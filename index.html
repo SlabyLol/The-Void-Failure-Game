@@ -1,44 +1,37 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void Failure</title>
+    <title>The Void Failure - Final Truth</title>
     <style>
         :root { --fnaf-green: #24ff15; --fnaf-red: #ff0000; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: var(--fnaf-green); font-family: 'Courier New', monospace; overflow: hidden; user-select: none; }
         
-        /* 3D Büro */
         .office { width: 100%; height: 100%; background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%); display: flex; justify-content: center; align-items: center; perspective: 1200px; }
         .desk { width: 800px; height: 500px; background: #121212; position: relative; transform: rotateX(15deg); border-top: 10px solid #0a0a0a; box-shadow: 0 60px 150px #000; display: flex; justify-content: center; align-items: center; }
         .monitor { width: 480px; height: 360px; background: #1a1a1a; border-radius: 12px; padding: 15px; position: relative; box-shadow: 0 0 50px #000; transform: translateZ(50px); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .screen { width: 100%; height: 100%; background: #040604; position: relative; overflow: hidden; border: 4px solid #000; }
         
-        /* Jumpscare */
         #jumpscare-layer { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9999; display: none; align-items: center; justify-content: center; }
         .scary-face { width: 140%; height: 140%; fill: #600; animation: tremor 0.04s infinite; }
         .crack-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: url('https://i.imgur.com/7S8zH4B.png'); background-size: cover; opacity: 0; z-index: 150; pointer-events: none; filter: invert(1); }
         
-        /* SCP Void & Messer */
         #scp-void { position: absolute; width: 350px; height: 350px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 5; pointer-events: none; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #knife-in-void { position: absolute; width: 80px; top: 35%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 5px red); z-index: 10; }
 
-        /* UI */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
-        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 8px 15px; margin: 10px; cursor: pointer; font-family: inherit; font-size: 12px; }
+        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 8px 15px; margin: 10px; cursor: pointer; font-family: inherit; font-size: 12px; transition: 0.2s; }
         .btn:hover { background: var(--fnaf-green); color: #000; }
         
-        /* Level 3 Balken */
         #stab-container { width: 200px; height: 35px; border: 2px solid var(--fnaf-green); position: relative; margin-top: 10px; cursor: pointer; background: #080808; }
         #stab-target { width: 40px; height: 100%; background: rgba(255,0,0,0.5); position: absolute; left: 80px; }
         #stab-bar { width: 10px; height: 100%; background: #fff; position: absolute; left: 0; pointer-events: none; }
 
-        /* Dialog Box */
         #dialog-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70%; background: rgba(0,0,0,0.95); border: 2px solid white; padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer; text-align: left; }
         #dialog-name { color: red; margin-bottom: 5px; font-weight: bold; }
 
-        /* Ending Screen */
         #ending-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
         .fade-in { animation: fadeIn 3s forwards; opacity: 0; }
 
@@ -66,13 +59,13 @@
                 
                 <div id="v-start" class="view active">
                     <h1>VOID_FAILURE</h1>
-                    <button class="btn" onclick="showView('game'); runLevel();">REPAIR</button>
+                    <button class="btn" onclick="showView('game'); runLevel();">REPAIR SYSTEM</button>
                     <button class="btn" onclick="showView('settings')">SETTINGS</button>
                 </div>
 
                 <div id="v-settings" class="view">
-                    <h3>CONFIG</h3>
-                    <label>DIFF:</label>
+                    <h3>CONFIGURATION</h3>
+                    <label>DIFFICULTY:</label>
                     <select id="diff" class="btn"><option value="1">EASY</option><option value="2" selected>NORMAL</option><option value="3">HARD</option></select>
                     <button class="btn" onclick="showView('start')">BACK</button>
                 </div>
@@ -82,7 +75,7 @@
                     <div id="game-zone"></div>
                 </div>
 
-                <div id="v-boss" class="view"><h3>REPAIRING... 99%</h3></div>
+                <div id="v-boss" class="view"><h3>SYSTEM REPAIR... 99%</h3></div>
             </div>
         </div>
     </div>
@@ -94,13 +87,14 @@
 </div>
 
 <div id="ending-screen">
-    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 10px;">ENDE</h1>
-    <p class="fade-in" style="color:#666; font-style: italic; margin-bottom: 30px;">Why....</p>
-    <div class="fade-in" style="color:var(--fnaf-green); border-top: 1px solid #333; padding-top: 20px; max-width: 500px;">
+    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 10px;">THE END</h1>
+    <p class="fade-in" style="color:#666; font-style: italic; margin-bottom: 10px;">Why....</p>
+    <p class="fade-in" style="color:#aaa; margin-bottom: 30px; font-size: 1.1rem;">Void only searched for friendship and love...</p>
+    <div class="fade-in" style="color:var(--fnaf-green); border-top: 1px solid #333; padding-top: 20px; max-width: 600px;">
         Lesson: Listen before you judge or destroy.
     </div>
     <br>
-    <button class="btn fade-in" onclick="location.reload()" style="margin-top: 40px;">WEITER</button>
+    <button class="btn fade-in" onclick="location.reload()" style="margin-top: 40px;">REBOOT</button>
 </div>
 
 <script>
@@ -120,17 +114,17 @@
         const zone = document.getElementById('game-zone');
         zone.innerHTML = '';
         const d = parseInt(document.getElementById('diff').value);
-        if (lvl < 5) startTimer(10 - (lvl * 1.2) - (d * 0.5));
+        if (lvl < 5) startTimer(11 - (lvl * 1.5) - (d * 0.5));
 
-        if (lvl === 1) { // Kabel
-            zone.innerHTML = '<p>CONNECT WIRES</p>';
+        if (lvl === 1) {
+            zone.innerHTML = '<p>CONNECT CONNECTORS</p>';
             for(let i=0; i<3; i++) {
                 let w = document.createElement('div');
                 w.style = "width:45px;height:45px;border:2px solid #222;margin:10px;cursor:pointer";
                 w.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
                 zone.appendChild(w);
             }
-        } else if (lvl === 2) { // 1-2-3
+        } else if (lvl === 2) {
             zone.innerHTML = '<p>SEQUENCE 1-2-3</p>';
             let c = 0;
             [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
@@ -141,11 +135,11 @@
                 };
                 zone.appendChild(b);
             });
-        } else if (lvl === 3) { // Block
-            zone.innerHTML = '<p>STABILIZE</p><div id="stab-container"><div id="stab-target"></div><div id="stab-bar"></div></div>';
+        } else if (lvl === 3) {
+            zone.innerHTML = '<p>STABILIZE POWER</p><div id="stab-container"><div id="stab-target"></div><div id="stab-bar"></div></div>';
             let p = 0; let dr = 1;
             stabInt = setInterval(() => { 
-                p += (1.5 * d) * dr;
+                p += (1.4 * d) * dr;
                 if(p >= 190 || p <= 0) dr *= -1;
                 if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = p + "px";
             }, 15);
@@ -153,9 +147,9 @@
                 if(isTrans) return;
                 if(p >= 80 && p <= 120) { clearInterval(stabInt); next(); } else { clearInterval(stabInt); sc(); }
             };
-        } else if (lvl === 4) { // Clicks
-            let cl=0; let b = document.createElement('button'); b.className="btn"; b.innerText="CLICK 15x";
-            b.onclick = () => { if(isTrans) return; cl++; b.innerText=15-cl; if(cl>=15) next(); };
+        } else if (lvl === 4) {
+            let cl=0; let b = document.createElement('button'); b.className="btn"; b.innerText="SYSTEM OVERRIDE (15x)";
+            b.onclick = () => { if(isTrans) return; cl++; b.innerText="CLICKS LEFT: " + (15-cl); if(cl>=15) next(); };
             zone.appendChild(b);
         } else finale();
     }
@@ -170,7 +164,7 @@
     }
 
     function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 300); }
-    function sc() { isTrans = true; clearInterval(timer); clearInterval(stabInt); document.getElementById('jumpscare-layer').style.display='flex'; setTimeout(()=>location.reload(), 1500); }
+    function sc() { isTrans = true; clearInterval(timer); clearInterval(stabInt); document.getElementById('jumpscare-layer').style.display='flex'; setTimeout(()=>location.reload(), 2000); }
 
     function finale() {
         clearInterval(timer); showView('boss');
@@ -200,10 +194,10 @@
         } else {
             document.getElementById('dialog-box').style.display = "none";
             const s = document.getElementById('scp-void');
-            s.style.transition = "all 2s linear";
-            s.style.filter = "invert(1) contrast(5) hue-rotate(180deg) blur(10px)";
+            s.style.transition = "all 2.5s ease-in";
+            s.style.filter = "invert(1) contrast(5) hue-rotate(180deg) blur(20px)";
             s.style.transform = "translate(-50%, -50%) scale(0)";
-            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 2000);
+            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 2500);
         }
     }
 </script>
