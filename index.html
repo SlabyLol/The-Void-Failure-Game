@@ -5,200 +5,190 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>THE VOID FAILURE</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; color: #fff; font-family: 'Courier New', monospace; }
-        canvas { display: block; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; color: #fff; font-family: 'Courier New', Courier, monospace; }
+        canvas { display: block; touch-action: none; }
         
         /* UI Layer */
-        #ui { position: fixed; top: 20px; left: 20px; z-index: 10; pointer-events: none; color: #440000; text-transform: uppercase; letter-spacing: 2px; }
+        #ui { position: fixed; top: 20px; left: 20px; z-index: 10; pointer-events: none; color: #300; text-transform: uppercase; font-weight: bold; }
         
-        /* Start Screen */
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: default; }
-        #start-btn { padding: 20px 40px; background: transparent; border: 2px solid #300; color: #300; font-family: inherit; font-size: 2rem; cursor: pointer; transition: 0.5s; }
+        /* Start-Bildschirm (Wichtig für Audio-Aktivierung) */
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #start-btn { padding: 20px 50px; background: transparent; border: 2px solid #400; color: #400; font-family: inherit; font-size: 1.5rem; cursor: pointer; transition: 0.3s; }
         #start-btn:hover { border-color: red; color: red; box-shadow: 0 0 20px red; }
 
-        /* Jumpscare */
+        /* Jumpscare Grafik */
         #jumpscare { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: none; background: #000; z-index: 9999; justify-content: center; align-items: center; }
-        .scary-face { width: 150%; height: 150%; fill: #200; animation: shake 0.05s infinite; filter: drop-shadow(0 0 50px red); }
-        @keyframes shake { 0% { transform: translate(10px, 10px) scale(1.1); } 50% { transform: translate(-10px, -5px) scale(1.2); } 100% { transform: translate(5px, 10px) scale(1.1); } }
+        .monster { width: 140%; height: 140%; fill: #200; filter: drop-shadow(0 0 40px red); animation: shake 0.04s infinite; }
+        @keyframes shake { 0% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -10px) scale(1.1); } 100% { transform: translate(2px, 8px); } }
 
-        /* End Screen */
-        #final { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #f00; display: none; z-index: 10000; overflow: hidden; text-align: center; line-height: 0.8; font-weight: bold; animation: strobe 0.1s infinite; }
-        @keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        /* "ToO bAd" Nachricht */
+        #bad-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 5rem; font-weight: bold; display: none; z-index: 1000; text-shadow: 0 0 15px #000; }
 
-        #bad-msg { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 5rem; display: none; z-index: 500; font-weight: bold; }
+        /* End-Screen */
+        #final-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #f00; display: none; z-index: 10000; overflow: hidden; font-weight: bold; line-height: 0.7; word-break: break-all; animation: strobe 0.05s infinite; }
+        @keyframes strobe { 0% { opacity: 1; } 50% { opacity: 0.6; } }
     </style>
 </head>
 <body>
 
-    <div id="ui">System: Online<br>Level: 1</div>
+    <div id="ui">System_Status: Critical<br>Depth: Level 1</div>
     
-    <div id="overlay">
-        <h1 style="color: #200; margin-bottom: 50px;">THE VOID FAILURE</h1>
+    <div id="start-screen">
+        <h1 style="color: #200; letter-spacing: 10px;">THE VOID FAILURE</h1>
         <button id="start-btn">EINTRETEN</button>
     </div>
 
     <div id="bad-msg">ToO bAd :)</div>
 
     <div id="jumpscare">
-        <svg class="scary-face" viewBox="0 0 200 200">
-            <path d="M 20 60 Q 50 10 100 10 Q 150 10 180 60 Q 200 120 100 190 Q 0 120 20 60" fill="#050000" stroke="red" stroke-width="2"/>
-            <circle cx="65" cy="75" r="15" fill="red" />
-            <circle cx="135" cy="75" r="15" fill="red" />
-            <path d="M 50 140 Q 100 200 150 140" stroke="red" fill="none" stroke-width="5" />
+        <svg class="monster" viewBox="0 0 200 200">
+            <path d="M 20 60 Q 50 10 100 10 Q 150 10 180 60 Q 200 120 100 190 Q 0 120 20 60" fill="#0a0000" stroke="red" stroke-width="2"/>
+            <circle cx="60" cy="80" r="12" fill="red"><animate attributeName="r" values="12;15;12" dur="0.1s" repeatCount="indefinite"/></circle>
+            <circle cx="140" cy="80" r="12" fill="red"><animate attributeName="r" values="12;15;12" dur="0.1s" repeatCount="indefinite"/></circle>
+            <path d="M 40 130 Q 100 210 160 130 L 150 140 Q 100 190 50 140 Z" fill="red" />
         </svg>
     </div>
 
-    <div id="final"></div>
+    <div id="final-screen"></div>
 
     <canvas id="gameCanvas"></canvas>
 
-    <audio id="s-jscare" src="c_jscare.mp3" preload="auto"></audio>
-    <audio id="s-loop" src="ncb_loop.mp3" loop preload="auto"></audio>
+    <audio id="audio-jscare" src="c_jscare.mp3" preload="auto"></audio>
+    <audio id="audio-loop" src="ncb_loop.mp3" loop preload="auto"></audio>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         const startBtn = document.getElementById('start-btn');
-        const overlay = document.getElementById('overlay');
         const ui = document.getElementById('ui');
+        
+        const sndJscare = document.getElementById('audio-jscare');
+        const sndLoop = document.getElementById('audio-loop');
 
-        let currentLevel = 1;
+        let level = 1;
+        let gameRunning = false;
         let player = { x: 0, y: 0 };
-        let goal = { x: 0, y: 0 };
-        let gameActive = false;
-
-        // Sound Initialisierung
-        const jscareSound = document.getElementById('s-jscare');
-        const loopSound = document.getElementById('s-loop');
+        let fragment = { x: 0, y: 0, found: false };
 
         function initLevel() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
             player.x = canvas.width / 2;
             player.y = canvas.height / 2;
-            goal.x = Math.random() * (canvas.width - 100) + 50;
-            goal.y = Math.random() * (canvas.height - 100) + 50;
-            ui.innerHTML = `System: Online<br>Level: ${currentLevel}`;
+            // Platziere das Fragment zufällig
+            fragment.x = Math.random() * (canvas.width - 100) + 50;
+            fragment.y = Math.random() * (canvas.height - 100) + 50;
+            ui.innerHTML = `System_Status: Critical<br>Depth: Level ${level}`;
         }
 
         startBtn.addEventListener('click', () => {
-            overlay.style.display = 'none';
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            gameActive = true;
+            document.getElementById('start-screen').style.display = 'none';
+            gameRunning = true;
             initLevel();
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(update);
         });
 
-        window.addEventListener('mousemove', (e) => { player.x = e.clientX; player.y = e.clientY; });
-        window.addEventListener('touchmove', (e) => { player.x = e.touches[0].clientX; player.y = e.touches[0].clientY; });
+        // Steuerung (Maus & Touch)
+        const move = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            player.x = (e.clientX || e.touches[0].clientX) - rect.left;
+            player.y = (e.clientY || e.touches[0].clientY) - rect.top;
+        };
+        window.addEventListener('mousemove', move);
+        window.addEventListener('touchmove', move);
 
-        function gameLoop() {
-            if (!gameActive) return;
+        function update() {
+            if (!gameRunning) return;
 
-            // Hintergrund
+            // 1. Hintergrund zeichnen (Absolute Dunkelheit)
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // "Gegner" Schatten (kurz sichtbar)
-            if (Math.random() > 0.98) {
-                ctx.fillStyle = 'rgba(20, 0, 0, 0.3)';
-                ctx.beginPath();
-                ctx.arc(goal.x + 20, goal.y + 20, 50, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Ziel (Das Void Fragment)
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "white";
-            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            // 2. Fragment zeichnen (nur sichtbar wenn Licht drauf fällt)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
             ctx.beginPath();
-            ctx.arc(goal.x, goal.y, 5, 0, Math.PI * 2);
+            ctx.arc(fragment.x, fragment.y, 3, 0, Math.PI * 2);
             ctx.fill();
-            ctx.shadowBlur = 0;
 
-            // Taschenlampen-Effekt (Maskierung)
+            // 3. Taschenlampen-Effekt (Maske)
             ctx.globalCompositeOperation = 'destination-in';
-            const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 150);
-            gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient;
+            const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 180);
+            grad.addColorStop(0, 'rgba(0,0,0,1)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.arc(player.x, player.y, 150, 0, Math.PI * 2);
+            ctx.arc(player.x, player.y, 180, 0, Math.PI * 2);
             ctx.fill();
             ctx.globalCompositeOperation = 'source-over';
 
-            // Kollision mit Ziel
-            const dist = Math.hypot(player.x - goal.x, player.y - goal.y);
-            if (dist < 30) {
-                if (currentLevel < 5) {
-                    currentLevel++;
+            // 4. Kollisionsprüfung
+            const d = Math.hypot(player.x - fragment.x, player.y - fragment.y);
+            if (d < 30) {
+                if (level < 5) {
+                    level++;
                     initLevel();
                 } else {
-                    gameActive = false;
+                    gameRunning = false;
                     startLevel5Logic();
                 }
             }
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(update);
         }
 
         async function startLevel5Logic() {
-            ui.innerHTML = "SYSTEM ERROR: LEVEL 5<br>IDENTITÄTSPRÜFUNG...";
+            ui.innerHTML = "LEVEL 5: THE END<br>BIOMETRISCHE ÜBERPRÜFUNG...";
             
             setTimeout(async () => {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    ui.innerHTML = "<span style='color:red'>ER HÖRT DICH JETZT. SEI STILL.</span>";
+                    ui.innerHTML = "<span style='color:red; font-size:1.5rem;'>STILLE! Wenn er dich hört, ist es vorbei.</span>";
                     
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const analyser = audioCtx.createAnalyser();
                     const source = audioCtx.createMediaStreamSource(stream);
                     source.connect(analyser);
                     analyser.fftSize = 256;
-                    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    const data = new Uint8Array(analyser.frequencyBinCount);
 
                     function monitor() {
-                        analyser.getByteFrequencyData(dataArray);
-                        let avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
-                        if (avg > 45) { // Jumpscare bei Geräusch
+                        analyser.getByteFrequencyData(data);
+                        let vol = data.reduce((a, b) => a + b) / data.length;
+                        if (vol > 45) { // Empfindlichkeit
                             triggerJumpscare();
                             stream.getTracks().forEach(t => t.stop());
-                        } else if (!gameActive) {
+                        } else if (!gameRunning) {
                             requestAnimationFrame(monitor);
                         }
                     }
                     monitor();
                 } catch (err) {
-                    // Mikrofon abgelehnt
-                    ui.style.display = "none";
-                    document.getElementById('bad-msg').style.display = "block";
+                    // ABGELEHNT
+                    ui.style.display = 'none';
+                    document.getElementById('bad-msg').style.display = 'block';
                     setTimeout(() => triggerJumpscare(), 1000);
                 }
             }, 2000);
         }
 
         function triggerJumpscare() {
-            document.getElementById('bad-msg').style.display = "none";
-            document.getElementById('jumpscare').style.display = "flex";
-            
-            // Audio abspielen
-            jscareSound.volume = 1.0;
-            jscareSound.play().catch(e => console.log("Audio Error:", e));
-
-            if (navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            document.getElementById('bad-msg').style.display = 'none';
+            document.getElementById('jumpscare').style.display = 'flex';
+            sndJscare.play();
+            if (navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
 
             setTimeout(() => {
-                document.getElementById('jumpscare').style.display = "none";
-                showFinalScreen();
+                document.getElementById('jumpscare').style.display = 'none';
+                showFinal();
             }, 1200);
         }
 
-        function showFinalScreen() {
-            const final = document.getElementById('final');
-            final.style.display = "block";
-            loopSound.play().catch(e => console.log("Loop Audio Error:", e));
-            
-            let text = "";
-            for(let i=0; i<3000; i++) text += "NEVER COME BACK ";
-            final.innerText = text;
+        function showFinal() {
+            const final = document.getElementById('final-screen');
+            final.style.display = 'block';
+            sndLoop.play();
+            let t = "";
+            for(let i=0; i<4000; i++) t += "NEVER COME BACK ";
+            final.innerText = t;
         }
     </script>
 </body>
