@@ -3,253 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Void Failure Game</title>
+    <title>The Void Failure Game - Ultimate</title>
     <style>
-        :root { --fnaf-green: #24ff15; --fnaf-red: #ff0000; --terminal-bg: #050805; }
+        :root {
+            --fnaf-green: #24ff15;
+            --fnaf-red: #ff0000;
+            --fnaf-blue: #00ffff;
+            --monitor-glow: rgba(36, 255, 21, 0.2);
+            --desk-color: #1a1a1a;
+        }
+
+        /* Colorblind Modes */
+        .cb-protanopia { --fnaf-red: #888; --fnaf-green: #fff100; }
+        .cb-deuteranopia { --fnaf-red: #6d5a00; --fnaf-green: #ffd500; }
+        .cb-tritanopia { --fnaf-red: #ff0050; --fnaf-green: #00f0ff; }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #000; color: var(--fnaf-green);
+            font-family: 'Courier New', monospace; overflow: hidden;
+        }
+
+        /* 3D Büro Atmosphäre */
+        .office {
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #151515 0%, #000 80%);
+            display: flex; justify-content: center; align-items: center;
+            perspective: 1000px;
+        }
+
+        .desk {
+            width: 600px; height: 400px;
+            background: var(--desk-color);
+            position: relative;
+            transform: rotateX(10deg);
+            border-top: 5px solid #111;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
+        }
+
+        /* Der Röhrenmonitor */
+        .monitor {
+            width: 420px; height: 320px;
+            background: #222;
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 0 30px #000;
+            transform: translateZ(20px);
+        }
+
+        .screen {
+            width: 100%; height: 100%;
+            background: #050805;
+            position: relative;
+            overflow: hidden;
+            border-radius: 5px;
+            border: 3px solid #111;
+            box-shadow: inset 0 0 40px #000;
+        }
+
+        /* CRT Filter */
+        .crt::before {
+            content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            z-index: 10; pointer-events: none; background-size: 100% 3px, 3px 100%;
+        }
+
+        /* UI Overlays */
+        #ui-layer {
+            position: absolute; top: 10px; width: 90%; left: 5%;
+            display: flex; justify-content: space-between; font-size: 10px; z-index: 20;
+        }
+        .battery-bar { width: 50px; height: 8px; border: 1px solid var(--fnaf-green); }
+        #timer-fill { width: 100%; height: 100%; background: var(--fnaf-green); transition: width 0.1s linear; }
+
+        /* Menüs */
+        .menu-view {
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+
+        .settings-view { display: none; padding: 20px; box-sizing: border-box; }
+
+        .btn {
+            background: transparent; border: 1px solid var(--fnaf-green);
+            color: var(--fnaf-green); padding: 8px 15px; margin: 5px;
+            cursor: pointer; font-family: inherit; font-size: 0.8rem;
+        }
+        .btn:hover { background: var(--fnaf-green); color: #000; }
+
+        /* Tasks & Game Elements */
+        .task-panel { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
         
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: #000; color: var(--fnaf-green); 
-            font-family: 'Courier New', monospace; overflow: hidden; 
-            user-select: none;
+        #stab-disk {
+            width: 150px; height: 150px; border: 5px solid #111; border-radius: 50%;
+            position: relative; background: #010101; margin: 20px; cursor: pointer;
         }
+        #stab-target { width: 40px; height: 20px; background: rgba(255,0,0,0.4); position: absolute; top: -3px; left: 55px; border: 1px solid red; border-radius: 3px; }
+        #stab-needle { width: 4px; height: 75px; background: #fff; position: absolute; bottom: 50%; left: calc(50% - 2px); transform-origin: bottom center; }
 
-        /* CRT EFFEKTE (Scanlines & Rauschen) */
-        .crt-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03)); 
-            z-index: 5000; pointer-events: none; background-size: 100% 3px, 3px 100%; opacity: 0.9; 
-        }
-        .vignette { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            box-shadow: inset 0 0 180px #000; z-index: 5001; pointer-events: none; 
-        }
+        .wire { width: 40px; height: 40px; border: 1px solid #333; margin: 10px; cursor: pointer; }
+        .wire.active { background: var(--fnaf-red); box-shadow: 0 0 15px var(--fnaf-red); }
 
-        #game-container { 
-            position: relative; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        }
+        #boss-creature { width: 10px; height: 10px; background: #fff; border-radius: 50%; filter: blur(10px); position: absolute; opacity: 0; top: 40%; left: 50%; }
+        #knife-img { width: 70px; position: absolute; bottom: 10px; filter: invert(1); transition: transform 0.1s; pointer-events: none; }
 
-        /* TOP UI */
-        #top-interface { 
-            position: absolute; top: 30px; text-align: center; width: 100%; z-index: 100; 
+        /* Scares */
+        #jumpscare-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: none; z-index: 10000; align-items: center; justify-content: center;
         }
-        .timer-shell { 
-            width: 300px; height: 15px; border: 1px solid #222; margin: 10px auto; 
-            background: #0a0000; overflow: hidden; border-radius: 2px;
-        }
-        #timer-bar { 
-            width: 100%; height: 100%; background: var(--fnaf-green); 
-            box-shadow: 0 0 15px var(--fnaf-green); transition: width 0.1s linear; 
-        }
+        .monster { width: 120%; height: 120%; fill: #200; animation: jitter 0.04s infinite; }
+        #fail-wall { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #400; display: none; z-index: 11000; word-break: break-all; overflow: hidden; font-size: 1rem; line-height: 0.7; }
 
-        /* GAME PANELS */
-        .panel { 
-            width: 380px; height: 480px; border: 4px solid #1a1a1a; 
-            background: var(--terminal-bg); display: none; 
-            flex-direction: column; align-items: center; justify-content: center; 
-            position: relative; box-shadow: inset 0 0 60px #000; 
-        }
-
-        /* LEVEL 3 FIX: STABILIZER */
-        #stab-disk { 
-            width: 250px; height: 250px; border: 8px solid #111; border-radius: 50%; 
-            position: relative; background: #010101; cursor: pointer; 
-        }
-        #stab-target-zone { 
-            width: 60px; height: 35px; background: rgba(255, 0, 0, 0.4); 
-            border: 2px solid red; position: absolute; top: -6px; left: 95px; 
-            border-radius: 5px; box-shadow: 0 0 20px red; z-index: 1;
-        }
-        #stab-needle { 
-            width: 6px; height: 120px; background: #fff; position: absolute; 
-            bottom: 50%; left: calc(50% - 3px); transform-origin: bottom center; 
-            box-shadow: 0 0 12px #fff; z-index: 2;
-        }
-
-        /* TASKS */
-        .wire { width: 70px; height: 70px; border: 2px solid #333; margin: 15px; cursor: pointer; background: #000; }
-        .wire.active { background: var(--fnaf-red); border-color: #fff; box-shadow: 0 0 25px red; }
-        .num-btn { 
-            width: 95px; height: 95px; background: #0a0a0a; border: 1px solid var(--fnaf-green); 
-            color: var(--fnaf-green); font-size: 2.5rem; margin: 10px; cursor: pointer; 
-        }
-        .num-btn.done { opacity: 0.1; border-color: red; pointer-events: none; }
-
-        /* BOSS BATTLE */
-        #boss-creature { 
-            width: 20px; height: 20px; background: #fff; border-radius: 50%; 
-            filter: blur(15px); position: absolute; opacity: 0; top: 40%; 
-        }
-        #knife-sprite { 
-            width: 130px; position: absolute; bottom: 30px; 
-            filter: invert(1) brightness(1.5); transition: transform 0.1s; 
-        }
-
-        /* SCREENS */
-        .full-screen { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 10000; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center; 
-        }
-        .btn-action { 
-            padding: 20px 60px; background: transparent; border: 2px solid #444; 
-            color: #666; cursor: pointer; font-family: inherit; font-size: 1.5rem; 
-            letter-spacing: 10px; transition: 0.3s; 
-        }
-        .btn-action:hover { border-color: var(--fnaf-green); color: var(--fnaf-green); box-shadow: 0 0 30px var(--fnaf-green); }
-
-        #jumpscare-box { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; display: none; z-index: 20000; 
-            align-items: center; justify-content: center; 
-        }
-        .jumpscare-monster { 
-            width: 150%; height: 150%; fill: #200; 
-            animation: jitter 0.04s infinite; 
-        }
-
-        #fail-text-wall { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; color: #500; display: none; z-index: 30000; 
-            word-break: break-all; overflow: hidden; font-size: 1.3rem; line-height: 0.6; 
-        }
-
-        @keyframes jitter { 
-            0% { transform: scale(1.1) translate(10px, 10px); } 
-            50% { transform: scale(1.15) translate(-10px, -10px); } 
-            100% { transform: scale(1.1) translate(0,0); } 
-        }
+        @keyframes jitter { 0%{transform: translate(5px,5px);} 50%{transform: translate(-5px,-5px);} }
+        
+        label { font-size: 0.7rem; margin-top: 10px; }
+        input[type="range"] { accent-color: var(--fnaf-green); width: 150px; }
     </style>
 </head>
-<body>
+<body id="game-body">
 
-    <div class="crt-overlay"></div>
-    <div class="vignette"></div>
+    <div class="office">
+        <div class="desk">
+            <div class="monitor">
+                <div class="screen crt">
+                    
+                    <div id="ui-layer" style="display:none;">
+                        <div id="depth-txt">D-01</div>
+                        <div class="battery-bar"><div id="timer-fill"></div></div>
+                    </div>
 
-    <div id="game-container">
-        <div id="top-interface">
-            <div id="depth-indicator" style="letter-spacing: 5px; color: #444;">DEPTH_01</div>
-            <div class="timer-shell"><div id="timer-bar"></div></div>
-        </div>
+                    <div id="content">
+                        <div id="start-view" class="menu-view">
+                            <h2 style="letter-spacing: 5px;">VOID_FAILURE</h2>
+                            <button class="btn" onclick="showView('game')">START GAME</button>
+                            <button class="btn" onclick="showView('settings')">SETTINGS</button>
+                        </div>
 
-        <div id="panel-tasks" class="panel"></div>
+                        <div id="settings-view" class="menu-view settings-view">
+                            <h3>CONFIGURATION</h3>
+                            <label>VOLUME</label>
+                            <input type="range" id="vol-slider" min="0" max="100" value="50" onchange="updateSettings()">
+                            
+                            <label>COLORBLIND</label>
+                            <select id="cb-mode" class="btn" onchange="updateSettings()">
+                                <option value="none">OFF</option>
+                                <option value="cb-protanopia">PROTANOPIA</option>
+                                <option value="cb-deuteranopia">DEUTERANOPIA</option>
+                                <option value="cb-tritanopia">TRITANOPIA</option>
+                            </select>
+                            <button class="btn" onclick="showView('start')" style="margin-top: 20px;">BACK</button>
+                        </div>
 
-        <div id="panel-terminal" class="panel">
-            <div style="font-size: 1.5rem; margin-bottom: 30px;">DECRYPTING... <span style="color:red">SHHH!</span></div>
-            <div style="width: 85%; height: 20px; border: 1px solid var(--fnaf-green);">
-                <div id="upload-fill" style="width:0%; height:100%; background: var(--fnaf-green);"></div>
+                        <div id="game-view" class="task-panel"></div>
+
+                        <div id="mic-view" class="task-panel">
+                            <div style="font-size: 0.8rem;">UPLOADING... <span style="color:red">SHHH!</span></div>
+                            <div class="battery-bar" style="width: 150px; margin-top: 15px;">
+                                <div id="upload-fill" style="width: 0%; height: 100%; background: var(--fnaf-green);"></div>
+                            </div>
+                        </div>
+
+                        <div id="boss-view" class="task-panel">
+                            <div id="boss-creature"></div>
+                            <div id="knife-img">
+                                <svg viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="#fff" stroke="#fff"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="terminal-logs" style="font-size: 0.7rem; margin-top: 40px; opacity: 0.4; width: 85%;"></div>
-        </div>
-
-        <div id="panel-boss" class="panel">
-            <div id="boss-creature"></div>
-            <div id="knife-sprite">
-                <svg viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="#fff" stroke="#fff"/></svg>
-            </div>
-            <div style="position:absolute; top:20px; color:red; font-size:0.8rem; letter-spacing:2px;">STRIKE_NOW</div>
         </div>
     </div>
 
-    <div id="start-view" class="full-screen">
-        <h1 style="letter-spacing: 15px; color: #111; margin-bottom: 60px;">THE VOID FAILURE</h1>
-        <button class="btn-action" onclick="bootGame()">BOOT_SYSTEM</button>
-    </div>
-
-    <div id="jumpscare-box">
-        <svg class="jumpscare-monster" viewBox="0 0 200 200">
+    <div id="jumpscare-layer">
+        <svg class="monster" viewBox="0 0 200 200">
             <circle cx="65" cy="80" r="20" fill="red"/><circle cx="135" cy="80" r="20" fill="red"/>
-            <path d="M 40 155 Q 100 245 160 155" stroke="red" fill="none" stroke-width="12"/>
+            <path d="M 40 150 Q 100 240 160 150" stroke="red" fill="none" stroke-width="12"/>
         </svg>
     </div>
 
-    <div id="fail-text-wall"></div>
+    <div id="fail-wall"></div>
 
     <audio id="snd-jscare" src="c_jscare.mp3"></audio>
     <audio id="snd-loop" src="ncb_loop.mp3" loop></audio>
 
     <script>
         let level = 1;
-        let timeLeft = 100;
         let timerInt, bossInt;
+        let volume = 0.5;
         const sndJscare = document.getElementById('snd-jscare');
         const sndLoop = document.getElementById('snd-loop');
 
-        // Gehörschutz: Lautstärke
-        sndJscare.volume = 0.5;
-        sndLoop.volume = 0.4;
+        function updateSettings() {
+            volume = document.getElementById('vol-slider').value / 100;
+            sndJscare.volume = volume;
+            sndLoop.volume = volume * 0.7;
 
-        function bootGame() {
-            document.getElementById('start-view').style.display = 'none';
-            // Audio Unlock
-            sndJscare.play().then(() => { sndJscare.pause(); sndJscare.currentTime = 0; });
+            const cbMode = document.getElementById('cb-mode').value;
+            document.getElementById('game-body').className = cbMode !== 'none' ? cbMode : '';
+        }
+
+        function showView(view) {
+            document.querySelectorAll('.menu-view, .task-panel').forEach(v => v.style.display = 'none');
+            document.getElementById('ui-layer').style.display = 'none';
+
+            if(view === 'start') document.getElementById('start-view').style.display = 'flex';
+            if(view === 'settings') document.getElementById('settings-view').style.display = 'flex';
+            if(view === 'game') {
+                document.getElementById('ui-layer').style.display = 'flex';
+                startGame();
+            }
+        }
+
+        function startGame() {
+            level = 1;
             loadLevel();
         }
 
         function loadLevel() {
-            const p = document.getElementById('panel-tasks');
-            p.style.display = 'flex';
-            p.innerHTML = '';
-            document.getElementById('depth-indicator').innerText = "DEPTH_0" + level;
+            const panel = document.getElementById('game-view');
+            panel.style.display = 'flex';
+            panel.innerHTML = '';
+            document.getElementById('depth-txt').innerText = "D-0" + level;
 
-            if (level === 1) { // Wires
+            if(level === 1) { // Wires
                 for(let i=0; i<3; i++) {
                     let w = document.createElement('div'); w.className = 'wire';
-                    w.onclick = function() { this.classList.add('active'); if(document.querySelectorAll('.wire.active').length === 3) next(); };
-                    p.appendChild(w);
+                    w.onclick = function() { this.classList.add('active'); if(document.querySelectorAll('.wire.active').length === 3) nextLevel(); };
+                    panel.appendChild(w);
                 }
-            } else if (level === 2) { // Sequence
+            } else if(level === 2) { // Sequence
                 let goal = 1;
                 [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
-                    let b = document.createElement('button'); b.className = 'num-btn'; b.innerText = n;
-                    b.onclick = function() { if(parseInt(this.innerText) === goal) { this.classList.add('done'); goal++; if(goal>3) next(); } else fail(); };
-                    p.appendChild(b);
+                    let b = document.createElement('button'); b.className = 'btn'; b.innerText = n;
+                    b.onclick = function() { if(parseInt(this.innerText) === goal) { this.style.opacity = 0.2; goal++; if(goal > 3) nextLevel(); } else triggerFail(); };
+                    panel.appendChild(b);
                 });
-            } else if (level === 3) { // STABILIZER (Corrected)
+            } else if(level === 3) { // Stabilizer
                 let disk = document.createElement('div'); disk.id = 'stab-disk';
-                let target = document.createElement('div'); target.id = 'stab-target-zone';
+                let target = document.createElement('div'); target.id = 'stab-target';
                 let needle = document.createElement('div'); needle.id = 'stab-needle';
                 let deg = 0;
-                let rotate = setInterval(() => { deg = (deg + 8) % 360; needle.style.transform = `rotate(${deg}deg)`; }, 20);
-                disk.onclick = () => { 
-                    if(deg > 340 || deg < 20) { clearInterval(rotate); next(); } 
-                    else fail(); 
-                };
-                disk.appendChild(target); disk.appendChild(needle); p.appendChild(disk);
-            } else if (level === 4) { // Fast Click
-                let h = 0;
-                let b = document.createElement('button'); b.className = 'num-btn'; b.style.width = "250px"; b.innerText = "OVERRIDE";
-                b.onclick = () => { h++; b.innerText = 12 - h; if(h >= 12) next(); };
-                p.appendChild(b);
+                let rot = setInterval(() => { deg = (deg + 8) % 360; needle.style.transform = `rotate(${deg}deg)`; }, 20);
+                disk.onclick = () => { if(deg > 340 || deg < 20) { clearInterval(rot); nextLevel(); } else triggerFail(); };
+                disk.appendChild(target); disk.appendChild(needle); panel.appendChild(disk);
+            } else if(level === 4) { // Click
+                let taps = 0;
+                let b = document.createElement('button'); b.className = 'btn'; b.innerText = "CLICK 10x";
+                b.onclick = () => { taps++; b.innerText = (10-taps) + "x"; if(taps >= 10) nextLevel(); };
+                panel.appendChild(b);
             } else {
-                p.style.display = 'none';
-                runLevel5Mic();
+                panel.style.display = 'none';
+                runLevel5();
                 return;
             }
-            startTimer(12 - (level * 1.5));
+            startTimer(12 - level);
         }
 
         function startTimer(s) {
-            timeLeft = 100;
+            let left = 100;
             clearInterval(timerInt);
             timerInt = setInterval(() => {
-                timeLeft -= (0.1 / s) * 100;
-                document.getElementById('timer-bar').style.width = timeLeft + "%";
-                if(timeLeft <= 0) fail();
+                left -= (0.1 / s) * 100;
+                document.getElementById('timer-fill').style.width = left + "%";
+                if(left <= 0) triggerFail();
             }, 100);
         }
 
-        function next() { level++; loadLevel(); }
+        function nextLevel() { level++; loadLevel(); }
 
-        async function runLevel5Mic() {
-            document.getElementById('panel-terminal').style.display = 'flex';
-            document.getElementById('top-interface').style.display = 'none';
-            let prg = 0;
-            const logBox = document.getElementById('terminal-logs');
-            const lines = ["> Syncing...", "> Bypass...", "> Soul.exe found.", "> Uploading...", "> WATCH OUT."];
-
+        async function runLevel5() {
+            document.getElementById('mic-view').style.display = 'flex';
+            document.getElementById('ui-layer').style.display = 'none';
+            let prog = 0;
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const audioCtx = new AudioContext();
@@ -257,54 +288,48 @@
                 const source = audioCtx.createMediaStreamSource(stream);
                 source.connect(analyser);
                 const data = new Uint8Array(analyser.frequencyBinCount);
-
                 const loop = setInterval(() => {
-                    prg += 0.4;
-                    document.getElementById('upload-fill').style.width = prg + "%";
-                    if(Math.floor(prg) % 20 === 0 && prg % 1 === 0) logBox.innerHTML += lines[Math.floor(prg/21)] + "<br>";
-
+                    prog += 0.5;
+                    document.getElementById('upload-fill').style.width = prog + "%";
                     analyser.getByteFrequencyData(data);
                     let vol = data.reduce((a,b)=>a+b)/data.length;
-                    if(vol > 50) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); fail(); }
-                    if(prg >= 100) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); runBossFight(); }
+                    if(vol > 50) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); triggerFail(); }
+                    if(prog >= 100) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); runBoss(); }
                 }, 50);
-            } catch(e) { fail(); }
+            } catch(e) { triggerFail(); }
         }
 
-        function runBossFight() {
-            document.getElementById('panel-terminal').style.display = 'none';
-            document.getElementById('panel-boss').style.display = 'flex';
-            let sz = 20;
+        function runBoss() {
+            document.getElementById('mic-view').style.display = 'none';
+            document.getElementById('boss-view').style.display = 'flex';
+            let sz = 15;
             const cre = document.getElementById('boss-creature');
             bossInt = setInterval(() => {
-                sz += 4; cre.style.width = sz + "px"; cre.style.height = sz + "px"; cre.style.opacity = sz/180;
-                if(sz > 400) fail();
+                sz += 4; cre.style.width = sz + "px"; cre.style.height = sz + "px"; cre.style.opacity = sz/150;
+                if(sz > 350) triggerFail();
             }, 30);
-
-            document.getElementById('panel-boss').onclick = () => {
+            document.getElementById('boss-view').onclick = () => {
                 clearInterval(bossInt);
-                document.getElementById('knife-sprite').style.transform = "translateY(-160px) rotate(-15deg)";
-                if(sz > 90 && sz < 165) {
-                    setTimeout(() => {
-                        document.getElementById('panel-boss').style.display = 'none';
-                        document.body.innerHTML = "<div class='full-screen'><h1 style='color:cyan'>SYSTEM_RESTORED</h1><p>Vielen Dank fürs Spielen!</p><button class='btn-action' onclick='location.reload()'>RESTART</button></div>";
-                    }, 800);
-                } else fail();
+                document.getElementById('knife-img').style.transform = "translateY(-100px) rotate(-15deg)";
+                if(sz > 80 && sz < 150) {
+                    setTimeout(() => { alert("SYSTEM SECURED!"); location.reload(); }, 1000);
+                } else triggerFail();
             };
         }
 
-        function fail() {
+        function triggerFail() {
             clearInterval(timerInt); clearInterval(bossInt);
-            document.getElementById('jumpscare-box').style.display = 'flex';
+            document.getElementById('jumpscare-layer').style.display = 'flex';
             sndJscare.play();
             setTimeout(() => {
-                document.getElementById('jumpscare-box').style.display = 'none';
-                const wall = document.getElementById('fail-text-wall');
-                wall.style.display = 'block';
-                sndLoop.play();
-                wall.innerText = "NEVER COME BACK ".repeat(3000);
-            }, 1600);
+                document.getElementById('jumpscare-layer').style.display = 'none';
+                const wall = document.getElementById('fail-wall');
+                wall.style.display = 'block'; sndLoop.play();
+                wall.innerText = "NEVER COME BACK ".repeat(2000);
+            }, 1500);
         }
+
+        updateSettings(); // Initialise
     </script>
 </body>
 </html>
