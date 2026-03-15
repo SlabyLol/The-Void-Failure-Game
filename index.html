@@ -104,6 +104,23 @@
     let stabInt;
     let dialogStep = 0;
 
+    // Jumpscare Sound Generator
+    function playScream() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+        osc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 1.5);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 1.5);
+    }
+
     function showView(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById('v-' + id).classList.add('active');
@@ -164,7 +181,15 @@
     }
 
     function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 300); }
-    function sc() { isTrans = true; clearInterval(timer); clearInterval(stabInt); document.getElementById('jumpscare-layer').style.display='flex'; setTimeout(()=>location.reload(), 2000); }
+    
+    function sc() { 
+        isTrans = true; 
+        clearInterval(timer); 
+        clearInterval(stabInt); 
+        playScream();
+        document.getElementById('jumpscare-layer').style.display='flex'; 
+        setTimeout(()=>location.reload(), 1500); 
+    }
 
     function finale() {
         clearInterval(timer); showView('boss');
