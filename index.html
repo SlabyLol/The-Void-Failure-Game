@@ -8,54 +8,61 @@
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; color: #fff; font-family: 'Courier New', monospace; user-select: none; }
         canvas { display: block; touch-action: none; cursor: none; }
 
-        /* UI Styling */
+        /* UI */
         #game-ui { position: fixed; top: 20px; left: 20px; z-index: 10; pointer-events: none; }
-        #level-display { font-size: 1.5rem; color: #400; font-weight: bold; }
-        #task-desc { font-size: 1.1rem; color: #888; margin-top: 5px; text-transform: uppercase; }
+        #level-display { font-size: 1.5rem; color: #600; font-weight: bold; text-shadow: 2px 2px #000; }
+        #task-desc { font-size: 1rem; color: #aaa; margin-top: 5px; text-transform: uppercase; }
         
         /* Volume Bar für Level 5 */
-        #volume-container { width: 250px; height: 15px; border: 1px solid #222; margin-top: 15px; display: none; background: #050000; }
-        #volume-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #300, #f00); transition: width 0.1s; }
+        #volume-container { width: 250px; height: 15px; border: 1px solid #444; margin-top: 15px; display: none; background: #111; position: relative; }
+        #volume-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #500, #f00); transition: width 0.1s; }
 
-        /* Screens */
+        /* Start Screen */
         .screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background: #000; }
-        #start-btn { padding: 20px 60px; background: transparent; border: 1px solid #300; color: #300; font-size: 1.8rem; cursor: pointer; transition: 0.5s; font-family: inherit; }
-        #start-btn:hover { border-color: red; color: red; box-shadow: 0 0 30px red; }
+        #start-btn { padding: 15px 50px; background: transparent; border: 2px solid #300; color: #500; font-size: 1.5rem; cursor: pointer; transition: 0.3s; font-family: inherit; }
+        #start-btn:hover { border-color: red; color: red; box-shadow: 0 0 20px red; }
 
-        /* Annäherung der Kreatur */
-        #approach-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; z-index: 9998; justify-content: center; align-items: center; }
-        #creature-sprite { width: 100px; height: 100px; background: #1a0000; border-radius: 50%; filter: blur(40px); transition: all 1.2s cubic-bezier(0.6, 0.04, 0.98, 0.33); }
+        /* Die Kreatur kommt (Approach) */
+        #approach-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; display: none; z-index: 9998; justify-content: center; align-items: center; pointer-events: none; }
+        #creature-silhouette { width: 20px; height: 20px; background: #111; border-radius: 50%; filter: blur(10px); }
+        .run-at-player { animation: runForward 1.2s forwards; }
+        @keyframes runForward {
+            0% { transform: scale(1); filter: blur(10px); background: #111; }
+            100% { transform: scale(100); filter: blur(2px); background: #300; }
+        }
 
         /* Jumpscare */
         #jumpscare { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; background: #000; z-index: 9999; justify-content: center; align-items: center; }
-        .monster-svg { width: 130%; height: 130%; fill: #200; filter: drop-shadow(0 0 60px red); animation: tremor 0.04s infinite; }
-        @keyframes tremor { 0% { transform: scale(1.1) translate(4px, 4px); } 50% { transform: scale(1.2) translate(-4px, -2px); } 100% { transform: scale(1.1) translate(2px, -4px); } }
+        .monster-svg { width: 140%; height: 140%; fill: #200; filter: drop-shadow(0 0 50px red); animation: tremor 0.05s infinite; }
+        @keyframes tremor { 0% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -10px); } 100% { transform: translate(2px, 8px); } }
 
-        /* "ToO bAd" & Ende */
-        #bad-msg { color: red; font-size: 5rem; font-weight: bold; display: none; z-index: 10001; text-shadow: 0 0 20px red; }
-        #final-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #f00; display: none; z-index: 10002; overflow: hidden; font-size: 1.4rem; line-height: 0.7; word-break: break-all; }
+        /* "ToO bAd :)" */
+        #bad-msg { color: red; font-size: 4rem; font-weight: bold; display: none; z-index: 10001; text-align: center; }
+
+        /* Finaler Screen */
+        #final-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #f00; display: none; z-index: 10002; overflow: hidden; font-size: 1.3rem; line-height: 0.7; word-break: break-all; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="game-ui">
-        <div id="level-display">SYSTEM_LOAD: 0%</div>
-        <div id="task-desc">Warte auf Initialisierung...</div>
+        <div id="level-display">DEPTH: LEVEL 1</div>
+        <div id="task-desc">FINDE DAS FRAGMENT IN DER DUNKELHEIT</div>
         <div id="volume-container"><div id="volume-bar"></div></div>
     </div>
 
     <div id="start-screen" class="screen">
-        <h1 style="color: #200; font-size: 3rem; letter-spacing: 15px;">THE VOID FAILURE</h1>
-        <button id="start-btn">VERBINDUNG STARTEN</button>
+        <h1 style="color: #200; font-size: 2.5rem; letter-spacing: 10px; margin-bottom: 30px;">THE VOID FAILURE</h1>
+        <button id="start-btn">SYSTEM STARTEN</button>
     </div>
 
     <div id="approach-overlay">
-        <div id="creature-sprite"></div>
+        <div id="creature-silhouette"></div>
     </div>
 
     <div id="jumpscare">
         <svg class="monster-svg" viewBox="0 0 200 200">
-            <path d="M 20 60 Q 50 5 100 5 Q 150 5 180 60 Q 200 130 100 195 Q 0 130 20 60" fill="#050000" stroke="red" stroke-width="1"/>
+            <path d="M 20 60 Q 50 5 100 5 Q 150 5 180 60 Q 200 130 100 195 Q 0 130 20 60" fill="#080000" stroke="red" stroke-width="1"/>
             <circle cx="65" cy="70" r="18" fill="red" />
             <circle cx="135" cy="70" r="18" fill="red" />
             <path d="M 30 140 Q 100 230 170 140 L 160 150 Q 100 210 40 150 Z" fill="red" />
@@ -73,119 +80,130 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const taskText = document.getElementById('task-desc');
-        const lvlText = document.getElementById('level-display');
+        const startBtn = document.getElementById('start-btn');
+        const lvlDisplay = document.getElementById('level-display');
+        const taskDisplay = document.getElementById('task-desc');
+        
         const sndJscare = document.getElementById('snd-jscare');
         const sndLoop = document.getElementById('snd-loop');
 
         let level = 1;
-        let active = false;
-        let pos = { x: 0, y: 0 };
-        let target = { x: 0, y: 0 };
+        let gameActive = false;
+        let mouse = { x: -1000, y: -1000 };
+        let target = { x: 0, y: 0, size: 15 };
         let timer;
-        let limit = 10;
+        let timeLeft = 12;
 
-        const levelData = [
-            { t: "Finde das Sicherheits-Fragment", time: 10 },
-            { t: "Lokalisiere den Systemfehler", time: 8 },
-            { t: "Säubere den Datenkern", time: 7 },
+        const levelConfigs = [
+            { t: "Suche nach dem Signal...", time: 12 },
+            { t: "Finde den Systemfehler...", time: 10 },
+            { t: "Lokalisiere das Fragment...", time: 8 },
             { t: "Letzte Synchronisation...", time: 6 },
-            { t: "IDENTIFIKATION: BLEIBE STUMM", time: 0 }
+            { t: "STILLE BEWAHREN.", time: 0 }
         ];
 
-        function init() {
+        function initLevel() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            // Zufällige Position des Ziels
             target.x = 100 + Math.random() * (canvas.width - 200);
             target.y = 100 + Math.random() * (canvas.height - 200);
-            lvlText.innerText = `DEPTH: LEVEL ${level}`;
-            taskText.innerText = levelData[level-1].t;
             
-            limit = levelData[level-1].time;
-            if(level < 5) startCountdown();
+            lvlDisplay.innerText = `DEPTH: LEVEL ${level}`;
+            taskDisplay.innerText = levelConfigs[level-1].t;
+            timeLeft = levelConfigs[level-1].time;
+            
+            if (level < 5) startTimer();
         }
 
-        function startCountdown() {
+        function startTimer() {
             clearInterval(timer);
             timer = setInterval(() => {
-                limit--;
-                if(limit <= 0) fail();
+                timeLeft--;
+                if (timeLeft <= 0) failGame();
             }, 1000);
         }
 
-        function fail() {
+        function failGame() {
             clearInterval(timer);
-            active = false;
+            gameActive = false;
             const overlay = document.getElementById('approach-overlay');
-            const sprite = document.getElementById('creature-sprite');
+            const silhouette = document.getElementById('creature-silhouette');
             overlay.style.display = 'flex';
-            
-            // Kreatur "rennt" auf Kamera zu
-            setTimeout(() => {
-                sprite.style.width = '200vw';
-                sprite.style.height = '200vw';
-                sprite.style.background = '#400';
-            }, 50);
+            silhouette.classList.add('run-at-player');
 
-            setTimeout(triggerJumpscare, 1300);
+            setTimeout(() => {
+                triggerJumpscare();
+            }, 1200);
         }
 
-        document.getElementById('start-btn').addEventListener('click', () => {
+        startBtn.addEventListener('click', () => {
             document.getElementById('start-screen').style.display = 'none';
-            active = true;
-            init();
-            render();
+            gameActive = true;
+            initLevel();
+            draw();
         });
 
-        window.addEventListener('mousemove', e => { pos.x = e.clientX; pos.y = e.clientY; });
-        window.addEventListener('touchmove', e => { pos.x = e.touches[0].clientX; pos.y = e.touches[0].clientY; });
-        
-        window.addEventListener('mousedown', () => {
-            if(!active || level >= 5) return;
-            if(Math.hypot(pos.x - target.x, pos.y - target.y) < 60) {
-                if(level < 4) {
+        // Steuerung
+        const updateMouse = (e) => {
+            mouse.x = e.clientX || e.touches[0].clientX;
+            mouse.y = e.clientY || e.touches[0].clientY;
+        };
+        window.addEventListener('mousemove', updateMouse);
+        window.addEventListener('touchmove', updateMouse);
+
+        // Klick-Erkennung
+        const checkTarget = () => {
+            if (!gameActive || level >= 5) return;
+            const dist = Math.hypot(mouse.x - target.x, mouse.y - target.y);
+            // Radius für Klick ist 60 Pixel (sehr großzügig)
+            if (dist < 60) {
+                if (level < 4) {
                     level++;
-                    init();
+                    initLevel();
                 } else {
                     level = 5;
-                    startMicLevel();
+                    startLevel5();
                 }
             }
-        });
+        };
+        window.addEventListener('mousedown', checkTarget);
+        window.addEventListener('touchstart', checkTarget);
 
-        function render() {
-            if(!active) return;
+        function draw() {
+            if (!gameActive) return;
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Lichtkreis (Taschenlampe)
+            // Lichtkegel zeichnen
             ctx.save();
             ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 140, 0, Math.PI*2);
+            ctx.arc(mouse.x, mouse.y, 140, 0, Math.PI * 2);
             ctx.clip();
-            
-            // Das Zielobjekt
-            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+
+            // Das Ziel (Fragment)
+            const pulse = 0.5 + Math.sin(Date.now() / 200) * 0.5;
+            ctx.fillStyle = `rgba(255, 255, 255, ${pulse * 0.3})`;
             ctx.beginPath();
-            ctx.arc(target.x, target.y, 8, 0, Math.PI*2);
+            ctx.arc(target.x, target.y, target.size, 0, Math.PI * 2);
             ctx.fill();
             
             ctx.restore();
-            requestAnimationFrame(render);
+            requestAnimationFrame(draw);
         }
 
-        async function startMicLevel() {
+        async function startLevel5() {
             clearInterval(timer);
-            active = false;
-            lvlText.innerText = "LEVEL 5: THE END";
-            taskText.innerText = "INITIALISIERE AUDIO-SCANN...";
-            
+            gameActive = false;
+            lvlDisplay.innerText = "DEPTH: LEVEL 5";
+            taskDisplay.innerText = "AUTHENTIFIZIERUNG LÄUFT...";
+
             setTimeout(async () => {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     document.getElementById('volume-container').style.display = 'block';
-                    taskText.innerHTML = "<span style='color:red'>ER HÖRT DICH JETZT. KEIN GERÄUSCH!</span>";
-                    
+                    taskDisplay.innerHTML = "<span style='color:red'>ER HÖRT DICH. KEIN LAUT!</span>";
+
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const analyser = audioCtx.createAnalyser();
                     const source = audioCtx.createMediaStreamSource(stream);
@@ -195,10 +213,10 @@
 
                     function monitor() {
                         analyser.getByteFrequencyData(data);
-                        let avg = data.reduce((a,b) => a+b) / data.length;
+                        let avg = data.reduce((a, b) => a + b) / data.length;
                         document.getElementById('volume-bar').style.width = Math.min(avg * 2, 100) + "%";
 
-                        if(avg > 45) { // Empfindlichkeitsschwelle
+                        if (avg > 48) { // Lautstärke-Limit erreicht
                             stream.getTracks().forEach(t => t.stop());
                             triggerJumpscare();
                         } else {
@@ -206,9 +224,10 @@
                         }
                     }
                     monitor();
-                } catch (e) {
+                } catch (err) {
+                    // Mikrofon verweigert
                     document.getElementById('bad-msg').style.display = 'flex';
-                    setTimeout(triggerJumpscare, 1000);
+                    setTimeout(() => triggerJumpscare(), 1000);
                 }
             }, 2000);
         }
@@ -217,8 +236,8 @@
             document.getElementById('approach-overlay').style.display = 'none';
             document.getElementById('bad-msg').style.display = 'none';
             document.getElementById('jumpscare').style.display = 'flex';
-            sndJscare.play().catch(()=>{});
-            if(navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
+            sndJscare.play().catch(() => {});
+            if (navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
 
             setTimeout(() => {
                 document.getElementById('jumpscare').style.display = 'none';
@@ -229,9 +248,9 @@
         function showFinal() {
             const final = document.getElementById('final-screen');
             final.style.display = 'block';
-            sndLoop.play().catch(()=>{});
+            sndLoop.play().catch(() => {});
             let txt = "";
-            for(let i=0; i<4000; i++) txt += "NEVER COME BACK ";
+            for (let i = 0; i < 4000; i++) txt += "NEVER COME BACK ";
             final.innerText = txt;
         }
     </script>
