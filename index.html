@@ -22,7 +22,7 @@
             user-select: none;
         }
 
-        /* 3D Büro */
+        /* 3D Büro-Umgebung */
         .office {
             width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%);
@@ -30,13 +30,14 @@
             perspective: 1200px;
         }
 
+        /* Raum-Flackern */
         .office::after {
             content: ""; position: absolute; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.3);
-            animation: flicker 5s infinite; pointer-events: none;
+            animation: flicker-room 6s infinite; pointer-events: none;
         }
 
-        @keyframes flicker { 0%, 94%, 100% { opacity: 0; } 95% { opacity: 0.4; } 97% { opacity: 0.6; } }
+        @keyframes flicker-room { 0%, 94%, 100% { opacity: 0; } 95% { opacity: 0.4; } 97% { opacity: 0.2; } }
 
         .desk {
             width: 750px; height: 500px; background: var(--desk-color);
@@ -63,32 +64,35 @@
             z-index: 100; pointer-events: none; background-size: 100% 4px, 4px 100%;
         }
 
-        /* UI */
+        /* UI Header */
         #ui-header { position: absolute; top: 10px; width: 90%; left: 5%; display: none; justify-content: space-between; font-size: 11px; z-index: 50; }
-        .bar-wrap { width: 70px; height: 10px; border: 1px solid var(--fnaf-green); }
-        #timer-bar { width: 100%; height: 100%; background: var(--fnaf-green); }
+        .bar-wrap { width: 70px; height: 10px; border: 1px solid var(--fnaf-green); background: #000; }
+        #timer-bar { width: 100%; height: 100%; background: var(--fnaf-green); transition: width 0.1s linear; }
 
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
 
         .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 10px 20px; margin: 5px; cursor: pointer; font-family: inherit; }
-        .btn:hover { background: var(--fnaf-green); color: #000; }
+        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 10px var(--fnaf-green); }
 
-        /* Games */
-        #stab-disk { width: 160px; height: 160px; border: 6px solid #111; border-radius: 50%; position: relative; background: #000; }
+        /* Level 3: Stabilizer Fix */
+        #stab-disk { width: 160px; height: 160px; border: 6px solid #111; border-radius: 50%; position: relative; background: #000; cursor: crosshair; }
         #stab-target { width: 45px; height: 25px; border: 2px solid red; position: absolute; top: -5px; left: 57px; background: rgba(255,0,0,0.2); }
         #stab-needle { width: 4px; height: 80px; background: #fff; position: absolute; bottom: 50%; left: calc(50% - 2px); transform-origin: bottom center; }
-        .wire { width: 50px; height: 50px; border: 2px solid #222; margin: 10px; cursor: pointer; }
-        .wire.on { background: var(--fnaf-red); box-shadow: 0 0 20px var(--fnaf-red); }
 
+        /* Level 1: Wires */
+        .wire { width: 50px; height: 50px; border: 2px solid #222; margin: 10px; cursor: pointer; }
+        .wire.on { background: var(--fnaf-red); box-shadow: 0 0 20px var(--fnaf-red); border-color: #fff; }
+
+        /* Boss Battle */
         #boss-enemy { width: 15px; height: 15px; background: #fff; border-radius: 50%; filter: blur(10px); position: absolute; opacity: 0; left: 50%; top: 40%; transform: translate(-50%, -50%); }
         #knife { width: 80px; position: absolute; bottom: 15px; filter: invert(1); transition: 0.1s; pointer-events: none; }
 
-        /* Fail/Scare */
+        /* Scares & Text */
         #jumpscare { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; display: none; z-index: 5000; align-items: center; justify-content: center; }
         #fail-wall { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; color: #600; display: none; z-index: 6000; word-break: break-all; overflow: hidden; font-size: 1.2rem; line-height: 0.7; }
         .monster { width: 140%; height: 140%; fill: #300; animation: shake 0.05s infinite; }
-        @keyframes shake { 0%{transform: translate(5px,5px);} 50%{transform: translate(-5px,-5px);} }
+        @keyframes shake { 0%{transform: translate(6px,6px);} 50%{transform: translate(-6px,-6px);} }
     </style>
 </head>
 <body id="game-body">
@@ -99,19 +103,20 @@
                 <div class="screen">
                     <div class="crt"></div>
                     <div id="ui-header">
-                        <div id="lvl-txt">DEPTH: 01</div>
+                        <div id="lvl-txt">VF_DEPTH: 01</div>
                         <div class="bar-wrap"><div id="timer-bar"></div></div>
                     </div>
 
                     <div id="v-start" class="view active">
-                        <h1 style="letter-spacing: 5px;">THE VOID FAILURE</h1>
-                        <button class="btn" onclick="setView('game')">INITIALIZE</button>
+                        <h1 style="letter-spacing: 5px; color: white;">THE VOID FAILURE</h1>
+                        <button class="btn" onclick="setView('game')">RUN_SYSTEM</button>
                         <button class="btn" onclick="setView('settings')">SETTINGS</button>
                     </div>
 
                     <div id="v-settings" class="view">
-                        <h3>SETTINGS</h3>
-                        <label>VOLUME</label><input type="range" id="vol" min="0" max="100" value="50" onchange="upd()">
+                        <h3>CONFIGURATION</h3>
+                        <label>VOLUME</label>
+                        <input type="range" id="vol" min="0" max="100" value="50" onchange="upd()">
                         <label>COLORBLIND</label>
                         <select id="cb" class="btn" onchange="upd()">
                             <option value="none">OFF</option>
@@ -123,15 +128,15 @@
                     </div>
 
                     <div id="v-game" class="view">
-                        <div id="g-content" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
+                        <div id="g-content" style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center;"></div>
                     </div>
 
                     <div id="v-repair" class="view">
-                        <h3 id="rep-title">SYSTEM_REPAIR</h3>
+                        <h3 id="rep-title">REPAIRING_SYSTEM...</h3>
                         <div class="bar-wrap" style="width: 250px; height: 20px;">
                             <div id="rep-fill" style="width:0%; height:100%; background: var(--fnaf-green);"></div>
                         </div>
-                        <div id="rep-log" style="font-size: 0.6rem; margin-top: 10px; height: 40px; opacity: 0.6;"></div>
+                        <div id="rep-log" style="font-size: 0.6rem; margin-top: 15px; height: 40px; opacity: 0.5;"></div>
                     </div>
 
                     <div id="v-boss" class="view">
@@ -147,8 +152,8 @@
 
     <div id="jumpscare">
         <svg class="monster" viewBox="0 0 200 200">
-            <circle cx="65" cy="80" r="20" fill="red"/><circle cx="135" cy="80" r="20" fill="red"/>
-            <path d="M 40 150 Q 100 240 160 150" stroke="red" fill="none" stroke-width="12"/>
+            <circle cx="65" cy="80" r="22" fill="red"/><circle cx="135" cy="80" r="22" fill="red"/>
+            <path d="M 40 150 Q 100 250 160 150" stroke="red" fill="none" stroke-width="15"/>
         </svg>
     </div>
     <div id="fail-wall"></div>
@@ -184,7 +189,7 @@
         function runLvl() {
             const box = document.getElementById('g-content');
             box.innerHTML = '';
-            document.getElementById('lvl-txt').innerText = "DEPTH: 0" + lvl;
+            document.getElementById('lvl-txt').innerText = "VF_DEPTH: 0" + lvl;
             
             if(lvl === 1) { // Wires
                 for(let i=0; i<3; i++) {
@@ -196,10 +201,10 @@
                 let g = 1;
                 [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
                     let b = document.createElement('button'); b.className = 'btn'; b.innerText = n;
-                    b.onclick = () => { if(n === g) { b.style.opacity = 0.2; g++; if(g > 3) next(); } else fail(); };
+                    b.onclick = () => { if(n === g) { b.style.opacity = 0.2; b.disabled = true; g++; if(g > 3) next(); } else fail(); };
                     box.appendChild(b);
                 });
-            } else if(lvl === 3) { // Stab
+            } else if(lvl === 3) { // Stabilizer
                 let d = document.createElement('div'); d.id = 'stab-disk';
                 let t = document.createElement('div'); t.id = 'stab-target';
                 let n = document.createElement('div'); n.id = 'stab-needle';
@@ -207,13 +212,13 @@
                 let r = setInterval(() => { deg = (deg + 9) % 360; n.style.transform = `rotate(${deg}deg)`; }, 20);
                 d.onclick = () => { if(deg > 340 || deg < 20) { clearInterval(r); next(); } else fail(); };
                 d.appendChild(t); d.appendChild(n); box.appendChild(d);
-            } else if(lvl === 4) { // Override
+            } else if(lvl === 4) { // Fast Override
                 let c = 0;
-                let b = document.createElement('button'); b.className = 'btn'; b.innerText = "OVERRIDE SYSTEM";
-                b.onclick = () => { c++; b.innerText = (10 - c); if(c >= 10) next(); };
+                let b = document.createElement('button'); b.className = 'btn'; b.innerText = "FORCE OVERRIDE";
+                b.onclick = () => { c++; b.innerText = (12 - c); if(c >= 12) next(); };
                 box.appendChild(b);
-            } else { runRepair(); return; }
-            startT(12 - (lvl * 2));
+            } else { runFakeRepair(); return; }
+            startT(12 - (lvl * 1.5));
         }
 
         function startT(s) {
@@ -227,39 +232,39 @@
 
         function next() { lvl++; runLvl(); }
 
-        function runRepair() {
+        function runFakeRepair() {
             document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
             document.getElementById('v-repair').classList.add('active');
             document.getElementById('ui-header').style.display = 'none';
             let p = 0;
-            const logs = ["> Scanning...", "> Deleting Void.exe...", "> Repairing UI...", "> Verifying...", "> ERROR: UNKNOWN_ENTITY"];
+            const logs = ["> Scanning...", "> Checking Integrity...", "> Cleaning Soul.dll...", "> Almost there...", "> ERR: S0M30N3_1S_C0M1NG"];
             let rL = setInterval(() => {
-                p += 0.7;
+                p += 0.6;
                 document.getElementById('rep-fill').style.width = p + "%";
-                document.getElementById('rep-log').innerText = logs[Math.floor(p/21)] || "";
+                document.getElementById('rep-log').innerText = logs[Math.floor(p/20)] || "";
                 if(p >= 99) {
                     clearInterval(rL);
-                    document.getElementById('rep-title').innerText = "CRITICAL FAILURE";
+                    document.getElementById('rep-title').innerText = "FATAL ERROR";
                     document.getElementById('rep-title').style.color = "red";
-                    setTimeout(() => runBoss(), 1500);
+                    setTimeout(() => runFinalBoss(), 1500);
                 }
             }, 60);
         }
 
-        function runBoss() {
+        function runFinalBoss() {
             document.querySelectorAll('.view').forEach(e => e.classList.remove('active'));
             document.getElementById('v-boss').classList.add('active');
-            let s = 10; const e = document.getElementById('boss-enemy');
+            let s = 10; const enemy = document.getElementById('boss-enemy');
             bLoop = setInterval(() => {
-                s += 4; e.style.width = s + "px"; e.style.height = s + "px"; e.style.opacity = s/200;
+                s += 4.5; enemy.style.width = s + "px"; enemy.style.height = s + "px"; enemy.style.opacity = s/180;
                 if(s > 400) fail();
             }, 30);
             document.getElementById('v-boss').onclick = () => {
                 clearInterval(bLoop);
-                document.getElementById('knife').style.transform = "translateY(-120px) rotate(-20deg)";
-                if(s > 100 && s < 250) {
-                    setTimeout(() => { alert("THE VOID HAS FAILED. YOU WON."); location.reload(); }, 1000);
-                } else fail();
+                document.getElementById('knife').style.transform = "translateY(-130px) rotate(-20deg)";
+                if(s > 90 && s < 210) {
+                    setTimeout(() => { alert("SYSTEM STABILIZED. YOU SURVIVED."); location.reload(); }, 1000);
+                } else { fail(); }
             };
         }
 
@@ -271,7 +276,7 @@
                 document.getElementById('jumpscare').style.display = 'none';
                 const f = document.getElementById('fail-wall');
                 f.style.display = 'block'; sL.play();
-                f.innerText = "NEVER COME BACK ".repeat(2000);
+                f.innerText = "NEVER COME BACK ".repeat(2500);
             }, 1500);
         }
         upd();
