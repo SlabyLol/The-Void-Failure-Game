@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void Failure - Original Style</title>
+    <title>The Void Failure - Classic Edition</title>
     <style>
         :root {
             --fnaf-green: #24ff15;
@@ -17,7 +17,7 @@
             user-select: none;
         }
 
-        /* 3D Büro & Monitor */
+        /* Büro & Monitor */
         .office {
             width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%);
@@ -44,13 +44,6 @@
             position: relative; overflow: hidden; border: 4px solid #000;
         }
 
-        /* Settings Button */
-        #settings-btn {
-            position: absolute; top: 10px; right: 10px;
-            font-size: 10px; cursor: pointer; border: 1px solid var(--fnaf-green);
-            padding: 2px 5px; z-index: 200;
-        }
-
         /* Jumpscare */
         #jumpscare-layer {
             position: fixed; top:0; left:0; width:100%; height:100%;
@@ -65,9 +58,9 @@
 
         .crack-overlay {
             position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(255,255,255,0.1); opacity: 0; z-index: 150;
-            pointer-events: none; border: 25px solid transparent;
-            border-image: url('https://i.imgur.com/7S8zH4B.png') 30 stretch;
+            background-image: url('https://i.imgur.com/7S8zH4B.png');
+            background-size: cover; opacity: 0; z-index: 150; pointer-events: none;
+            filter: invert(1);
         }
 
         /* SCP Void */
@@ -81,7 +74,13 @@
         /* Gameplay */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .active { display: flex; }
-        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 8px 15px; margin: 10px; cursor: pointer; font-family: inherit; }
+        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 8px 15px; margin: 5px; cursor: pointer; font-family: inherit; font-size: 12px; }
+        .btn:hover { background: var(--fnaf-green); color: #000; }
+
+        /* Level 3 Balken */
+        #stab-container { width: 200px; height: 30px; border: 2px solid var(--fnaf-green); position: relative; margin-top: 10px; }
+        #stab-target { width: 40px; height: 100%; background: rgba(255,0,0,0.5); position: absolute; left: 80px; }
+        #stab-bar { width: 10px; height: 100%; background: #fff; position: absolute; left: 0; }
 
         @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.05) translate(5px, 5px); } }
         @keyframes shake-mon { 0% { transform: translateZ(50px) translate(3px, 3px); } 50% { transform: translateZ(50px) translate(-3px, -3px); } }
@@ -108,13 +107,29 @@
 
     <div class="desk">
         <div class="monitor" id="monitor">
-            <div id="settings-btn" onclick="alert('VOL: 100%\nSENS: HIGH\nMODE: VOID')">⚙ SETTINGS</div>
             <div class="screen">
                 <div class="crack-overlay" id="crack"></div>
                 
                 <div id="v-start" class="view active">
                     <h2 style="color:white">VOID_FAILURE</h2>
-                    <button class="btn" onclick="startGame()">BOOT REPAIR</button>
+                    <button class="btn" onclick="showView('game'); runLevel();">START REPAIR</button>
+                    <button class="btn" onclick="showView('settings')">SETTINGS</button>
+                </div>
+
+                <div id="v-settings" class="view">
+                    <h3>SYSTEM CONFIG</h3>
+                    <div style="font-size: 10px;">
+                        <label>DIFFICULTY:</label>
+                        <select id="diff" class="btn"><option value="1">EASY</option><option value="2" selected>NORMAL</option><option value="3">HARD</option></select>
+                        <br>
+                        <label>UI COLOR:</label>
+                        <select id="color" class="btn" onchange="document.documentElement.style.setProperty('--fnaf-green', this.value)">
+                            <option value="#24ff15">GREEN</option>
+                            <option value="#00ffff">BLUE</option>
+                            <option value="#ffaa00">AMBER</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="showView('start')">SAVE & BACK</button>
                 </div>
 
                 <div id="v-game" class="view">
@@ -133,11 +148,8 @@
 <script>
     let lvl = 1;
     let timer;
-
-    function startGame() {
-        showView('game');
-        runLevel();
-    }
+    let stabPos = 0;
+    let stabDir = 1;
 
     function showView(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -147,10 +159,11 @@
     function runLevel() {
         const zone = document.getElementById('game-zone');
         zone.innerHTML = '';
-        if (lvl < 5) startTimer(7 - (lvl * 0.5));
+        const diff = parseInt(document.getElementById('diff').value);
+        if (lvl < 5) startTimer(8 - (lvl * 0.7) - (diff * 0.5));
 
         if (lvl === 1) { // Wires
-            zone.innerHTML = '<p style="font-size:12px">CONNECT WIRES</p>';
+            zone.innerHTML = '<p style="font-size:12px">FIX WIRES</p>';
             for(let i=0; i<3; i++) {
                 let w = document.createElement('div');
                 w.style = "width:45px;height:45px;border:2px solid #222;margin:10px;cursor:pointer";
@@ -169,14 +182,20 @@
                 };
                 zone.appendChild(b);
             });
-        } else if (lvl === 3) { // Classic Stabilizer (FIXED)
-            zone.innerHTML = '<div id="s" style="width:90px;height:90px;border:4px solid #333;border-radius:50%;position:relative"><div id="n" style="width:2px;height:45px;background:white;position:absolute;left:44px;bottom:50%;transform-origin:bottom"></div></div><p style="font-size:10px;margin-top:10px">STOP AT 12:00</p>';
-            let d = 0;
+        } else if (lvl === 3) { // Classic Block Stabilizer
+            zone.innerHTML = '<p style="font-size:10px">STABILIZE BALANCER</p><div id="stab-container"><div id="stab-target"></div><div id="stab-bar"></div></div>';
+            stabPos = 0;
             let r = setInterval(() => { 
-                d = (d + 12) % 360; 
-                if(document.getElementById('n')) document.getElementById('n').style.transform=`rotate(${d}deg)`;
+                stabPos += (2 * diff) * stabDir;
+                if(stabPos >= 190 || stabPos <= 0) stabDir *= -1;
+                if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = stabPos + "px";
             }, 20);
-            document.getElementById('s').onclick = () => { if(d < 30 || d > 330) { clearInterval(r); next(); } else { clearInterval(r); sc(); } };
+            
+            document.getElementById('v-game').onclick = (e) => {
+                if(lvl !== 3) return;
+                if(stabPos >= 80 && stabPos <= 120) { clearInterval(r); document.getElementById('v-game').onclick = null; next(); } 
+                else { clearInterval(r); sc(); }
+            };
         } else if (lvl === 4) { // Override
             let c=0; let b=document.createElement('button'); b.className="btn"; b.innerText="OVERRIDE 15x";
             b.onclick = () => { c++; b.innerText = 15-c; if(c>=15) next(); };
@@ -219,7 +238,7 @@
                     s.onclick = () => {
                         s.style.filter = "invert(1) contrast(10)";
                         s.style.transform = "translate(-50%, -50%) scale(0)";
-                        setTimeout(() => { alert("YOU SURVIVED THE VOID"); location.reload(); }, 1000);
+                        setTimeout(() => { alert("SCP VOID DEFEATED"); location.reload(); }, 1000);
                     };
                 }, 1500);
             }, 1500);
