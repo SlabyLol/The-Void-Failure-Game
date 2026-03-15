@@ -3,77 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Void Terminal</title>
-    <link rel="stylesheet" href="style.css">
+    <title>The Void Failure Game</title>
+    <style>
+        :root { --fnaf-green: #24ff15; --fnaf-red: #ff0000; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: var(--fnaf-green); font-family: 'Courier New', monospace; overflow: hidden; }
+
+        /* CRT Effekte */
+        .crt-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02)); z-index: 5000; pointer-events: none; background-size: 100% 3px, 3px 100%; }
+        .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-shadow: inset 0 0 150px #000; z-index: 5001; pointer-events: none; }
+
+        #game-viewport { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* UI */
+        #ui-top { position: absolute; top: 20px; text-align: center; z-index: 100; width: 100%; }
+        #timer-box { width: 260px; height: 10px; border: 1px solid #1a1a1a; margin: 10px auto; background: #050000; }
+        #timer-fill { width: 100%; height: 100%; background: var(--fnaf-green); box-shadow: 0 0 10px var(--fnaf-green); }
+
+        /* Panels */
+        .panel { width: 350px; height: 450px; border: 2px solid #111; background: #050505; display: none; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+
+        /* Level 3 FIX: Der Stabilisator */
+        #stab-disk { width: 220px; height: 220px; border: 6px solid #111; border-radius: 50%; position: relative; background: #020202; }
+        #stab-target { width: 60px; height: 30px; background: rgba(255,0,0,0.4); border: 2px solid red; position: absolute; top: -4px; left: 80px; border-radius: 4px; z-index: 1; }
+        #stab-needle { width: 6px; height: 100px; background: #fff; position: absolute; bottom: 50%; left: calc(50% - 3px); transform-origin: bottom center; box-shadow: 0 0 10px #fff; z-index: 2; }
+
+        /* Tasks General */
+        .wire { width: 60px; height: 60px; border: 2px solid #222; margin: 15px; cursor: pointer; background: #0a0a0a; }
+        .wire.active { background: var(--fnaf-red); border-color: #fff; box-shadow: 0 0 20px red; }
+        .num-btn { width: 85px; height: 85px; background: #0a0a0a; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); font-size: 2rem; margin: 8px; cursor: pointer; }
+        .num-btn:active { background: var(--fnaf-green); color: #000; }
+        .num-btn.done { opacity: 0.1; border-color: red; pointer-events: none; }
+
+        /* Boss Battle */
+        #boss-entity { width: 20px; height: 20px; background: #fff; border-radius: 50%; filter: blur(12px); position: absolute; opacity: 0; top: 40%; }
+        #knife-sprite { width: 110px; position: absolute; bottom: 30px; filter: invert(1); transition: transform 0.1s; }
+
+        /* Screens */
+        .full-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn { padding: 15px 45px; background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); cursor: pointer; font-family: inherit; font-size: 1.3rem; letter-spacing: 5px; }
+        .btn:hover { background: var(--fnaf-green); color: #000; }
+
+        #jumpscare { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: none; z-index: 20000; align-items: center; justify-content: center; }
+        #fail-wall { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: red; display: none; z-index: 30000; word-break: break-all; overflow: hidden; font-size: 1.2rem; line-height: 0.7; }
+
+        @keyframes monster-shake { 0% { transform: scale(1.1) translate(5px, 5px); } 50% { transform: scale(1.15) translate(-5px, -5px); } 100% { transform: scale(1.1) translate(0,0); } }
+        .shake { animation: monster-shake 0.05s infinite; }
+    </style>
 </head>
 <body>
-    <div class="office">
-        <div class="desk">
-            <div class="tv-case">
-                <div class="screen-border">
-                    <div id="monitor" class="monitor-screen">
-                        <div class="scanlines"></div>
-                        <div class="vignette"></div>
-                        
-                        <div id="ui-overlay">
-                            <div id="depth-display">DEPTH: <span id="depth-val">01</span></div>
-                            <div class="battery-container">
-                                <div id="timer-bar"></div>
-                            </div>
-                        </div>
 
-                        <div id="content">
-                            <div id="start-screen" class="view">
-                                <h1 class="glitch" data-text="VOID_OS">VOID_OS</h1>
-                                <button class="btn" onclick="initGame()">BOOT SYSTEM</button>
-                            </div>
+    <div class="crt-overlay"></div>
+    <div class="vignette"></div>
 
-                            <div id="task-view" class="view" style="display:none;">
-                                <div id="task-container"></div>
-                            </div>
+    <div id="game-viewport">
+        <div id="ui-top">
+            <div id="depth-txt">SYSTEM_DEPTH: 01</div>
+            <div id="timer-box"><div id="timer-fill"></div></div>
+        </div>
 
-                            <div id="terminal-view" class="view" style="display:none;">
-                                <div class="terminal-header">CRITICAL UPLOAD</div>
-                                <div class="loading-area">
-                                    <div id="upload-progress"></div>
-                                </div>
-                                <div id="terminal-logs"></div>
-                                <div class="mic-indicator">VOICE_SENSOR: <span id="mic-status">ACTIVE</span></div>
-                            </div>
+        <div id="task-panel" class="panel"></div>
 
-                            <div id="boss-view" class="view" style="display:none;">
-                                <div id="boss-target-circle"></div>
-                                <div id="creature-silhouette"></div>
-                                <img src="https://cdn-icons-png.flaticon.com/512/103/103362.png" id="knife-img" alt="Knife">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tv-knobs">
-                    <div class="knob"></div>
-                    <div class="knob"></div>
-                </div>
+        <div id="fnaf-panel" class="panel">
+            <div style="font-size: 1.2rem; margin-bottom: 25px; color: var(--fnaf-green);">UPLOADING_DATA... <span style="color:red">SHHH!</span></div>
+            <div style="width: 80%; height: 15px; border: 1px solid var(--fnaf-green);">
+                <div id="upload-bar" style="width:0%; height:100%; background: var(--fnaf-green); box-shadow: 0 0 10px var(--fnaf-green);"></div>
             </div>
+            <div id="terminal-logs" style="font-size: 0.6rem; margin-top: 30px; opacity: 0.5; width: 80%;"></div>
+        </div>
+
+        <div id="boss-panel" class="panel">
+            <div id="boss-entity"></div>
+            <div id="knife-sprite">
+                <svg viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="#fff" stroke="#fff"/></svg>
+            </div>
+            <div style="position:absolute; top:20px; font-size:0.7rem; color:red;">STRIKE_WHEN_READY</div>
         </div>
     </div>
 
-    <div id="jumpscare-layer">
-        <div class="monster-face"></div>
+    <div id="start-screen" class="full-screen">
+        <h1 style="letter-spacing: 10px; color: #1a1a1a; margin-bottom: 40px;">THE VOID FAILURE</h1>
+        <button class="btn" onclick="startGame()">BOOT</button>
     </div>
 
-    <div id="fail-layer">
-        <div id="fail-text"></div>
+    <div id="jumpscare">
+        <svg class="shake" style="width:140%; height:140%;" viewBox="0 0 200 200">
+            <circle cx="65" cy="80" r="18" fill="red"/><circle cx="135" cy="80" r="18" fill="red"/>
+            <path d="M 40 145 Q 100 230 160 145" stroke="red" fill="none" stroke-width="10"/>
+        </svg>
     </div>
 
-    <div id="victory-layer" class="view" style="display:none;">
-        <h1 class="cyan-glitch">SYSTEM SECURED</h1>
-        <p>Thx for playing</p>
-        <button class="btn" onclick="location.reload()">RESTART</button>
-    </div>
+    <div id="fail-wall"></div>
 
     <audio id="snd-jscare" src="c_jscare.mp3"></audio>
     <audio id="snd-loop" src="ncb_loop.mp3" loop></audio>
 
-    <script src="script.js"></script>
+    <script>
+        let level = 1;
+        let timeLeft = 100;
+        let timerInt, bossInt;
+        const sndJscare = document.getElementById('snd-jscare');
+        const sndLoop = document.getElementById('snd-loop');
+
+        // Lautstärken-Management
+        sndJscare.volume = 0.5;
+        sndLoop.volume = 0.4;
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            // Browser Audio Unlock
+            sndJscare.play().then(() => { sndJscare.pause(); sndJscare.currentTime = 0; });
+            loadLevel();
+        }
+
+        function loadLevel() {
+            const panel = document.getElementById('task-panel');
+            panel.style.display = 'flex';
+            panel.innerHTML = '';
+            document.getElementById('depth-txt').innerText = "SYSTEM_DEPTH: 0" + level;
+
+            if (level === 1) { // Wires
+                for(let i=0; i<3; i++) {
+                    let w = document.createElement('div'); w.className = 'wire';
+                    w.onclick = function() { this.classList.add('active'); if(document.querySelectorAll('.wire.active').length === 3) next(); };
+                    panel.appendChild(w);
+                }
+            } else if (level === 2) { // Numbers
+                let goal = 1;
+                [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
+                    let b = document.createElement('button'); b.className = 'num-btn'; b.innerText = n;
+                    b.onclick = function() { if(parseInt(this.innerText) === goal) { this.classList.add('done'); goal++; if(goal>3) next(); } else triggerFail(); };
+                    panel.appendChild(b);
+                });
+            } else if (level === 3) { // Level 3 FIX: Stabilizer
+                let disk = document.createElement('div'); disk.id = 'stab-disk';
+                let target = document.createElement('div'); target.id = 'stab-target';
+                let needle = document.createElement('div'); needle.id = 'stab-needle';
+                let angle = 0;
+                let rotateInterval = setInterval(() => { 
+                    angle = (angle + 6) % 360; 
+                    needle.style.transform = `rotate(${angle}deg)`; 
+                }, 20);
+                disk.onclick = () => { 
+                    // Trefferzone ist ca. 345 Grad bis 15 Grad (Oben)
+                    if(angle > 340 || angle < 20) { clearInterval(rotateInterval); next(); } 
+                    else triggerFail(); 
+                };
+                disk.appendChild(target); disk.appendChild(needle); panel.appendChild(disk);
+            } else if (level === 4) { // Spam Click
+                let hits = 0;
+                let b = document.createElement('button'); b.className = 'num-btn'; b.style.width = "200px"; b.innerText = "ACTIVATE";
+                b.onclick = () => { hits++; b.innerText = 10 - hits; if(hits >= 10) next(); };
+                panel.appendChild(b);
+            } else {
+                panel.style.display = 'none';
+                runLevel5();
+                return;
+            }
+            startTimer(11 - (level * 1.2));
+        }
+
+        function startTimer(sec) {
+            timeLeft = 100;
+            clearInterval(timerInt);
+            timerInt = setInterval(() => {
+                timeLeft -= (0.1 / sec) * 100;
+                document.getElementById('timer-fill').style.width = timeLeft + "%";
+                if(timeLeft <= 0) triggerFail();
+            }, 100);
+        }
+
+        function next() { level++; loadLevel(); }
+
+        async function runLevel5() {
+            document.getElementById('fnaf-panel').style.display = 'flex';
+            document.getElementById('ui-top').style.display = 'none';
+            let progress = 0;
+            const logLines = ["> Check...", "> Port 80...", "> Soul...", "> Extracting...", "> Danger..."];
+            const logBox = document.getElementById('terminal-logs');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioCtx = new AudioContext();
+                const analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(stream);
+                source.connect(analyser);
+                const data = new Uint8Array(analyser.frequencyBinCount);
+
+                const loop = setInterval(() => {
+                    progress += 0.4;
+                    document.getElementById('upload-bar').style.width = progress + "%";
+                    if(Math.floor(progress) % 20 === 0 && progress % 1 === 0) logBox.innerHTML += logLines[Math.floor(progress/21)] + "<br>";
+                    
+                    analyser.getByteFrequencyData(data);
+                    let vol = data.reduce((a,b)=>a+b)/data.length;
+                    if(vol > 48) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); triggerFail(); }
+                    if(progress >= 100) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); runBossFight(); }
+                }, 50);
+            } catch(e) { triggerFail(); }
+        }
+
+        function runBossFight() {
+            document.getElementById('fnaf-panel').style.display = 'none';
+            document.getElementById('boss-panel').style.display = 'flex';
+            let size = 15;
+            const entity = document.getElementById('boss-entity');
+            bossInt = setInterval(() => {
+                size += 4; entity.style.width = size + "px"; entity.style.height = size + "px"; entity.style.opacity = size/160;
+                if(size > 380) triggerFail();
+            }, 30);
+
+            document.getElementById('boss-panel').onclick = () => {
+                clearInterval(bossInt);
+                document.getElementById('knife-sprite').style.transform = "translateY(-140px) rotate(-15deg)";
+                if(size > 90 && size < 160) {
+                    setTimeout(() => {
+                        document.getElementById('boss-panel').style.display = 'none';
+                        document.body.innerHTML = "<div class='full-screen'><h1 style='color:cyan'>THE_VOID_CLEANSED</h1><p>Thx for playing</p><button class='btn' onclick='location.reload()'>RESTART</button></div>";
+                    }, 800);
+                } else triggerFail();
+            };
+        }
+
+        function triggerFail() {
+            clearInterval(timerInt); clearInterval(bossInt);
+            document.getElementById('jumpscare').style.display = 'flex';
+            sndJscare.play();
+            setTimeout(() => {
+                document.getElementById('jumpscare').style.display = 'none';
+                const wall = document.getElementById('fail-wall');
+                wall.style.display = 'block';
+                sndLoop.play();
+                let txt = ""; for(let i=0; i<3000; i++) txt += "NEVER COME BACK ";
+                wall.innerText = txt;
+            }, 1500);
+        }
+    </script>
 </body>
 </html>
