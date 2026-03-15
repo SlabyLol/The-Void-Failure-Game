@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Void Failure Game - Ultimate</title>
+    <title>DB75: THE VOID OFFICE</title>
     <style>
         :root {
             --fnaf-green: #24ff15;
             --fnaf-red: #ff0000;
             --fnaf-blue: #00ffff;
-            --monitor-glow: rgba(36, 255, 21, 0.2);
-            --desk-color: #1a1a1a;
+            --monitor-glow: rgba(36, 255, 21, 0.15);
+            --desk-color: #121212;
         }
 
         /* Colorblind Modes */
@@ -24,263 +24,280 @@
             font-family: 'Courier New', monospace; overflow: hidden;
         }
 
-        /* 3D Büro Atmosphäre */
-        .office {
+        /* 3D Büro Setting */
+        .office-env {
             width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #151515 0%, #000 80%);
+            background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%);
             display: flex; justify-content: center; align-items: center;
-            perspective: 1000px;
+            perspective: 1200px;
+        }
+
+        /* Flackerndes Licht im Büro */
+        .office-env::after {
+            content: ""; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.2);
+            animation: flicker-room 4s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes flicker-room {
+            0%, 100% { opacity: 0; }
+            95% { opacity: 0.2; }
+            96% { opacity: 0.8; }
+            97% { opacity: 0.1; }
         }
 
         .desk {
-            width: 600px; height: 400px;
+            width: 700px; height: 450px;
             background: var(--desk-color);
             position: relative;
-            transform: rotateX(10deg);
-            border-top: 5px solid #111;
+            transform: rotateX(15deg);
+            border-top: 8px solid #0a0a0a;
+            box-shadow: 0 60px 120px rgba(0,0,0,1);
             display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.9);
         }
 
-        /* Der Röhrenmonitor */
-        .monitor {
-            width: 420px; height: 320px;
-            background: #222;
-            border-radius: 15px;
-            padding: 15px;
+        /* Der Monitor (Hardware) */
+        .monitor-frame {
+            width: 450px; height: 350px;
+            background: #1f1f1f;
+            border-radius: 10px;
+            padding: 12px;
             position: relative;
-            box-shadow: 0 0 30px #000;
-            transform: translateZ(20px);
+            box-shadow: 0 0 40px #000, inset 0 0 10px #333;
+            transform: translateZ(30px);
         }
 
+        /* Der Screen (Software) */
         .screen {
             width: 100%; height: 100%;
-            background: #050805;
+            background: #040604;
             position: relative;
             overflow: hidden;
-            border-radius: 5px;
-            border: 3px solid #111;
-            box-shadow: inset 0 0 40px #000;
+            border: 4px solid #000;
+            box-shadow: inset 0 0 50px #000;
         }
 
         /* CRT Filter */
-        .crt::before {
-            content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            z-index: 10; pointer-events: none; background-size: 100% 3px, 3px 100%;
+        .crt-fx {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%),
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 100; pointer-events: none; background-size: 100% 4px, 4px 100%;
         }
 
-        /* UI Overlays */
-        #ui-layer {
+        /* Game UI */
+        #os-header {
             position: absolute; top: 10px; width: 90%; left: 5%;
-            display: flex; justify-content: space-between; font-size: 10px; z-index: 20;
+            display: flex; justify-content: space-between; font-size: 12px; z-index: 50;
+            text-shadow: 0 0 5px var(--fnaf-green);
         }
-        .battery-bar { width: 50px; height: 8px; border: 1px solid var(--fnaf-green); }
-        #timer-fill { width: 100%; height: 100%; background: var(--fnaf-green); transition: width 0.1s linear; }
 
-        /* Menüs */
-        .menu-view {
+        .progress-shell { width: 60px; height: 10px; border: 1px solid var(--fnaf-green); }
+        #timer-bar { width: 100%; height: 100%; background: var(--fnaf-green); }
+
+        /* Ansichten */
+        .view {
             width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; box-sizing: border-box;
         }
 
-        .settings-view { display: none; padding: 20px; box-sizing: border-box; }
+        .active-view { display: flex; }
 
+        h1, h2 { letter-spacing: 4px; margin: 10px; }
         .btn {
             background: transparent; border: 1px solid var(--fnaf-green);
-            color: var(--fnaf-green); padding: 8px 15px; margin: 5px;
-            cursor: pointer; font-family: inherit; font-size: 0.8rem;
+            color: var(--fnaf-green); padding: 10px 20px; margin: 5px;
+            cursor: pointer; font-family: inherit; font-size: 0.9rem;
+            transition: 0.2s;
         }
-        .btn:hover { background: var(--fnaf-green); color: #000; }
+        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 15px var(--fnaf-green); }
 
-        /* Tasks & Game Elements */
-        .task-panel { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; }
-        
+        /* Level Elements */
         #stab-disk {
-            width: 150px; height: 150px; border: 5px solid #111; border-radius: 50%;
-            position: relative; background: #010101; margin: 20px; cursor: pointer;
+            width: 160px; height: 160px; border: 6px solid #111; border-radius: 50%;
+            position: relative; background: #000; margin: 10px;
         }
-        #stab-target { width: 40px; height: 20px; background: rgba(255,0,0,0.4); position: absolute; top: -3px; left: 55px; border: 1px solid red; border-radius: 3px; }
-        #stab-needle { width: 4px; height: 75px; background: #fff; position: absolute; bottom: 50%; left: calc(50% - 2px); transform-origin: bottom center; }
+        #stab-target { width: 45px; height: 25px; border: 2px solid red; position: absolute; top: -5px; left: 57px; background: rgba(255,0,0,0.2); }
+        #stab-needle { width: 4px; height: 80px; background: #fff; position: absolute; bottom: 50%; left: calc(50% - 2px); transform-origin: bottom center; }
 
-        .wire { width: 40px; height: 40px; border: 1px solid #333; margin: 10px; cursor: pointer; }
-        .wire.active { background: var(--fnaf-red); box-shadow: 0 0 15px var(--fnaf-red); }
+        .wire { width: 50px; height: 50px; border: 2px solid #222; margin: 10px; cursor: pointer; }
+        .wire.on { background: var(--fnaf-red); box-shadow: 0 0 20px var(--fnaf-red); border-color: #fff; }
 
-        #boss-creature { width: 10px; height: 10px; background: #fff; border-radius: 50%; filter: blur(10px); position: absolute; opacity: 0; top: 40%; left: 50%; }
-        #knife-img { width: 70px; position: absolute; bottom: 10px; filter: invert(1); transition: transform 0.1s; pointer-events: none; }
+        #boss-enemy { width: 15px; height: 15px; background: #fff; border-radius: 50%; filter: blur(10px); position: absolute; opacity: 0; }
+        #knife-tool { width: 80px; position: absolute; bottom: 15px; filter: invert(1); transition: 0.1s; pointer-events: none; }
 
-        /* Scares */
-        #jumpscare-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: none; z-index: 10000; align-items: center; justify-content: center;
+        /* Scares & Fails */
+        #jumpscare {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: #000; display: none; z-index: 5000; align-items: center; justify-content: center;
         }
-        .monster { width: 120%; height: 120%; fill: #200; animation: jitter 0.04s infinite; }
-        #fail-wall { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #400; display: none; z-index: 11000; word-break: break-all; overflow: hidden; font-size: 1rem; line-height: 0.7; }
+        .monster-img { width: 140%; height: 140%; fill: #300; animation: shake 0.05s infinite; }
+        #fail-screen {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: #000; color: #600; display: none; z-index: 6000;
+            word-break: break-all; overflow: hidden; line-height: 0.7; font-size: 1.2rem;
+        }
 
-        @keyframes jitter { 0%{transform: translate(5px,5px);} 50%{transform: translate(-5px,-5px);} }
-        
-        label { font-size: 0.7rem; margin-top: 10px; }
-        input[type="range"] { accent-color: var(--fnaf-green); width: 150px; }
+        @keyframes shake { 0%{transform: translate(8px, 8px);} 50%{transform: translate(-8px, -8px);} }
     </style>
 </head>
-<body id="game-body">
+<body id="main-body">
 
-    <div class="office">
+    <div class="office-env">
         <div class="desk">
-            <div class="monitor">
-                <div class="screen crt">
-                    
-                    <div id="ui-layer" style="display:none;">
-                        <div id="depth-txt">D-01</div>
-                        <div class="battery-bar"><div id="timer-fill"></div></div>
+            <div class="monitor-frame">
+                <div class="screen">
+                    <div class="crt-fx"></div>
+
+                    <div id="os-header" style="display:none;">
+                        <div>DB75_SYSTEM [v4.0]</div>
+                        <div class="progress-shell"><div id="timer-bar"></div></div>
                     </div>
 
-                    <div id="content">
-                        <div id="start-view" class="menu-view">
-                            <h2 style="letter-spacing: 5px;">VOID_FAILURE</h2>
-                            <button class="btn" onclick="showView('game')">START GAME</button>
-                            <button class="btn" onclick="showView('settings')">SETTINGS</button>
-                        </div>
+                    <div id="view-start" class="view active-view">
+                        <h1 style="color:white">DB75</h1>
+                        <p style="font-size: 0.7rem;">VOID OFFICE TERMINAL</p>
+                        <button class="btn" onclick="changeView('game')">RUN SYSTEM</button>
+                        <button class="btn" onclick="changeView('settings')">SETTINGS</button>
+                    </div>
 
-                        <div id="settings-view" class="menu-view settings-view">
-                            <h3>CONFIGURATION</h3>
-                            <label>VOLUME</label>
-                            <input type="range" id="vol-slider" min="0" max="100" value="50" onchange="updateSettings()">
-                            
-                            <label>COLORBLIND</label>
-                            <select id="cb-mode" class="btn" onchange="updateSettings()">
-                                <option value="none">OFF</option>
-                                <option value="cb-protanopia">PROTANOPIA</option>
-                                <option value="cb-deuteranopia">DEUTERANOPIA</option>
-                                <option value="cb-tritanopia">TRITANOPIA</option>
-                            </select>
-                            <button class="btn" onclick="showView('start')" style="margin-top: 20px;">BACK</button>
-                        </div>
+                    <div id="view-settings" class="view">
+                        <h2>SETTINGS</h2>
+                        <label style="font-size: 0.7rem;">MASTER VOLUME</label>
+                        <input type="range" id="volume-ctrl" min="0" max="100" value="50" onchange="applySettings()">
+                        
+                        <label style="font-size: 0.7rem; margin-top:15px;">COLORBLIND MODE</label>
+                        <select id="cb-select" class="btn" onchange="applySettings()">
+                            <option value="none">OFF</option>
+                            <option value="cb-protanopia">PROTANOPIA</option>
+                            <option value="cb-deuteranopia">DEUTERANOPIA</option>
+                            <option value="cb-tritanopia">TRITANOPIA</option>
+                        </select>
+                        <button class="btn" onclick="changeView('start')" style="margin-top:20px;">SAVE & EXIT</button>
+                    </div>
 
-                        <div id="game-view" class="task-panel"></div>
+                    <div id="view-game" class="view">
+                        <div id="game-content" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;"></div>
+                    </div>
 
-                        <div id="mic-view" class="task-panel">
-                            <div style="font-size: 0.8rem;">UPLOADING... <span style="color:red">SHHH!</span></div>
-                            <div class="battery-bar" style="width: 150px; margin-top: 15px;">
-                                <div id="upload-fill" style="width: 0%; height: 100%; background: var(--fnaf-green);"></div>
-                            </div>
-                        </div>
-
-                        <div id="boss-view" class="task-panel">
-                            <div id="boss-creature"></div>
-                            <div id="knife-img">
-                                <svg viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="#fff" stroke="#fff"/></svg>
-                            </div>
+                    <div id="view-mic" class="view">
+                        <h3 style="color:red">AUDIO SENSOR ACTIVE</h3>
+                        <p style="font-size: 0.6rem;">DON'T MAKE A SOUND</p>
+                        <div class="progress-shell" style="width: 200px; height: 20px;">
+                            <div id="mic-progress" style="width:0%; height:100%; background: var(--fnaf-green);"></div>
                         </div>
                     </div>
+
+                    <div id="view-boss" class="view">
+                        <div id="boss-enemy"></div>
+                        <div id="knife-tool">
+                            <svg viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="#fff"/></svg>
+                        </div>
+                        <p style="position:absolute; bottom:5px; font-size:0.5rem; color:red;">TIMING ATTACK REQUIRED</p>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="jumpscare-layer">
-        <svg class="monster" viewBox="0 0 200 200">
-            <circle cx="65" cy="80" r="20" fill="red"/><circle cx="135" cy="80" r="20" fill="red"/>
-            <path d="M 40 150 Q 100 240 160 150" stroke="red" fill="none" stroke-width="12"/>
+    <div id="jumpscare">
+        <svg class="monster-img" viewBox="0 0 200 200">
+            <circle cx="60" cy="80" r="22" fill="red"/><circle cx="140" cy="80" r="22" fill="red"/>
+            <path d="M 30 150 Q 100 250 170 150" stroke="red" fill="none" stroke-width="15"/>
         </svg>
     </div>
 
-    <div id="fail-wall"></div>
+    <div id="fail-screen"></div>
 
     <audio id="snd-jscare" src="c_jscare.mp3"></audio>
     <audio id="snd-loop" src="ncb_loop.mp3" loop></audio>
 
     <script>
-        let level = 1;
-        let timerInt, bossInt;
-        let volume = 0.5;
-        const sndJscare = document.getElementById('snd-jscare');
-        const sndLoop = document.getElementById('snd-loop');
+        let currentLevel = 1;
+        let timerLoop, bossLoop;
+        let masterVol = 0.5;
+        const sJscare = document.getElementById('snd-jscare');
+        const sLoop = document.getElementById('snd-loop');
 
-        function updateSettings() {
-            volume = document.getElementById('vol-slider').value / 100;
-            sndJscare.volume = volume;
-            sndLoop.volume = volume * 0.7;
-
-            const cbMode = document.getElementById('cb-mode').value;
-            document.getElementById('game-body').className = cbMode !== 'none' ? cbMode : '';
+        function applySettings() {
+            masterVol = document.getElementById('volume-ctrl').value / 100;
+            sJscare.volume = masterVol;
+            sLoop.volume = masterVol * 0.6;
+            
+            const mode = document.getElementById('cb-select').value;
+            document.getElementById('main-body').className = (mode !== 'none') ? mode : '';
         }
 
-        function showView(view) {
-            document.querySelectorAll('.menu-view, .task-panel').forEach(v => v.style.display = 'none');
-            document.getElementById('ui-layer').style.display = 'none';
+        function changeView(v) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active-view'));
+            document.getElementById('os-header').style.display = 'none';
 
-            if(view === 'start') document.getElementById('start-view').style.display = 'flex';
-            if(view === 'settings') document.getElementById('settings-view').style.display = 'flex';
-            if(view === 'game') {
-                document.getElementById('ui-layer').style.display = 'flex';
-                startGame();
+            if(v === 'start') document.getElementById('view-start').classList.add('active-view');
+            if(v === 'settings') document.getElementById('view-settings').classList.add('active-view');
+            if(v === 'game') {
+                document.getElementById('view-game').classList.add('active-view');
+                document.getElementById('os-header').style.display = 'flex';
+                currentLevel = 1;
+                runLevel();
             }
         }
 
-        function startGame() {
-            level = 1;
-            loadLevel();
-        }
-
-        function loadLevel() {
-            const panel = document.getElementById('game-view');
-            panel.style.display = 'flex';
-            panel.innerHTML = '';
-            document.getElementById('depth-txt').innerText = "D-0" + level;
-
-            if(level === 1) { // Wires
+        function runLevel() {
+            const container = document.getElementById('game-content');
+            container.innerHTML = '';
+            
+            if(currentLevel === 1) { // Wires
                 for(let i=0; i<3; i++) {
                     let w = document.createElement('div'); w.className = 'wire';
-                    w.onclick = function() { this.classList.add('active'); if(document.querySelectorAll('.wire.active').length === 3) nextLevel(); };
-                    panel.appendChild(w);
+                    w.onclick = function() { this.classList.add('on'); if(document.querySelectorAll('.wire.on').length === 3) next(); };
+                    container.appendChild(w);
                 }
-            } else if(level === 2) { // Sequence
+            } else if(currentLevel === 2) { // Logic
                 let goal = 1;
                 [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
                     let b = document.createElement('button'); b.className = 'btn'; b.innerText = n;
-                    b.onclick = function() { if(parseInt(this.innerText) === goal) { this.style.opacity = 0.2; goal++; if(goal > 3) nextLevel(); } else triggerFail(); };
-                    panel.appendChild(b);
+                    b.onclick = () => { if(n === goal) { b.style.opacity = 0.2; goal++; if(goal > 3) next(); } else fail(); };
+                    container.appendChild(b);
                 });
-            } else if(level === 3) { // Stabilizer
+            } else if(currentLevel === 3) { // Stabilizer
                 let disk = document.createElement('div'); disk.id = 'stab-disk';
                 let target = document.createElement('div'); target.id = 'stab-target';
                 let needle = document.createElement('div'); needle.id = 'stab-needle';
                 let deg = 0;
-                let rot = setInterval(() => { deg = (deg + 8) % 360; needle.style.transform = `rotate(${deg}deg)`; }, 20);
-                disk.onclick = () => { if(deg > 340 || deg < 20) { clearInterval(rot); nextLevel(); } else triggerFail(); };
-                disk.appendChild(target); disk.appendChild(needle); panel.appendChild(disk);
-            } else if(level === 4) { // Click
-                let taps = 0;
-                let b = document.createElement('button'); b.className = 'btn'; b.innerText = "CLICK 10x";
-                b.onclick = () => { taps++; b.innerText = (10-taps) + "x"; if(taps >= 10) nextLevel(); };
-                panel.appendChild(b);
+                let rot = setInterval(() => { deg = (deg + 9) % 360; needle.style.transform = `rotate(${deg}deg)`; }, 20);
+                disk.onclick = () => { if(deg > 340 || deg < 20) { clearInterval(rot); next(); } else fail(); };
+                disk.appendChild(target); disk.appendChild(needle); container.appendChild(disk);
+            } else if(currentLevel === 4) { // Spam
+                let count = 0;
+                let b = document.createElement('button'); b.className = 'btn'; b.innerText = "OVERRIDE SYSTEM";
+                b.onclick = () => { count++; b.innerText = (12 - count); if(count >= 12) next(); };
+                container.appendChild(b);
             } else {
-                panel.style.display = 'none';
-                runLevel5();
+                runMicLevel();
                 return;
             }
-            startTimer(12 - level);
+            startTimer(13 - (currentLevel * 2));
         }
 
         function startTimer(s) {
             let left = 100;
-            clearInterval(timerInt);
-            timerInt = setInterval(() => {
+            clearInterval(timerLoop);
+            timerLoop = setInterval(() => {
                 left -= (0.1 / s) * 100;
-                document.getElementById('timer-fill').style.width = left + "%";
-                if(left <= 0) triggerFail();
+                document.getElementById('timer-bar').style.width = left + "%";
+                if(left <= 0) fail();
             }, 100);
         }
 
-        function nextLevel() { level++; loadLevel(); }
+        function next() { currentLevel++; runLevel(); }
 
-        async function runLevel5() {
-            document.getElementById('mic-view').style.display = 'flex';
-            document.getElementById('ui-layer').style.display = 'none';
-            let prog = 0;
+        async function runMicLevel() {
+            changeView('none');
+            document.getElementById('view-mic').classList.add('active-view');
+            let progress = 0;
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const audioCtx = new AudioContext();
@@ -288,48 +305,50 @@
                 const source = audioCtx.createMediaStreamSource(stream);
                 source.connect(analyser);
                 const data = new Uint8Array(analyser.frequencyBinCount);
+                
                 const loop = setInterval(() => {
-                    prog += 0.5;
-                    document.getElementById('upload-fill').style.width = prog + "%";
+                    progress += 0.5;
+                    document.getElementById('mic-progress').style.width = progress + "%";
                     analyser.getByteFrequencyData(data);
                     let vol = data.reduce((a,b)=>a+b)/data.length;
-                    if(vol > 50) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); triggerFail(); }
-                    if(prog >= 100) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); runBoss(); }
+                    if(vol > 50) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); fail(); }
+                    if(progress >= 100) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); runBossLevel(); }
                 }, 50);
-            } catch(e) { triggerFail(); }
+            } catch(e) { fail(); }
         }
 
-        function runBoss() {
-            document.getElementById('mic-view').style.display = 'none';
-            document.getElementById('boss-view').style.display = 'flex';
-            let sz = 15;
-            const cre = document.getElementById('boss-creature');
-            bossInt = setInterval(() => {
-                sz += 4; cre.style.width = sz + "px"; cre.style.height = sz + "px"; cre.style.opacity = sz/150;
-                if(sz > 350) triggerFail();
+        function runBossLevel() {
+            changeView('none');
+            document.getElementById('view-boss').classList.add('active-view');
+            let size = 10;
+            const enemy = document.getElementById('boss-enemy');
+            bossLoop = setInterval(() => {
+                size += 4; enemy.style.width = size + "px"; enemy.style.height = size + "px";
+                enemy.style.opacity = size / 200;
+                if(size > 400) fail();
             }, 30);
-            document.getElementById('boss-view').onclick = () => {
-                clearInterval(bossInt);
-                document.getElementById('knife-img').style.transform = "translateY(-100px) rotate(-15deg)";
-                if(sz > 80 && sz < 150) {
-                    setTimeout(() => { alert("SYSTEM SECURED!"); location.reload(); }, 1000);
-                } else triggerFail();
+            document.getElementById('view-boss').onclick = () => {
+                clearInterval(bossLoop);
+                document.getElementById('knife-tool').style.transform = "translateY(-120px) rotate(-20deg)";
+                if(size > 90 && size < 170) {
+                    setTimeout(() => { alert("DB75 SYSTEM SECURED."); location.reload(); }, 1000);
+                } else fail();
             };
         }
 
-        function triggerFail() {
-            clearInterval(timerInt); clearInterval(bossInt);
-            document.getElementById('jumpscare-layer').style.display = 'flex';
-            sndJscare.play();
+        function fail() {
+            clearInterval(timerLoop); clearInterval(bossLoop);
+            document.getElementById('jumpscare').style.display = 'flex';
+            sJscare.play();
             setTimeout(() => {
-                document.getElementById('jumpscare-layer').style.display = 'none';
-                const wall = document.getElementById('fail-wall');
-                wall.style.display = 'block'; sndLoop.play();
-                wall.innerText = "NEVER COME BACK ".repeat(2000);
+                document.getElementById('jumpscare').style.display = 'none';
+                const f = document.getElementById('fail-screen');
+                f.style.display = 'block'; sLoop.play();
+                f.innerText = "NEVER COME BACK ".repeat(2500);
             }, 1500);
         }
 
-        updateSettings(); // Initialise
+        applySettings();
     </script>
 </body>
 </html>
