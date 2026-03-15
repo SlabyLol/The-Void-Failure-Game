@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE VOID FAILURE</title>
+    <style>
+        :root { --glitch-color: #ff0000; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; color: #fff; 
+            font-family: 'Courier New', monospace; 
+            overflow: hidden; cursor: none;
+        }
+
+        /* Hintergrund-Atmosphäre */
+        #grain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://media.giphy.com/media/oEI9uWUicH9N6/giphy.gif');
+            opacity: 0.08; pointer-events: none; z-index: 10;
+        }
+
+        /* Vignetten-Effekt (Tunnelblick) */
+        #vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 10%, rgba(0,0,0,0.95) 80%);
+            z-index: 5; pointer-events: none;
+        }
+
+        #game-container {
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; height: 100%; position: relative; z-index: 2;
+        }
+
+        /* Glitch Text */
+        .glitch-text {
+            font-size: 2.5rem; text-transform: uppercase; letter-spacing: 5px;
+            animation: pulse 2s infinite, shake 0.5s infinite alternate;
+            text-shadow: 2px 0 red, -2px 0 blue;
+            color: #eee;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px); }
+            100% { transform: translate(-1px, -2px); }
+        }
+
+        .btn {
+            background: none; border: 1px solid #222; color: #444;
+            padding: 15px 40px; font-size: 1rem; cursor: pointer;
+            margin-top: 50px; transition: all 0.3s;
+        }
+
+        .btn:hover { border-color: red; color: red; box-shadow: 0 0 20px red; }
+
+        /* Jumpscare-Element */
+        #jumpscare-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://files.catbox.moe/6v0d0v.jpg') center center / cover no-repeat;
+            z-index: 9999; display: none; filter: contrast(300%) invert(10%);
+        }
+
+        /* Endbildschirm */
+        #final-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; color: #600; display: none; z-index: 10000;
+            font-weight: 900; line-height: 0.8; font-size: 1.4rem; overflow: hidden;
+            animation: strobe 0.05s infinite;
+        }
+
+        @keyframes strobe {
+            0% { background: #000; }
+            50% { background: #050000; }
+        }
+
+        .level-indicator { color: #222; font-size: 0.8rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="grain"></div>
+    <div id="vignette"></div>
+
+    <div id="game-container">
+        <div id="level-info" class="level-indicator">SYSTEM_ERROR: LEVEL_1</div>
+        <div id="main-msg" class="glitch-text">The Beginning</div>
+        <div id="sub-msg" style="color: #333; margin-top: 10px;">Hörst du das Rauschen?</div>
+        <button id="action-btn" class="btn" onclick="progress()">TIEFER GEHEN</button>
+    </div>
+
+    <div id="jumpscare-overlay"></div>
+    <div id="final-screen"></div>
+
+    <audio id="snd-scream" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-one/human_scream_male_high_pitched_horror.mp3"></audio>
+    <audio id="snd-bg" loop src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-free-bundle/the_free_bundle_horror_cinematic_atmosphere_dark_heavy_creepy_001.mp3"></audio>
+
+    <script>
+        let stage = 1;
+        const levels = [
+            { l: "LEVEL_1", h: "The Beginning", s: "Es gibt kein Zurück." },
+            { l: "LEVEL_2", h: "The Whispers", s: "Sie wissen, dass du hier bist." },
+            { l: "LEVEL_3", h: "The Shadows", s: "Guck nicht unters Bett." },
+            { l: "LEVEL_4", h: "No Escape", s: "Die Leere starrt zurück." },
+            { l: "LEVEL_5", h: "THE VOID FAILURE", s: "ER IST HINTER DIR." }
+        ];
+
+        function progress() {
+            const bgSnd = document.getElementById('snd-bg');
+            if(stage === 1) bgSnd.play();
+
+            if (stage < 5) {
+                stage++;
+                document.getElementById('level-info').innerText = "SYSTEM_ERROR: " + levels[stage-1].l;
+                document.getElementById('main-msg').innerText = levels[stage-1].h;
+                document.getElementById('sub-msg').innerText = levels[stage-1].s;
+                
+                if(stage === 5) {
+                    document.getElementById('action-btn').innerText = "DAS ENDE AKZEPTIEREN";
+                }
+            } else {
+                startTheEnd();
+            }
+        }
+
+        async function startTheEnd() {
+            const btn = document.getElementById('action-btn');
+            const sub = document.getElementById('sub-msg');
+            btn.style.display = "none";
+            sub.innerText = "Initialisiere Mikrofon-Kalibrierung...";
+
+            try {
+                // Mikrofon-Abfrage
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                sub.innerHTML = "<span style='color:red; font-size: 1.5rem;'>STILL! Bewege dich nicht.<br>Wenn du lauter als 50dB bist, findet er dich.</span>";
+                
+                // Audio-Analyse
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(stream);
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+
+                function monitor() {
+                    analyser.getByteFrequencyData(dataArray);
+                    let average = dataArray.reduce((p, c) => p + c, 0) / bufferLength;
+
+                    if (average > 48) { // Entspricht ca. 50dB Schwelle
+                        triggerJumpscare();
+                        stream.getTracks().forEach(t => t.stop());
+                    } else {
+                        requestAnimationFrame(monitor);
+                    }
+                }
+                monitor();
+
+            } catch (err) {
+                // FALLS ABGELEHNT
+                sub.innerText = "ToO bAd :)";
+                setTimeout(() => { triggerJumpscare(); }, 1000);
+            }
+        }
+
+        function triggerJumpscare() {
+            const scream = document.getElementById('snd-scream');
+            const jump = document.getElementById('jumpscare-overlay');
+            const bg = document.getElementById('snd-bg');
+            
+            bg.pause();
+            jump.style.display = "block";
+            scream.play();
+
+            // Zusätzlicher Blitz-Effekt
+            let count = 0;
+            let flash = setInterval(() => {
+                jump.style.opacity = count % 2 === 0 ? "0.8" : "1";
+                count++;
+                if(count > 20) clearInterval(flash);
+            }, 50);
+
+            setTimeout(() => {
+                jump.style.display = "none";
+                showFinal();
+            }, 1200);
+        }
+
+        function showFinal() {
+            const final = document.getElementById('final-screen');
+            final.style.display = "block";
+            let content = "";
+            for(let i=0; i<3000; i++) {
+                content += "NEVER COME BACK ";
+            }
+            final.innerText = content;
+            
+            // Handy-Vibration für den Schock
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 1000]);
+        }
+    </script>
+</body>
+</html>
