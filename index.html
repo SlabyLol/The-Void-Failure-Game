@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void Failure - Fixed Edition</title>
+    <title>The Void Failure - Original Style</title>
     <style>
         :root {
             --fnaf-green: #24ff15;
@@ -17,7 +17,7 @@
             user-select: none;
         }
 
-        /* Büro & Monitor */
+        /* 3D Büro & Monitor */
         .office {
             width: 100%; height: 100%;
             background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%);
@@ -44,7 +44,14 @@
             position: relative; overflow: hidden; border: 4px solid #000;
         }
 
-        /* Jumpscare & Effekte */
+        /* Settings Button */
+        #settings-btn {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 10px; cursor: pointer; border: 1px solid var(--fnaf-green);
+            padding: 2px 5px; z-index: 200;
+        }
+
+        /* Jumpscare */
         #jumpscare-layer {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background: #000; z-index: 9999; display: none;
@@ -52,15 +59,15 @@
         }
 
         .scary-face {
-            width: 150%; height: 150%; fill: #500;
-            animation: tremor 0.05s infinite;
+            width: 140%; height: 140%; fill: #600;
+            animation: tremor 0.04s infinite;
         }
 
         .crack-overlay {
             position: absolute; top:0; left:0; width:100%; height:100%;
-            background: url('https://www.transparenttextures.com/patterns/glass-knobs.png');
-            background-size: cover; opacity: 0; z-index: 100; pointer-events: none;
-            filter: invert(1);
+            background: rgba(255,255,255,0.1); opacity: 0; z-index: 150;
+            pointer-events: none; border: 25px solid transparent;
+            border-image: url('https://i.imgur.com/7S8zH4B.png') 30 stretch;
         }
 
         /* SCP Void */
@@ -68,26 +75,25 @@
             position: absolute; width: 350px; height: 350px;
             top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
             opacity: 0; z-index: 5; pointer-events: none;
-            transition: transform 0.5s, opacity 0.5s;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
         }
 
-        /* UI */
+        /* Gameplay */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .active { display: flex; }
-        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 10px 20px; margin: 10px; cursor: pointer; font-family: inherit; }
-        .btn:hover { background: var(--fnaf-green); color: #000; }
+        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 8px 15px; margin: 10px; cursor: pointer; font-family: inherit; }
 
-        @keyframes tremor { 0% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -5px); } }
-        @keyframes shake-monitor { 0% { transform: translateZ(50px) translate(2px, 2px); } 50% { transform: translateZ(50px) translate(-2px, -2px); } }
+        @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.05) translate(5px, 5px); } }
+        @keyframes shake-mon { 0% { transform: translateZ(50px) translate(3px, 3px); } 50% { transform: translateZ(50px) translate(-3px, -3px); } }
     </style>
 </head>
 <body>
 
 <div id="jumpscare-layer">
     <svg class="scary-face" viewBox="0 0 200 200">
-        <circle cx="60" cy="80" r="30" fill="red" />
-        <circle cx="140" cy="80" r="30" fill="red" />
-        <path d="M 30 150 Q 100 250 170 150" stroke="white" stroke-width="12" fill="none" />
+        <circle cx="60" cy="70" r="25" fill="red" />
+        <circle cx="140" cy="70" r="25" fill="red" />
+        <path d="M 30 140 Q 100 240 170 140" stroke="white" stroke-width="12" fill="none" />
     </svg>
 </div>
 
@@ -102,21 +108,22 @@
 
     <div class="desk">
         <div class="monitor" id="monitor">
+            <div id="settings-btn" onclick="alert('VOL: 100%\nSENS: HIGH\nMODE: VOID')">⚙ SETTINGS</div>
             <div class="screen">
                 <div class="crack-overlay" id="crack"></div>
                 
                 <div id="v-start" class="view active">
-                    <h1 style="color:white; letter-spacing: 3px;">VOID FAILURE</h1>
-                    <button class="btn" onclick="startGame()">START SYSTEM</button>
+                    <h2 style="color:white">VOID_FAILURE</h2>
+                    <button class="btn" onclick="startGame()">BOOT REPAIR</button>
                 </div>
 
                 <div id="v-game" class="view">
-                    <div id="timer-bar" style="width:100%; height:6px; background:var(--fnaf-green); position:absolute; top:0;"></div>
+                    <div id="timer-bar" style="width:100%; height:5px; background:var(--fnaf-green); position:absolute; top:0;"></div>
                     <div id="game-zone"></div>
                 </div>
 
                 <div id="v-boss" class="view">
-                    <h2 id="status-text">REPAIRING: 99%</h2>
+                    <h3 id="boss-txt">REPAIRING... 99%</h3>
                 </div>
             </div>
         </div>
@@ -142,97 +149,81 @@
         zone.innerHTML = '';
         if (lvl < 5) startTimer(7 - (lvl * 0.5));
 
-        if (lvl === 1) { // Kabel
-            zone.innerHTML = '<p>FIX ALL WIRES</p>';
+        if (lvl === 1) { // Wires
+            zone.innerHTML = '<p style="font-size:12px">CONNECT WIRES</p>';
             for(let i=0; i<3; i++) {
                 let w = document.createElement('div');
-                w.style = "width:50px;height:50px;border:2px solid #222;margin:10px;cursor:pointer";
-                w.onclick = function() { this.style.background="red"; this.classList.add('done'); if(document.querySelectorAll('.done').length==3) nextLvl(); };
+                w.style = "width:45px;height:45px;border:2px solid #222;margin:10px;cursor:pointer";
+                w.onclick = function() { this.style.background="red"; this.classList.add('x'); if(document.querySelectorAll('.x').length==3) next(); };
                 zone.appendChild(w);
             }
         } else if (lvl === 2) { // 1-2-3
-            zone.innerHTML = '<p>SEQUENCE 1-2-3</p>';
+            zone.innerHTML = '<p style="font-size:12px">SEQUENCE 1-2-3</p>';
             [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
                 let b = document.createElement('button'); b.className="btn"; b.innerText=n;
                 b.onclick = function() { 
-                    if(this.innerText == (document.querySelectorAll('.ok').length+1)) { 
-                        this.classList.add('ok'); this.style.opacity=0.2; 
-                        if(document.querySelectorAll('.ok').length==3) nextLvl(); 
-                    } else triggerJumpscare(); 
+                    if(this.innerText == (document.querySelectorAll('.y').length+1)) { 
+                        this.classList.add('y'); this.style.opacity=0.2; 
+                        if(document.querySelectorAll('.y').length==3) next(); 
+                    } else sc(); 
                 };
                 zone.appendChild(b);
             });
-        } else if (lvl === 3) { // Stabilizer
-            zone.innerHTML = '<div id="disk" style="width:100px;height:100px;border:4px solid #333;border-radius:50%;position:relative"><div id="needle" style="width:3px;height:50px;background:white;position:absolute;left:48.5px;bottom:50%;transform-origin:bottom"></div></div><p>STOP AT TOP</p>';
-            let deg = 0;
-            let rot = setInterval(() => { 
-                deg = (deg + 10) % 360; 
-                if(document.getElementById('needle')) document.getElementById('needle').style.transform=`rotate(${deg}deg)`;
+        } else if (lvl === 3) { // Classic Stabilizer (FIXED)
+            zone.innerHTML = '<div id="s" style="width:90px;height:90px;border:4px solid #333;border-radius:50%;position:relative"><div id="n" style="width:2px;height:45px;background:white;position:absolute;left:44px;bottom:50%;transform-origin:bottom"></div></div><p style="font-size:10px;margin-top:10px">STOP AT 12:00</p>';
+            let d = 0;
+            let r = setInterval(() => { 
+                d = (d + 12) % 360; 
+                if(document.getElementById('n')) document.getElementById('n').style.transform=`rotate(${d}deg)`;
             }, 20);
-            document.getElementById('disk').onclick = () => { if(deg < 30 || deg > 330) { clearInterval(rot); nextLvl(); } else { clearInterval(rot); triggerJumpscare(); } };
-        } else if (lvl === 4) { // Klicks
-            let c=0; let b=document.createElement('button'); b.className="btn"; b.innerText="OVERRIDE (15x)";
-            b.onclick = () => { c++; b.innerText = 15-c; if(c>=15) nextLvl(); };
+            document.getElementById('s').onclick = () => { if(d < 30 || d > 330) { clearInterval(r); next(); } else { clearInterval(r); sc(); } };
+        } else if (lvl === 4) { // Override
+            let c=0; let b=document.createElement('button'); b.className="btn"; b.innerText="OVERRIDE 15x";
+            b.onclick = () => { c++; b.innerText = 15-c; if(c>=15) next(); };
             zone.appendChild(b);
         } else {
-            startEpicFinale();
+            finale();
         }
     }
 
     function startTimer(s) {
-        let val = 100; clearInterval(timer);
+        let w = 100; clearInterval(timer);
         timer = setInterval(() => {
-            val -= (100 / (s * 10));
-            document.getElementById('timer-bar').style.width = val + "%";
-            if(val <= 0) triggerJumpscare();
+            w -= (100 / (s * 10));
+            document.getElementById('timer-bar').style.width = w + "%";
+            if(w <= 0) sc();
         }, 100);
     }
 
-    function nextLvl() { lvl++; runLevel(); }
+    function next() { lvl++; runLevel(); }
+    function sc() { clearInterval(timer); document.getElementById('jumpscare-layer').style.display='flex'; setTimeout(()=>location.reload(), 1500); }
 
-    function triggerJumpscare() {
-        clearInterval(timer);
-        document.getElementById('jumpscare-layer').style.display = 'flex';
-        setTimeout(() => location.reload(), 1500);
-    }
-
-    function startEpicFinale() {
+    function finale() {
         clearInterval(timer);
         showView('boss');
-        
-        // 1. Monitor zittert
         setTimeout(() => {
-            document.getElementById('monitor').style.animation = "shake-monitor 0.1s infinite";
-        }, 1000);
-
-        // 2. Screen zersplittert
-        setTimeout(() => {
-            document.getElementById('crack').style.opacity = "1";
-            document.getElementById('status-text').innerText = "FATAL ERROR";
-            document.getElementById('status-text').style.color = "red";
-        }, 2500);
-
-        // 3. SCP Void wirft Monitor weg & erscheint
-        setTimeout(() => {
-            const mon = document.getElementById('monitor');
-            mon.style.transform = "translate(1200px, 400px) rotate(180deg)";
-            mon.style.opacity = "0";
-
-            const scp = document.getElementById('scp-void');
-            scp.style.opacity = "1";
-            scp.style.transform = "translate(-50%, -50%) scale(1.6)";
-            scp.style.pointerEvents = "auto";
-            
-            // Finale: Auf SCP klicken um zu gewinnen
-            scp.onclick = () => {
-                scp.style.filter = "invert(1) hue-rotate(180deg)";
-                scp.style.transform = "translate(-50%, -50%) scale(0)";
+            document.getElementById('monitor').style.animation = "shake-mon 0.1s infinite";
+            setTimeout(() => {
+                document.getElementById('crack').style.opacity = "1";
+                document.getElementById('boss-txt').innerText = "FATAL ERROR";
                 setTimeout(() => {
-                    alert("SYSTEM SECURED. SCP VOID PURGED.");
-                    location.reload();
-                }, 1000);
-            };
-        }, 4000);
+                    const m = document.getElementById('monitor');
+                    m.style.transition = "transform 0.5s, opacity 0.3s";
+                    m.style.transform = "translate(1200px, 400px) rotate(180deg)";
+                    m.style.opacity = "0";
+
+                    const s = document.getElementById('scp-void');
+                    s.style.opacity = "1";
+                    s.style.transform = "translate(-50%, -50%) scale(1.6)";
+                    s.style.pointerEvents = "auto";
+                    s.onclick = () => {
+                        s.style.filter = "invert(1) contrast(10)";
+                        s.style.transform = "translate(-50%, -50%) scale(0)";
+                        setTimeout(() => { alert("YOU SURVIVED THE VOID"); location.reload(); }, 1000);
+                    };
+                }, 1500);
+            }, 1500);
+        }, 1000);
     }
 </script>
 </body>
