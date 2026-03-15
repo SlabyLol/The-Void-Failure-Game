@@ -1,0 +1,127 @@
+:root {
+    --monitor-green: #24ff15;
+    --monitor-bg: #0a0f0a;
+    --void-red: #ff0000;
+}
+
+body, html {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background-color: #020202;
+    overflow: hidden;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Der Raum */
+.office {
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #111 0%, #000 80%);
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* TV Gehäuse */
+.tv-case {
+    width: 450px; height: 380px;
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 0 50px #000, inset 0 0 20px #333;
+    display: flex;
+}
+
+.screen-border {
+    width: 350px; height: 340px;
+    background: #111;
+    border-radius: 50% / 5%;
+    padding: 10px;
+    box-shadow: inset 0 0 10px #000;
+}
+
+.monitor-screen {
+    width: 100%; height: 100%;
+    background: var(--monitor-bg);
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 2px solid #222;
+}
+
+/* CRT Effekte */
+.scanlines {
+    position: absolute; top:0; left:0; width:100%; height:100%;
+    background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+    z-index: 10; pointer-events: none;
+}
+
+.vignette {
+    position: absolute; top:0; left:0; width:100%; height:100%;
+    box-shadow: inset 0 0 80px rgba(0,0,0,0.9);
+    z-index: 11; pointer-events: none;
+}
+
+/* UI Elemente */
+#ui-overlay {
+    position: absolute; top: 10px; width: 90%; left: 5%;
+    display: flex; justify-content: space-between;
+    z-index: 20; color: var(--monitor-green); font-size: 10px;
+}
+
+.battery-container {
+    width: 50px; height: 10px; border: 1px solid var(--monitor-green);
+}
+
+#timer-bar { width: 100%; height: 100%; background: var(--monitor-green); }
+
+/* Buttons & Views */
+.view {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+}
+
+.btn {
+    background: transparent; border: 1px solid var(--monitor-green);
+    color: var(--monitor-green); padding: 10px 20px;
+    cursor: pointer; margin-top: 20px; font-family: inherit;
+}
+
+.btn:hover { background: var(--monitor-green); color: black; }
+
+/* Boss Elemente */
+#creature-silhouette {
+    width: 10px; height: 10px; background: #000;
+    border-radius: 50%; filter: blur(5px);
+    position: absolute; opacity: 0;
+}
+
+#knife-img {
+    width: 80px; position: absolute; bottom: -20px;
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(100deg);
+    transition: transform 0.1s;
+}
+
+/* Jumpscare */
+#jumpscare-layer {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: #000; display: none; z-index: 100;
+}
+
+.monster-face {
+    width: 100%; height: 100%;
+    background: url('https://i.imgur.com/vHqB3qH.png') center/contain no-repeat; /* Platzhalter für Gesicht */
+    filter: brightness(0.5) sepia(1) saturate(10) hue-rotate(-50deg);
+    animation: jitter 0.05s infinite;
+}
+
+@keyframes jitter {
+    0% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, -2px); }
+    100% { transform: translate(0, 0); }
+}
+
+#fail-layer {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: black; color: red; display: none;
+    z-index: 110; overflow: hidden; word-break: break-all;
+}
