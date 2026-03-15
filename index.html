@@ -2,206 +2,290 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level 5: The End</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Void Failure</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #fff;
-            font-family: 'Courier New', Courier, monospace;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            user-select: none;
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; color: #fff; font-family: 'Courier New', monospace; user-select: none; }
+        
+        /* Status oben rechts (ob Sounds geladen sind) */
+        #sound-status { position: fixed; top: 5px; right: 10px; font-size: 10px; color: #222; z-index: 1000; }
+
+        /* UI & Timer */
+        #game-container { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #ui-top { position: absolute; top: 30px; text-align: center; z-index: 5; }
+        #timer-bar { width: 220px; height: 10px; background: #100; margin-top: 10px; border: 1px solid #300; border-radius: 5px; overflow: hidden; }
+        #timer-fill { width: 100%; height: 100%; background: #f00; box-shadow: 0 0 10px red; }
+
+        /* Task-Fenster (Level 1-4) */
+        #task-window { 
+            width: 320px; height: 380px; border: 2px solid #200; background: #050505; 
+            display: none; flex-direction: column; align-items: center; justify-content: space-around;
+            padding: 20px; box-shadow: 0 0 50px rgba(255,0,0,0.1); z-index: 10;
         }
 
-        #game-container {
-            text-align: center;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        /* FNAF Level 5 Panel */
+        #fnaf-panel {
+            width: 340px; height: 420px; border: 5px solid #1a1a1a; background: #010101;
+            display: none; flex-direction: column; padding: 25px; box-sizing: border-box;
+            box-shadow: inset 0 0 30px #000; position: relative; border-radius: 10px;
         }
+        .fnaf-text { color: #0f0; font-size: 0.9rem; margin: 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        #loading-container { width: 100%; height: 25px; border: 1px solid #0f0; margin: 20px 0; position: relative; background: #001000; }
+        #loading-fill { height: 100%; width: 0%; background: #0f0; box-shadow: 0 0 15px #0f0; }
+        #process-logs { height: 140px; overflow: hidden; font-size: 0.7rem; color: #0a0; opacity: 0.8; line-height: 1.4; border-top: 1px solid #030; padding-top: 10px; }
+        
+        /* Failure State (Flackern) */
+        .failed-anim { color: #f00 !important; border-color: #f00 !important; animation: system-crash 0.1s infinite; text-shadow: 0 0 15px red; }
+        @keyframes system-crash { 0% { opacity: 1; transform: translate(2px, 2px); } 50% { opacity: 0.3; transform: translate(-2px, -2px); } 100% { opacity: 1; } }
 
-        #message {
-            font-size: 2rem;
-            color: darkred;
-            text-shadow: 2px 2px 5px #000;
-            display: none;
-            z-index: 10;
-        }
+        /* Minispiele CSS */
+        .wire-dot { width: 50px; height: 50px; border-radius: 50%; background: #200; cursor: pointer; border: 2px solid #400; }
+        .wire-dot.active { background: #f00; box-shadow: 0 0 25px #f00; border-color: #fff; }
+        .num-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .num-btn { width: 80px; height: 80px; background: #0d0d0d; border: 2px solid #300; color: #600; font-size: 2rem; cursor: pointer; font-family: inherit; }
+        .num-btn.done { border-color: #f00; color: #f00; opacity: 0.15; transform: scale(0.9); }
+        #slider-track { width: 60px; height: 260px; background: #0a0a0a; border: 2px solid #222; position: relative; border-radius: 5px; }
+        #slider-knob { width: 100%; height: 60px; background: #500; position: absolute; bottom: 0; cursor: pointer; border: 1px solid #f00; }
+        #cal-dial { width: 200px; height: 200px; border: 5px solid #111; border-radius: 50%; position: relative; background: #030303; }
+        #cal-needle { width: 4px; height: 100px; background: #f00; position: absolute; left: 98px; top: 0; transform-origin: bottom; box-shadow: 0 0 10px #f00; }
+        #cal-target { width: 50px; height: 25px; background: rgba(255,0,0,0.4); position: absolute; top: 0; left: 75px; border-radius: 5px; }
 
-        #start-btn {
-            padding: 15px 30px;
-            font-size: 1.5rem;
-            background: transparent;
-            color: red;
-            border: 2px solid red;
-            cursor: pointer;
-            font-family: inherit;
-            transition: 0.3s;
-        }
+        /* Jumpscare & Annäherung */
+        #approach { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; display:none; z-index:1000; align-items:center; justify-content:center; }
+        #creature-shadow { width: 30px; height: 30px; background:#100; border-radius:50%; filter:blur(15px); transition: 1.1s all ease-in; }
+        #jumpscare { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; display:none; z-index:1001; align-items:center; justify-content:center; }
+        .monster-svg { width: 140%; height:140%; fill:#200; filter: drop-shadow(0 0 40px #f00); animation: jitter 0.05s infinite; }
+        @keyframes jitter { 0%{transform: translate(4px,4px) scale(1.1);} 50%{transform: translate(-4px,-4px) scale(1.15);} 100%{transform: translate(0,0) scale(1.1);} }
 
-        #start-btn:hover {
-            background: red;
-            color: black;
-        }
-
-        #jumpscare-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none; /* Versteckt bis zum Jumpscare */
-            background-color: black;
-            z-index: 100;
-        }
-
-        #jumpscare-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            animation: shake 0.1s infinite;
-        }
-
-        @keyframes shake {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(2px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(2px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        #never-come-back {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            color: red;
-            font-size: 1.5rem;
-            text-align: center;
-            line-height: 1.5;
-            z-index: 200;
-            overflow: hidden;
-            word-wrap: break-word;
-        }
+        /* Start & Ende */
+        .screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:2000; }
+        .btn { padding: 20px 60px; background:transparent; border: 2px solid #300; color:#500; cursor:pointer; font-family:inherit; font-size: 1.6rem; letter-spacing: 5px; transition: 0.4s; }
+        .btn:hover { color: #f00; border-color: #f00; box-shadow: 0 0 30px #f00; }
+        #final-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#f00; display:none; z-index:3000; word-break:break-all; font-weight:bold; overflow:hidden; line-height:0.7; text-align: center; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
+    <div id="sound-status">JS: ? | LP: ?</div>
+
+    <div id="start-screen" class="screen">
+        <h1 style="color:#300; letter-spacing:15px; font-size: 2.2rem; margin-bottom: 40px;">THE VOID FAILURE</h1>
+        <button class="btn" onclick="startGame()">SYSTEM INITIALIZE</button>
+    </div>
+
     <div id="game-container">
-        <h1 id="title">Level: 5 The End</h1>
-        <button id="start-btn">Level betreten</button>
-        <div id="message"></div>
+        <div id="ui-top">
+            <div id="lvl-txt" style="color:#500; font-size: 1.2rem;">DEPTH: 0</div>
+            <div id="timer-bar"><div id="timer-fill"></div></div>
+        </div>
+
+        <div id="task-window"></div>
+
+        <div id="fnaf-panel">
+            <div class="fnaf-text" id="p-status">STATUS: UPLOADING...</div>
+            <div class="fnaf-text" id="p-time">REMAINING: --</div>
+            <div id="loading-container"><div id="loading-fill"></div></div>
+            <div id="process-logs"></div>
+            <div class="fnaf-text" id="mic-status" style="color: #550; font-size: 0.6rem; margin-top: 15px;">VOICE SENSOR: MONITORING...</div>
+        </div>
     </div>
 
-    <div id="jumpscare-container">
-        <img id="jumpscare-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Schrei_der_Angst.jpg/800px-Schrei_der_Angst.jpg" alt="Scary Face">
+    <div id="approach"><div id="creature-shadow"></div></div>
+    
+    <div id="jumpscare">
+        <svg class="monster-svg" viewBox="0 0 200 200">
+            <path d="M 20 60 Q 50 5 100 5 Q 150 5 180 60 Q 200 130 100 195 Q 0 130 20 60" fill="#080000" stroke="red" stroke-width="1"/>
+            <circle cx="65" cy="75" r="16" fill="red" />
+            <circle cx="135" cy="75" r="16" fill="red" />
+            <path d="M 40 145 Q 100 220 160 145" stroke="red" fill="none" stroke-width="8" />
+        </svg>
     </div>
 
-    <div id="never-come-back"></div>
+    <div id="final-screen"></div>
 
-    <audio id="jumpscare-sound" src="https://actions.google.com/sounds/v1/horror/monster_zombie_growl.ogg"></audio>
+    <audio id="snd-jscare" src="c_jscare.mp3" preload="auto"></audio>
+    <audio id="snd-loop" src="ncb_loop.mp3" loop preload="auto"></audio>
 
     <script>
-        const startBtn = document.getElementById('start-btn');
-        const title = document.getElementById('title');
-        const message = document.getElementById('message');
-        const jumpscareContainer = document.getElementById('jumpscare-container');
-        const jumpscareSound = document.getElementById('jumpscare-sound');
-        const neverComeBackScreen = document.getElementById('never-come-back');
-        let audioContext;
+        let level = 1;
+        let timeLeft = 10;
+        let timerInterval;
+        let gameActive = false;
+        
+        const taskWin = document.getElementById('task-window');
+        const timerFill = document.getElementById('timer-fill');
+        const sndJscare = document.getElementById('snd-jscare');
+        const sndLoop = document.getElementById('snd-loop');
 
-        startBtn.addEventListener('click', () => {
-            startBtn.style.display = 'none';
-            title.style.display = 'none';
-            requestMicAccess();
-        });
+        // Sound Check
+        sndJscare.oncanplaythrough = () => document.getElementById('sound-status').innerText = "JS: OK | LP: ?";
+        sndLoop.oncanplaythrough = () => document.getElementById('sound-status').innerText = "JS: OK | LP: OK";
 
-        function requestMicAccess() {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(function(stream) {
-                    // MIKROFON AKZEPTIERT
-                    message.innerText = "pssst... sei leise.";
-                    message.style.display = "block";
-                    monitorAudio(stream);
-                })
-                .catch(function(err) {
-                    // MIKROFON ABGELEHNT
-                    message.innerText = "ToO bAd :)";
-                    message.style.display = "block";
-                    setTimeout(() => {
-                        triggerJumpscare(false);
-                    }, 1000);
-                });
+        function startGame() {
+            // Browser Audio Unlock
+            sndJscare.play().then(() => { sndJscare.pause(); sndJscare.currentTime = 0; });
+            sndLoop.play().then(() => { sndLoop.pause(); sndLoop.currentTime = 0; });
+            
+            document.getElementById('start-screen').style.display = 'none';
+            gameActive = true;
+            loadLevel();
         }
 
-        function monitorAudio(stream) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const analyser = audioContext.createAnalyser();
-            const microphone = audioContext.createMediaStreamSource(stream);
-            microphone.connect(analyser);
-            analyser.fftSize = 256;
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
+        function loadLevel() {
+            taskWin.style.display = 'flex';
+            taskWin.innerHTML = '';
+            document.getElementById('lvl-txt').innerText = "DEPTH: " + level;
+            
+            let baseTime = 12 - (level * 1.5);
+            timeLeft = baseTime;
+            
+            if (level === 1) task1();
+            else if (level === 2) task2();
+            else if (level === 3) task3();
+            else if (level === 4) task4();
+            else if (level === 5) startLevel5();
 
-            function checkVolume() {
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for(let i = 0; i < bufferLength; i++) {
-                    sum += dataArray[i];
-                }
-                let averageVolume = sum / bufferLength;
-
-                // Schwellenwert für ca. "50dB" - Web Audio gibt Rohwerte (0-255) aus.
-                // Ein Wert von 40-50 entspricht in etwa leisem Sprechen/Atmen ins Mikrofon.
-                if (averageVolume > 45) { 
-                    triggerJumpscare(true);
-                    return; // Stoppt die Schleife
-                }
-
-                requestAnimationFrame(checkVolume);
-            }
-            checkVolume();
-        }
-
-        function triggerJumpscare(showNeverComeBack) {
-            jumpscareContainer.style.display = "block";
-            jumpscareSound.play();
-
-            if (showNeverComeBack) {
-                setTimeout(() => {
-                    jumpscareContainer.style.display = "none";
-                    showEndScreen();
-                }, 1000); // 1 Sekunde Jumpscare, dann Text
+            if(level < 5) {
+                clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft -= 0.05;
+                    timerFill.style.width = (timeLeft / baseTime * 100) + "%";
+                    if(timeLeft <= 0) fail();
+                }, 50);
             }
         }
 
-        function showEndScreen() {
-            neverComeBackScreen.style.display = "block";
-            let text = "";
-            // Generiert hunderte "NEVER COME BACK"
-            for(let i = 0; i < 500; i++) {
-                text += "NEVER COME BACK ";
+        // --- TASKS ---
+        function task1() {
+            for(let i=0; i<3; i++) {
+                let d = document.createElement('div'); d.className = 'wire-dot';
+                d.onclick = function() { this.classList.add('active'); if(document.querySelectorAll('.wire-dot.active').length === 3) nextLevel(); };
+                taskWin.appendChild(d);
             }
-            neverComeBackScreen.innerText = text;
+        }
+
+        function task2() {
+            let g = document.createElement('div'); g.className = 'num-grid';
+            let c = 1;
+            [1,2,3,4].sort(()=>Math.random()-0.5).forEach(n => {
+                let b = document.createElement('button'); b.className='num-btn'; b.innerText=n;
+                b.onclick = function(){ if(parseInt(this.innerText)===c){ this.classList.add('done'); c++; if(c>4) nextLevel(); } else fail(); };
+                g.appendChild(b);
+            });
+            taskWin.appendChild(g);
+        }
+
+        function task3() {
+            let t = document.createElement('div'); t.id = 'slider-track';
+            let k = document.createElement('div'); k.id = 'slider-knob';
+            const move = (e) => {
+                let y = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+                let r = t.getBoundingClientRect();
+                let p = Math.max(0, Math.min(200, r.bottom - y));
+                k.style.bottom = p + "px";
+                if(p > 195) { window.removeEventListener('mousemove', move); nextLevel(); }
+            };
+            k.onmousedown = k.ontouchstart = () => { window.addEventListener('mousemove', move); window.addEventListener('touchmove', move); };
+            window.onmouseup = window.ontouchend = () => { window.removeEventListener('mousemove', move); window.removeEventListener('touchmove', move); };
+            t.appendChild(k); taskWin.appendChild(t);
+        }
+
+        function task4() {
+            let d = document.createElement('div'); d.id = 'cal-dial';
+            let n = document.createElement('div'); n.id = 'cal-needle';
+            let tar = document.createElement('div'); tar.id = 'cal-target';
+            let a = 0;
+            let r = setInterval(() => { a = (a + 5) % 360; n.style.transform = `rotate(${a}deg)`; }, 20);
+            d.onclick = () => { if(a > 340 || a < 20) { clearInterval(r); nextLevel(); } else fail(); };
+            d.appendChild(tar); d.appendChild(n); taskWin.appendChild(d);
+        }
+
+        // --- LEVEL 5: TERMINAL ---
+        async function startLevel5() {
+            clearInterval(timerInterval);
+            taskWin.style.display = 'none';
+            document.getElementById('ui-top').style.display = 'none';
+            document.getElementById('fnaf-panel').style.display = 'flex';
+            
+            const logs = ["Init Protocol...", "Scanning Void...", "Found Soul.dat", "Decrypting...", "Linking Nodes...", "Finalizing..."];
+            const logBox = document.getElementById('process-logs');
+            let logI = 0;
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioCtx = new AudioContext();
+                const analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(stream);
+                source.connect(analyser);
+                
+                let progress = 0;
+                let sec = 10;
+                const mData = new Uint8Array(analyser.frequencyBinCount);
+
+                const loop = setInterval(() => {
+                    progress += 0.5;
+                    if(Math.floor(progress) % 10 === 0 && progress % 1 === 0) {
+                        sec = 10 - Math.floor(progress/10);
+                        document.getElementById('p-time').innerText = `REMAINING: ${sec}s`;
+                        if(logI < logs.length) { logBox.innerHTML += `> ${logs[logI]}<br>`; logI++; }
+                    }
+                    document.getElementById('loading-fill').style.width = progress + "%";
+
+                    // Audio Check
+                    analyser.getByteFrequencyData(mData);
+                    let v = mData.reduce((a,b)=>a+b)/mData.length;
+                    if(v > 45) { // Zu laut!
+                        clearInterval(loop);
+                        stream.getTracks().forEach(t => t.stop());
+                        systemCrash();
+                    }
+
+                    if(progress >= 100) {
+                        clearInterval(loop);
+                        stream.getTracks().forEach(t => t.stop());
+                        showFinal();
+                    }
+                }, 50);
+
+            } catch(e) { systemCrash(); }
+        }
+
+        function systemCrash() {
+            const p = document.getElementById('fnaf-panel');
+            p.classList.add('failed-anim');
+            document.getElementById('p-status').innerText = "SYSTEM FAILED";
+            document.getElementById('p-time').innerText = "ERROR 0x00013";
+            document.getElementById('process-logs').innerHTML = "<br><h2 style='text-align:center; color:red;'>SOMEONE IS APPROACHING</h2>";
+            setTimeout(fail, 2000);
+        }
+
+        function nextLevel() { level++; loadLevel(); }
+
+        function fail() {
+            gameActive = false;
+            document.getElementById('fnaf-panel').style.display = 'none';
+            taskWin.style.display = 'none';
+            const app = document.getElementById('approach');
+            const cre = document.getElementById('creature-shadow');
+            app.style.display = 'flex';
+            setTimeout(() => { cre.style.transform = "scale(80)"; cre.style.background = "#200"; }, 50);
+            setTimeout(triggerJumpscare, 1200);
+        }
+
+        function triggerJumpscare() {
+            document.getElementById('approach').style.display = 'none';
+            document.getElementById('jumpscare').style.display = 'flex';
+            sndJscare.play().catch(()=>{});
+            if(navigator.vibrate) navigator.vibrate([1000, 200, 1000]);
+            setTimeout(() => { document.getElementById('jumpscare').style.display = 'none'; showFinal(); }, 1500);
+        }
+
+        function showFinal() {
+            const f = document.getElementById('final-screen');
+            f.style.display = 'block';
+            sndLoop.play().catch(()=>{});
+            let s = ""; for(let i=0; i<3500; i++) s += "NEVER COME BACK ";
+            f.innerText = s;
         }
     </script>
 </body>
