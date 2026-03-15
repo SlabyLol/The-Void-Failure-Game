@@ -2,353 +2,207 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DB75: THE VOID OFFICE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 5: The End</title>
     <style>
-        :root {
-            --fnaf-green: #24ff15;
-            --fnaf-red: #ff0000;
-            --fnaf-blue: #00ffff;
-            --monitor-glow: rgba(36, 255, 21, 0.15);
-            --desk-color: #121212;
-        }
-
-        /* Colorblind Modes */
-        .cb-protanopia { --fnaf-red: #888; --fnaf-green: #fff100; }
-        .cb-deuteranopia { --fnaf-red: #6d5a00; --fnaf-green: #ffd500; }
-        .cb-tritanopia { --fnaf-red: #ff0050; --fnaf-green: #00f0ff; }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: #000; color: var(--fnaf-green);
-            font-family: 'Courier New', monospace; overflow: hidden;
-        }
-
-        /* 3D Büro Setting */
-        .office-env {
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%);
-            display: flex; justify-content: center; align-items: center;
-            perspective: 1200px;
-        }
-
-        /* Flackerndes Licht im Büro */
-        .office-env::after {
-            content: ""; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.2);
-            animation: flicker-room 4s infinite;
-            pointer-events: none;
-        }
-
-        @keyframes flicker-room {
-            0%, 100% { opacity: 0; }
-            95% { opacity: 0.2; }
-            96% { opacity: 0.8; }
-            97% { opacity: 0.1; }
-        }
-
-        .desk {
-            width: 700px; height: 450px;
-            background: var(--desk-color);
-            position: relative;
-            transform: rotateX(15deg);
-            border-top: 8px solid #0a0a0a;
-            box-shadow: 0 60px 120px rgba(0,0,0,1);
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* Der Monitor (Hardware) */
-        .monitor-frame {
-            width: 450px; height: 350px;
-            background: #1f1f1f;
-            border-radius: 10px;
-            padding: 12px;
-            position: relative;
-            box-shadow: 0 0 40px #000, inset 0 0 10px #333;
-            transform: translateZ(30px);
-        }
-
-        /* Der Screen (Software) */
-        .screen {
-            width: 100%; height: 100%;
-            background: #040604;
-            position: relative;
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
             overflow: hidden;
-            border: 4px solid #000;
-            box-shadow: inset 0 0 50px #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
         }
 
-        /* CRT Filter */
-        .crt-fx {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 100; pointer-events: none; background-size: 100% 4px, 4px 100%;
+        #game-container {
+            text-align: center;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Game UI */
-        #os-header {
-            position: absolute; top: 10px; width: 90%; left: 5%;
-            display: flex; justify-content: space-between; font-size: 12px; z-index: 50;
-            text-shadow: 0 0 5px var(--fnaf-green);
+        #message {
+            font-size: 2rem;
+            color: darkred;
+            text-shadow: 2px 2px 5px #000;
+            display: none;
+            z-index: 10;
         }
 
-        .progress-shell { width: 60px; height: 10px; border: 1px solid var(--fnaf-green); }
-        #timer-bar { width: 100%; height: 100%; background: var(--fnaf-green); }
-
-        /* Ansichten */
-        .view {
-            width: 100%; height: 100%;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; box-sizing: border-box;
+        #start-btn {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            background: transparent;
+            color: red;
+            border: 2px solid red;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.3s;
         }
 
-        .active-view { display: flex; }
-
-        h1, h2 { letter-spacing: 4px; margin: 10px; }
-        .btn {
-            background: transparent; border: 1px solid var(--fnaf-green);
-            color: var(--fnaf-green); padding: 10px 20px; margin: 5px;
-            cursor: pointer; font-family: inherit; font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 15px var(--fnaf-green); }
-
-        /* Level Elements */
-        #stab-disk {
-            width: 160px; height: 160px; border: 6px solid #111; border-radius: 50%;
-            position: relative; background: #000; margin: 10px;
-        }
-        #stab-target { width: 45px; height: 25px; border: 2px solid red; position: absolute; top: -5px; left: 57px; background: rgba(255,0,0,0.2); }
-        #stab-needle { width: 4px; height: 80px; background: #fff; position: absolute; bottom: 50%; left: calc(50% - 2px); transform-origin: bottom center; }
-
-        .wire { width: 50px; height: 50px; border: 2px solid #222; margin: 10px; cursor: pointer; }
-        .wire.on { background: var(--fnaf-red); box-shadow: 0 0 20px var(--fnaf-red); border-color: #fff; }
-
-        #boss-enemy { width: 15px; height: 15px; background: #fff; border-radius: 50%; filter: blur(10px); position: absolute; opacity: 0; }
-        #knife-tool { width: 80px; position: absolute; bottom: 15px; filter: invert(1); transition: 0.1s; pointer-events: none; }
-
-        /* Scares & Fails */
-        #jumpscare {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: #000; display: none; z-index: 5000; align-items: center; justify-content: center;
-        }
-        .monster-img { width: 140%; height: 140%; fill: #300; animation: shake 0.05s infinite; }
-        #fail-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: #000; color: #600; display: none; z-index: 6000;
-            word-break: break-all; overflow: hidden; line-height: 0.7; font-size: 1.2rem;
+        #start-btn:hover {
+            background: red;
+            color: black;
         }
 
-        @keyframes shake { 0%{transform: translate(8px, 8px);} 50%{transform: translate(-8px, -8px);} }
+        #jumpscare-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* Versteckt bis zum Jumpscare */
+            background-color: black;
+            z-index: 100;
+        }
+
+        #jumpscare-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        #never-come-back {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: red;
+            font-size: 1.5rem;
+            text-align: center;
+            line-height: 1.5;
+            z-index: 200;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
     </style>
 </head>
-<body id="main-body">
+<body>
 
-    <div class="office-env">
-        <div class="desk">
-            <div class="monitor-frame">
-                <div class="screen">
-                    <div class="crt-fx"></div>
-
-                    <div id="os-header" style="display:none;">
-                        <div>DB75_SYSTEM [v4.0]</div>
-                        <div class="progress-shell"><div id="timer-bar"></div></div>
-                    </div>
-
-                    <div id="view-start" class="view active-view">
-                        <h1 style="color:white">DB75</h1>
-                        <p style="font-size: 0.7rem;">VOID OFFICE TERMINAL</p>
-                        <button class="btn" onclick="changeView('game')">RUN SYSTEM</button>
-                        <button class="btn" onclick="changeView('settings')">SETTINGS</button>
-                    </div>
-
-                    <div id="view-settings" class="view">
-                        <h2>SETTINGS</h2>
-                        <label style="font-size: 0.7rem;">MASTER VOLUME</label>
-                        <input type="range" id="volume-ctrl" min="0" max="100" value="50" onchange="applySettings()">
-                        
-                        <label style="font-size: 0.7rem; margin-top:15px;">COLORBLIND MODE</label>
-                        <select id="cb-select" class="btn" onchange="applySettings()">
-                            <option value="none">OFF</option>
-                            <option value="cb-protanopia">PROTANOPIA</option>
-                            <option value="cb-deuteranopia">DEUTERANOPIA</option>
-                            <option value="cb-tritanopia">TRITANOPIA</option>
-                        </select>
-                        <button class="btn" onclick="changeView('start')" style="margin-top:20px;">SAVE & EXIT</button>
-                    </div>
-
-                    <div id="view-game" class="view">
-                        <div id="game-content" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;"></div>
-                    </div>
-
-                    <div id="view-mic" class="view">
-                        <h3 style="color:red">AUDIO SENSOR ACTIVE</h3>
-                        <p style="font-size: 0.6rem;">DON'T MAKE A SOUND</p>
-                        <div class="progress-shell" style="width: 200px; height: 20px;">
-                            <div id="mic-progress" style="width:0%; height:100%; background: var(--fnaf-green);"></div>
-                        </div>
-                    </div>
-
-                    <div id="view-boss" class="view">
-                        <div id="boss-enemy"></div>
-                        <div id="knife-tool">
-                            <svg viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="#fff"/></svg>
-                        </div>
-                        <p style="position:absolute; bottom:5px; font-size:0.5rem; color:red;">TIMING ATTACK REQUIRED</p>
-                    </div>
-
-                </div>
-            </div>
-        </div>
+    <div id="game-container">
+        <h1 id="title">Level: 5 The End</h1>
+        <button id="start-btn">Level betreten</button>
+        <div id="message"></div>
     </div>
 
-    <div id="jumpscare">
-        <svg class="monster-img" viewBox="0 0 200 200">
-            <circle cx="60" cy="80" r="22" fill="red"/><circle cx="140" cy="80" r="22" fill="red"/>
-            <path d="M 30 150 Q 100 250 170 150" stroke="red" fill="none" stroke-width="15"/>
-        </svg>
+    <div id="jumpscare-container">
+        <img id="jumpscare-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Schrei_der_Angst.jpg/800px-Schrei_der_Angst.jpg" alt="Scary Face">
     </div>
 
-    <div id="fail-screen"></div>
+    <div id="never-come-back"></div>
 
-    <audio id="snd-jscare" src="c_jscare.mp3"></audio>
-    <audio id="snd-loop" src="ncb_loop.mp3" loop></audio>
+    <audio id="jumpscare-sound" src="https://actions.google.com/sounds/v1/horror/monster_zombie_growl.ogg"></audio>
 
     <script>
-        let currentLevel = 1;
-        let timerLoop, bossLoop;
-        let masterVol = 0.5;
-        const sJscare = document.getElementById('snd-jscare');
-        const sLoop = document.getElementById('snd-loop');
+        const startBtn = document.getElementById('start-btn');
+        const title = document.getElementById('title');
+        const message = document.getElementById('message');
+        const jumpscareContainer = document.getElementById('jumpscare-container');
+        const jumpscareSound = document.getElementById('jumpscare-sound');
+        const neverComeBackScreen = document.getElementById('never-come-back');
+        let audioContext;
 
-        function applySettings() {
-            masterVol = document.getElementById('volume-ctrl').value / 100;
-            sJscare.volume = masterVol;
-            sLoop.volume = masterVol * 0.6;
-            
-            const mode = document.getElementById('cb-select').value;
-            document.getElementById('main-body').className = (mode !== 'none') ? mode : '';
-        }
+        startBtn.addEventListener('click', () => {
+            startBtn.style.display = 'none';
+            title.style.display = 'none';
+            requestMicAccess();
+        });
 
-        function changeView(v) {
-            document.querySelectorAll('.view').forEach(el => el.classList.remove('active-view'));
-            document.getElementById('os-header').style.display = 'none';
-
-            if(v === 'start') document.getElementById('view-start').classList.add('active-view');
-            if(v === 'settings') document.getElementById('view-settings').classList.add('active-view');
-            if(v === 'game') {
-                document.getElementById('view-game').classList.add('active-view');
-                document.getElementById('os-header').style.display = 'flex';
-                currentLevel = 1;
-                runLevel();
-            }
-        }
-
-        function runLevel() {
-            const container = document.getElementById('game-content');
-            container.innerHTML = '';
-            
-            if(currentLevel === 1) { // Wires
-                for(let i=0; i<3; i++) {
-                    let w = document.createElement('div'); w.className = 'wire';
-                    w.onclick = function() { this.classList.add('on'); if(document.querySelectorAll('.wire.on').length === 3) next(); };
-                    container.appendChild(w);
-                }
-            } else if(currentLevel === 2) { // Logic
-                let goal = 1;
-                [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
-                    let b = document.createElement('button'); b.className = 'btn'; b.innerText = n;
-                    b.onclick = () => { if(n === goal) { b.style.opacity = 0.2; goal++; if(goal > 3) next(); } else fail(); };
-                    container.appendChild(b);
+        function requestMicAccess() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    // MIKROFON AKZEPTIERT
+                    message.innerText = "pssst... sei leise.";
+                    message.style.display = "block";
+                    monitorAudio(stream);
+                })
+                .catch(function(err) {
+                    // MIKROFON ABGELEHNT
+                    message.innerText = "ToO bAd :)";
+                    message.style.display = "block";
+                    setTimeout(() => {
+                        triggerJumpscare(false);
+                    }, 1000);
                 });
-            } else if(currentLevel === 3) { // Stabilizer
-                let disk = document.createElement('div'); disk.id = 'stab-disk';
-                let target = document.createElement('div'); target.id = 'stab-target';
-                let needle = document.createElement('div'); needle.id = 'stab-needle';
-                let deg = 0;
-                let rot = setInterval(() => { deg = (deg + 9) % 360; needle.style.transform = `rotate(${deg}deg)`; }, 20);
-                disk.onclick = () => { if(deg > 340 || deg < 20) { clearInterval(rot); next(); } else fail(); };
-                disk.appendChild(target); disk.appendChild(needle); container.appendChild(disk);
-            } else if(currentLevel === 4) { // Spam
-                let count = 0;
-                let b = document.createElement('button'); b.className = 'btn'; b.innerText = "OVERRIDE SYSTEM";
-                b.onclick = () => { count++; b.innerText = (12 - count); if(count >= 12) next(); };
-                container.appendChild(b);
-            } else {
-                runMicLevel();
-                return;
+        }
+
+        function monitorAudio(stream) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function checkVolume() {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for(let i = 0; i < bufferLength; i++) {
+                    sum += dataArray[i];
+                }
+                let averageVolume = sum / bufferLength;
+
+                // Schwellenwert für ca. "50dB" - Web Audio gibt Rohwerte (0-255) aus.
+                // Ein Wert von 40-50 entspricht in etwa leisem Sprechen/Atmen ins Mikrofon.
+                if (averageVolume > 45) { 
+                    triggerJumpscare(true);
+                    return; // Stoppt die Schleife
+                }
+
+                requestAnimationFrame(checkVolume);
             }
-            startTimer(13 - (currentLevel * 2));
+            checkVolume();
         }
 
-        function startTimer(s) {
-            let left = 100;
-            clearInterval(timerLoop);
-            timerLoop = setInterval(() => {
-                left -= (0.1 / s) * 100;
-                document.getElementById('timer-bar').style.width = left + "%";
-                if(left <= 0) fail();
-            }, 100);
+        function triggerJumpscare(showNeverComeBack) {
+            jumpscareContainer.style.display = "block";
+            jumpscareSound.play();
+
+            if (showNeverComeBack) {
+                setTimeout(() => {
+                    jumpscareContainer.style.display = "none";
+                    showEndScreen();
+                }, 1000); // 1 Sekunde Jumpscare, dann Text
+            }
         }
 
-        function next() { currentLevel++; runLevel(); }
-
-        async function runMicLevel() {
-            changeView('none');
-            document.getElementById('view-mic').classList.add('active-view');
-            let progress = 0;
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                const audioCtx = new AudioContext();
-                const analyser = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaStreamSource(stream);
-                source.connect(analyser);
-                const data = new Uint8Array(analyser.frequencyBinCount);
-                
-                const loop = setInterval(() => {
-                    progress += 0.5;
-                    document.getElementById('mic-progress').style.width = progress + "%";
-                    analyser.getByteFrequencyData(data);
-                    let vol = data.reduce((a,b)=>a+b)/data.length;
-                    if(vol > 50) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); fail(); }
-                    if(progress >= 100) { clearInterval(loop); stream.getTracks().forEach(t=>t.stop()); runBossLevel(); }
-                }, 50);
-            } catch(e) { fail(); }
+        function showEndScreen() {
+            neverComeBackScreen.style.display = "block";
+            let text = "";
+            // Generiert hunderte "NEVER COME BACK"
+            for(let i = 0; i < 500; i++) {
+                text += "NEVER COME BACK ";
+            }
+            neverComeBackScreen.innerText = text;
         }
-
-        function runBossLevel() {
-            changeView('none');
-            document.getElementById('view-boss').classList.add('active-view');
-            let size = 10;
-            const enemy = document.getElementById('boss-enemy');
-            bossLoop = setInterval(() => {
-                size += 4; enemy.style.width = size + "px"; enemy.style.height = size + "px";
-                enemy.style.opacity = size / 200;
-                if(size > 400) fail();
-            }, 30);
-            document.getElementById('view-boss').onclick = () => {
-                clearInterval(bossLoop);
-                document.getElementById('knife-tool').style.transform = "translateY(-120px) rotate(-20deg)";
-                if(size > 90 && size < 170) {
-                    setTimeout(() => { alert("DB75 SYSTEM SECURED."); location.reload(); }, 1000);
-                } else fail();
-            };
-        }
-
-        function fail() {
-            clearInterval(timerLoop); clearInterval(bossLoop);
-            document.getElementById('jumpscare').style.display = 'flex';
-            sJscare.play();
-            setTimeout(() => {
-                document.getElementById('jumpscare').style.display = 'none';
-                const f = document.getElementById('fail-screen');
-                f.style.display = 'block'; sLoop.play();
-                f.innerText = "NEVER COME BACK ".repeat(2500);
-            }, 1500);
-        }
-
-        applySettings();
     </script>
 </body>
 </html>
