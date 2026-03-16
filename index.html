@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void Failure - Final Truth</title>
+    <title>The Void Failure - Darkfox Co. 2026</title>
     <style>
         :root { 
             --fnaf-green: #24ff15; 
@@ -17,19 +17,17 @@
             font-family: 'Courier New', monospace; overflow: hidden; user-select: none; 
         }
 
-        /* Ambient Office */
         .office { 
             width: 100%; height: 100%; 
             background: radial-gradient(circle at 50% 40%, #111 0%, #050505 60%, #000 100%); 
             display: flex; justify-content: center; align-items: center; perspective: 1200px; 
         }
 
-        /* Monitor Design */
         .monitor { 
-            width: 520px; height: 380px; background: #1a1a1a; 
+            width: 520px; height: 420px; background: #1a1a1a; 
             border-radius: 20px; padding: 15px; position: relative; 
             box-shadow: 0 0 100px #000, inset 0 0 20px #000; 
-            transform: translateZ(50px); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateZ(50px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             border: 4px solid #222;
         }
 
@@ -39,38 +37,32 @@
             border-radius: 10px;
         }
 
-        /* CRT Overlay Image */
         #crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url('crtb.png'); background-size: cover;
             opacity: 0; z-index: 100; pointer-events: none; transition: opacity 0.3s;
         }
 
-        /* UI Views */
-        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; padding: 20px; box-sizing: border-box;}
         .active { display: flex; }
 
         .btn { 
             background: rgba(0,0,0,0.5); border: 1px solid var(--fnaf-green); 
-            color: var(--fnaf-green); padding: 12px 25px; margin: 10px; 
-            cursor: pointer; font-family: inherit; font-size: 14px; 
+            color: var(--fnaf-green); padding: 10px 20px; margin: 5px; 
+            cursor: pointer; font-family: inherit; font-size: 13px; 
             text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
         }
-        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 20px var(--fnaf-green); }
+        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 15px var(--fnaf-green); }
 
-        /* Frequency Task */
         #freq-container { width: 250px; height: 80px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; margin-top: 20px;}
         input[type=range] { width: 80%; accent-color: var(--fnaf-green); cursor: pointer; }
 
-        /* Dialog Box */
         #dialog-box { 
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
             width: 75%; background: rgba(0,0,0,0.95); border: 2px solid #fff; 
-            padding: 25px; color: white; display: none; z-index: 2000; 
-            cursor: pointer;
+            padding: 25px; color: white; display: none; z-index: 2000; cursor: pointer;
         }
 
-        /* Final Entity */
         #scp-void { 
             position: absolute; width: 400px; height: 400px; top: 50%; left: 50%; 
             transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
@@ -78,18 +70,24 @@
         }
         #knife { position: absolute; width: 80px; top: 30%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 10px red); z-index: 210; }
 
-        /* Ending Screen */
         #ending-screen { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: #000; z-index: 9000; display: none; 
-            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            flex-direction: column; align-items: center; justify-content: flex-start; text-align: center;
+            overflow-y: auto; padding: 60px 20px; box-sizing: border-box;
         }
 
-        .fade-in { opacity: 0; animation: fadeInEffect 2s forwards; }
+        .story-text { 
+            color: #ccc; max-width: 750px; font-size: 15px; line-height: 1.8; 
+            margin: 20px 0; text-align: center; padding: 0 30px; white-space: pre-wrap;
+        }
 
-        @keyframes fadeInEffect { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes shake-extreme { 0% { transform: translate(5px, 5px); } 100% { transform: translate(-5px, -5px); } }
-        @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.05) translate(5px, 5px); } }
+        .copyright-text { font-size: 10px; color: #444; margin-top: 20px; letter-spacing: 1px; }
+        .fade-in { opacity: 0; animation: fadeInEffect 2.5s forwards; }
+
+        @keyframes fadeInEffect { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake-extreme { 0% { transform: translate(6px, 6px); } 100% { transform: translate(-6px, -6px); } }
+        @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.06) translate(5px, 5px); } }
     </style>
 </head>
 <body>
@@ -114,8 +112,31 @@
             <div id="crt-overlay"></div>
             
             <div id="v-start" class="view active">
-                <h1 style="letter-spacing: 4px;">VOID_FAILURE</h1>
+                <h1 style="letter-spacing: 5px; margin-bottom: 5px;">VOID_FAILURE</h1>
+                <p style="font-size: 9px; margin-bottom: 25px; color: #444;">DARKFOX CO. SYSTEMS</p>
                 <button class="btn" onclick="startGame()">REPAIR SYSTEM</button>
+                <button class="btn" onclick="showView('settings')">SETTINGS</button>
+                <button class="btn" onclick="showView('credits')">CREDITS</button>
+                <div class="copyright-text">Copyright Darkfox Co. 2026</div>
+            </div>
+
+            <div id="v-settings" class="view">
+                <h3>SETTINGS</h3>
+                <label style="font-size: 11px;">MOD_DIFFICULTY</label>
+                <select id="diff-select" class="btn" style="background: black; width: 150px;">
+                    <option value="1">EASY</option>
+                    <option value="2" selected>NORMAL</option>
+                    <option value="3">HARD</option>
+                </select>
+                <button class="btn" onclick="showView('start')" style="margin-top: 20px;">BACK</button>
+            </div>
+
+            <div id="v-credits" class="view">
+                <h3>CREDITS</h3>
+                <p style="font-size: 12px;">Directed by: <span style="color:white">Darkfox</span></p>
+                <p style="font-size: 12px;">Engine: Darkfox Co. v4.0</p>
+                <p style="font-size: 12px;">Audio: c_jscare.mp3</p>
+                <button class="btn" onclick="showView('start')" style="margin-top: 20px;">BACK</button>
             </div>
 
             <div id="v-game" class="view">
@@ -124,7 +145,7 @@
             </div>
 
             <div id="v-boss" class="view">
-                <h2 id="status-text">REPAIRING... 99%</h2>
+                <h2 id="status-text">OVERRIDING... 99%</h2>
             </div>
         </div>
     </div>
@@ -136,13 +157,22 @@
 </div>
 
 <div id="ending-screen">
-    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 20px;">THE END</h1>
-    <p class="fade-in" style="color:#666; font-style: italic; margin-bottom: 10px; animation-delay: 1s;">Why....</p>
-    <p class="fade-in" style="color:#aaa; margin-bottom: 40px; animation-delay: 2s;">Void only searched for friendship and love...</p>
-    <div class="fade-in" style="color:var(--fnaf-green); border-top: 1px solid #333; padding-top: 20px; max-width: 500px; animation-delay: 3s;">
-        Lesson: Listen before you judge or destroy.
+    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 10px;">THE END</h1>
+    <h3 class="fade-in" style="color:var(--fnaf-red); letter-spacing: 3px; animation-delay: 0.5s;">THE LEGEND OF THE MISUNDERSTOOD</h3>
+    
+    <div id="story-content" class="story-text fade-in" style="animation-delay: 1.5s;">
+        Loading legend...
     </div>
-    <button class="btn fade-in" onclick="location.reload()" style="margin-top:50px; animation-delay: 4s;">REBOOT</button>
+
+    <div class="fade-in" style="color:var(--fnaf-green); font-weight: bold; margin: 20px 0; animation-delay: 4s;">
+        "Everyone is different. Listen before you destroy."
+    </div>
+
+    <div class="fade-in" style="color:#444; font-size: 11px; animation-delay: 5s;">
+        Copyright Darkfox Co. 2026
+    </div>
+
+    <button class="btn fade-in" onclick="location.reload()" style="margin-top:40px; animation-delay: 6s; padding: 15px 40px;">REBOOT SYSTEM</button>
 </div>
 
 <script>
@@ -152,13 +182,25 @@
     let dialogStep = 0;
     const jumpscareSound = document.getElementById('jumpscare-audio');
 
+    // STORY LOADING LOGIC
+    async function loadStory() {
+        try {
+            const response = await fetch('story-void.txt');
+            if (response.ok) {
+                const text = await response.text();
+                document.getElementById('story-content').innerText = text;
+            } else {
+                document.getElementById('story-content').innerText = "The legend was lost in the void (story-void.txt not found).";
+            }
+        } catch (error) {
+            console.error("Story failed to load:", error);
+        }
+    }
+
     function startGame() {
-        // Unlock audio for the browser
-        jumpscareSound.play().then(() => {
-            jumpscareSound.pause();
-            jumpscareSound.currentTime = 0;
-        }).catch(e => console.log("Audio unlock interaction."));
-        
+        loadStory(); // Start loading story when game starts
+        jumpscareSound.play().then(() => { jumpscareSound.pause(); jumpscareSound.currentTime = 0; }).catch(e => {});
+        lvl = 1;
         showView('game');
         runLevel();
     }
@@ -172,22 +214,23 @@
         isTrans = false;
         const zone = document.getElementById('game-zone');
         zone.innerHTML = '';
-        if(lvl < 4) startTimer(11 - (lvl * 2.5));
+        const d = parseInt(document.getElementById('diff-select').value);
+        if(lvl < 4) startTimer(12 - (lvl * 2.5) - (d * 1.2));
 
         if(lvl === 1) {
-            zone.innerHTML = '<p>ALIGN NODES</p>';
+            zone.innerHTML = '<p>RECALIBRATE NODES</p>';
             for(let i=0; i<3; i++) {
-                let d = document.createElement('div');
-                d.style = "width:40px; height:40px; border:1px solid var(--fnaf-green); margin:10px; cursor:pointer;";
-                d.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
-                zone.appendChild(d);
+                let div = document.createElement('div');
+                div.style = "width:45px; height:45px; border:1px solid var(--fnaf-green); margin:12px; cursor:pointer;";
+                div.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
+                zone.appendChild(div);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>STABILIZE POWER</p><div id="freq-container"><div style="width:40px; height:100%; background:rgba(255,0,0,0.3); position:absolute;"></div><div id="stab-bar" style="width:4px; height:100%; background:white; position:absolute; left:0;"></div></div>';
+            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div style="width:40px; height:100%; background:rgba(255,0,0,0.3); position:absolute;"></div><div id="stab-bar" style="width:4px; height:100%; background:white; position:absolute; left:0;"></div></div>';
             let p = 0, dr = 1;
             let si = setInterval(() => {
-                p += 3.5 * dr; if(p >= 246 || p <= 0) dr *= -1;
-                document.getElementById('stab-bar').style.left = p + "px";
+                p += (2.6 + d) * dr; if(p >= 246 || p <= 0) dr *= -1;
+                if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = p + "px";
             }, 10);
             document.getElementById('freq-container').onclick = () => {
                 if(p > 105 && p < 145) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
@@ -198,7 +241,7 @@
             const k = document.getElementById('knob');
             k.oninput = () => {
                 document.getElementById('f-val').innerText = k.value + "Hz (Target: " + target + "Hz)";
-                if(Math.abs(k.value - target) < 2) { next(); }
+                if(Math.abs(k.value - target) < (4 - d)) { next(); }
             };
         } else finale();
     }
@@ -212,11 +255,11 @@
         }, 100);
     }
 
-    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 400); }
+    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 450); }
 
     function sc() {
         isTrans = true; clearInterval(timer);
-        jumpscareSound.play().catch(e => console.error("Sound play failed:", e));
+        jumpscareSound.play().catch(e => {});
         document.getElementById('jumpscare-layer').style.display='flex';
         setTimeout(() => location.reload(), 2000);
     }
@@ -226,14 +269,11 @@
         setTimeout(() => {
             document.getElementById('crt-overlay').style.opacity = "1";
             document.getElementById('monitor').style.animation = "shake-extreme 0.05s infinite";
-            
             setTimeout(() => {
                 const m = document.getElementById('monitor');
-                m.style.transform = "translate(1200px, 400px) rotate(120deg)"; m.style.opacity = "0";
-                
+                m.style.transform = "translate(1500px, 600px) rotate(180deg)"; m.style.opacity = "0";
                 const v = document.getElementById('scp-void');
                 v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.6)"; v.style.pointerEvents = "auto";
-                
                 v.onclick = () => {
                     document.getElementById('knife').style.display = "block";
                     v.onclick = null;
@@ -250,10 +290,10 @@
         } else {
             document.getElementById('dialog-box').style.display = "none";
             const v = document.getElementById('scp-void');
-            v.style.transition = "all 2.5s ease-in";
-            v.style.filter = "invert(1) blur(15px) contrast(3)";
+            v.style.transition = "all 3s cubic-bezier(0.1, 0, 0.9, 1)";
+            v.style.filter = "invert(1) blur(20px) contrast(4)";
             v.style.transform = "translate(-50%, -50%) scale(0)";
-            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 3000);
+            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 3500);
         }
     }
 </script>
