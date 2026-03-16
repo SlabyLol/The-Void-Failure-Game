@@ -66,25 +66,30 @@
         .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: var(--glow); }
 
         /* Tasks */
-        #game-zone { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #freq-container { width: 280px; height: 90px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; background: rgba(0,20,0,0.1); }
-        input[type=range] { width: 80%; accent-color: var(--fnaf-green); cursor: crosshair; }
+        input[type=range] { width: 85%; accent-color: var(--fnaf-green); cursor: crosshair; }
 
-        /* Jumpscare / Entity */
+        /* Jumpscare System */
+        #jumpscare-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
+            z-index: 9999; display: none; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .scare-image {
+            width: 150%; height: 150%; fill: #300; filter: contrast(2) brightness(0.8);
+            animation: jitter 0.05s infinite;
+        }
+
+        /* Void Entity (Final Scene) */
         #scp-void { 
             position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; 
             transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
             pointer-events: none; filter: drop-shadow(0 0 25px red);
         }
-        
         #knife { position: absolute; width: 100px; top: 25%; left: 58%; transform: rotate(35deg); display: none; filter: drop-shadow(0 0 15px red); }
 
-        #jumpscare-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
-            z-index: 9999; display: none; align-items: center; justify-content: center;
-        }
-
-        /* Ending Screen & Scroll */
+        /* Ending Screen */
         #ending-screen { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: #000; z-index: 9000; display: none; 
@@ -101,18 +106,17 @@
             white-space: pre-wrap;
         }
 
-        /* Dialog Box */
-        #dialog-box { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            width: 70%; background: rgba(0,0,0,0.95); border: 2px solid #fff; 
-            padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer;
+        /* Animations */
+        @keyframes jitter {
+            0% { transform: translate(5px, -5px) scale(1); filter: invert(0); }
+            50% { transform: translate(-8px, 8px) scale(1.1); filter: invert(0.2); }
+            100% { transform: translate(3px, -3px) scale(1); }
         }
-
         @keyframes scrollText { from { top: 100%; } to { top: -250%; } }
-        @keyframes shake { 0% { transform: translate(5px, 5px); } 100% { transform: translate(-5px, -5px); } }
+        @keyframes shake { 0% { transform: translate(8px, 8px); } 100% { transform: translate(-8px, -8px); } }
     </style>
 </head>
-<body>
+<body id="main-body">
 
 <audio id="jumpscare-audio" src="c_jscare.mp3"></audio>
 <div class="scanlines"></div>
@@ -129,17 +133,15 @@
             
             <div id="v-start" class="view active">
                 <h1 style="letter-spacing: 10px; text-shadow: var(--glow);">VOID_FAILURE</h1>
-                <p style="font-size: 9px; opacity: 0.5; margin-bottom: 30px;">DARKFOX CO. TERMINAL v4.0.26</p>
                 <button class="btn" onclick="startGame()">INITIALIZE REPAIR</button>
                 <button class="btn" onclick="showView('settings')">SETTINGS</button>
                 <button class="btn" onclick="showView('credits')">CREDITS</button>
-                <div style="font-size: 8px; margin-top: 25px;">© Copyright Darkfox Co. 2026</div>
+                <div style="font-size: 8px; margin-top: 25px; color:#222;">© Copyright Darkfox Co. 2026</div>
             </div>
 
             <div id="v-settings" class="view">
                 <h3>CONFIGURATION</h3>
-                <label style="font-size: 10px;">LEVEL_OF_DIFFICULTY</label>
-                <select id="diff-select" class="btn" style="background: #000; font-size: 11px;">
+                <select id="diff-select" class="btn" style="background: #000;">
                     <option value="1">STORY (EASY)</option>
                     <option value="2" selected>STANDARD (NORMAL)</option>
                     <option value="3">HARDCORE (HARD)</option>
@@ -150,27 +152,36 @@
             <div id="v-credits" class="view">
                 <h3>ACCESS LOGS</h3>
                 <p style="font-size: 11px;">DIRECTOR: DARKFOX</p>
-                <p style="font-size: 11px;">ENGINE: DF_VOID_CORE</p>
-                <p style="font-size: 11px;">AUDIO: C_JSCARE.MP3</p>
                 <button class="btn" onclick="showView('start')">BACK</button>
             </div>
 
             <div id="v-game" class="view">
-                <div id="timer-bar" style="width:100%; height:5px; background:var(--fnaf-green); position:absolute; top:0; box-shadow: var(--glow);"></div>
+                <div id="timer-bar" style="width:100%; height:5px; background:var(--fnaf-green); position:absolute; top:0;"></div>
                 <div id="game-zone"></div>
             </div>
 
             <div id="v-boss" class="view">
-                <h2 style="animation: shake 0.05s infinite; color: red;">SYSTEM OVERRIDE: 99%</h2>
+                <h2 style="animation: shake 0.05s infinite; color: red;">FATAL ERROR...</h2>
             </div>
         </div>
     </div>
 </div>
 
 <div id="jumpscare-layer">
-    <svg style="width:120%; height:120%; fill:red;" viewBox="0 0 200 200">
-        <circle cx="60" cy="70" r="30" /><circle cx="140" cy="70" r="30" />
-        <path d="M 20 150 Q 100 260 180 150" stroke="white" stroke-width="15" fill="none" />
+    <div style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, black 70%); z-index: 2;"></div>
+    <svg class="scare-image" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="90" fill="#100" />
+        <path d="M 20 100 Q 100 0 180 100" fill="none" stroke="red" stroke-width="2" opacity="0.5"/>
+        <circle cx="70" cy="80" r="25" fill="white">
+            <animate attributeName="r" values="25;28;25" dur="0.1s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="130" cy="80" r="25" fill="white">
+            <animate attributeName="r" values="25;28;25" dur="0.1s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="70" cy="80" r="10" fill="black" />
+        <circle cx="130" cy="80" r="10" fill="black" />
+        <path d="M 50 140 Q 100 190 150 140" stroke="white" stroke-width="8" fill="none" />
+        <path d="M 30 40 L 170 160 M 170 40 L 30 160" stroke="red" stroke-width="1" opacity="0.3"/>
     </svg>
 </div>
 
@@ -181,9 +192,8 @@
 
 <div id="ending-screen">
     <h1 style="color:white; letter-spacing: 12px; margin-bottom: 0;">THE END</h1>
-    <p style="color: #444; font-size: 10px;">Legend of the Misunderstood</p>
     <div id="story-scroll">
-        <div id="story-content">Loading legend from story-void.txt...</div>
+        <div id="story-content">Loading story-void.txt...</div>
     </div>
     <button class="btn" onclick="location.reload()">REBOOT TERMINAL</button>
 </div>
@@ -192,20 +202,19 @@
     let lvl = 1, timer, isTrans = false, dialogStep = 0;
     const sound = document.getElementById('jumpscare-audio');
 
-    // 1. Mouse Parallax Effect
+    // Mouse Parallax
     document.addEventListener('mousemove', (e) => {
         const x = (window.innerWidth / 2 - e.pageX) / 45;
         const y = (window.innerHeight / 2 - e.pageY) / 45;
         document.getElementById('parallax-bg').style.transform = `translate(${x}px, ${y}px)`;
     });
 
-    // 2. Load Story from Text File
-    async function loadStoryFile() {
+    async function loadStory() {
         try {
             const r = await fetch('story-void.txt');
-            const txt = r.ok ? await r.text() : "The legend is missing. Create story-void.txt!";
+            const txt = r.ok ? await r.text() : "Legend file missing.";
             document.getElementById('story-content').innerText = txt;
-        } catch(e) { document.getElementById('story-content').innerText = "File Error: story-void.txt not found."; }
+        } catch(e) { document.getElementById('story-content').innerText = "File Error."; }
     }
 
     function showView(id) {
@@ -214,11 +223,9 @@
     }
 
     function startGame() {
-        loadStoryFile();
+        loadStory();
         sound.play().then(() => { sound.pause(); sound.currentTime = 0; });
-        lvl = 1;
-        showView('game');
-        runLevel();
+        lvl = 1; showView('game'); runLevel();
     }
 
     function runLevel() {
@@ -226,7 +233,10 @@
         const zone = document.getElementById('game-zone');
         zone.innerHTML = '';
         const d = parseInt(document.getElementById('diff-select').value);
-        if(lvl < 4) startTimer(11 - (lvl * 2.5) - (d * 1.5));
+        
+        // BALANCING: Mehr Zeit für Level 3
+        let timeBase = (lvl === 3) ? 14 : 11; 
+        startTimer(timeBase - (lvl * 2) - (d * 1.5));
 
         if(lvl === 1) {
             zone.innerHTML = '<p>RESET NODES</p>';
@@ -237,22 +247,23 @@
                 zone.appendChild(div);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>SYNC SIGNAL</p><div id="freq-container"><div style="width:40px; height:100%; background:rgba(255,0,0,0.4); position:absolute;"></div><div id="stab-bar" style="width:4px; height:100%; background:#fff; position:absolute; left:0; box-shadow:0 0 10px #fff;"></div></div>';
+            zone.innerHTML = '<p>SYNC SIGNAL</p><div id="freq-container"><div id="stab-bar" style="width:4px; height:100%; background:#fff; position:absolute; left:0;"></div></div>';
             let p = 0, dr = 1;
             let si = setInterval(() => {
-                p += (2.8 + d) * dr; if(p >= 276 || p <= 0) dr *= -1;
+                p += (2.5 + d) * dr; if(p >= 276 || p <= 0) dr *= -1;
                 if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = p + "px";
             }, 10);
             document.getElementById('freq-container').onclick = () => {
                 if(p > 110 && p < 150) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
             };
         } else if(lvl === 3) {
-            zone.innerHTML = '<p>FREQ_MATCH</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:10px;">SCANNING...</p>';
-            let target = Math.floor(Math.random() * 80) + 10;
+            zone.innerHTML = '<p>FREQ_MATCH (0-100)</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:15px; color:white;">SEARCHING...</p>';
+            let target = Math.floor(Math.random() * 70) + 15;
             const k = document.getElementById('knob');
             k.oninput = () => {
-                document.getElementById('f-val').innerText = `${k.value}Hz / ${target}Hz`;
-                if(Math.abs(k.value - target) < (4 - d)) next();
+                document.getElementById('f-val').innerText = `CURRENT: ${k.value}Hz / TARGET: ${target}Hz`;
+                // Präzision angepasst für mehr Fairness
+                if(Math.abs(k.value - target) <= (4 - d)) { next(); }
             };
         } else finale();
     }
@@ -266,13 +277,19 @@
         }, 100);
     }
 
-    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 500); }
+    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 600); }
 
     function sc() {
         isTrans = true; clearInterval(timer);
         sound.play();
-        document.getElementById('jumpscare-layer').style.display='flex';
-        setTimeout(() => location.reload(), 2000);
+        
+        // Hard Jumpscare Effect
+        document.getElementById('main-body').style.animation = "shake 0.05s infinite";
+        document.getElementById('jumpscare-layer').style.display = 'flex';
+        
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
     }
 
     function finale() {
