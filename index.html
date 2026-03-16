@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>THE VOID FAILURE // SYSTEM_TERMINATED</title>
+    <title>THE VOID FAILURE // BALANCED_ERROR</title>
     <style>
-        :root { --void-red: #660000; --glitch-blue: #00ffff; }
+        :root { --void-red: #660000; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Courier New', monospace; overflow: hidden; color: white; }
 
-        /* Hintergrund-Atmosphäre */
         .void-bg { 
             position: fixed; width: 100%; height: 100%; 
             background: radial-gradient(circle, #0a0a0a 0%, #000 100%); 
@@ -20,7 +19,6 @@
             background-size: 100% 4px; pointer-events: none; z-index: 1000;
         }
 
-        /* Monitor-Hardware */
         .monitor { 
             width: 660px; height: 500px; background: #050505; border: 4px solid #111;
             position: relative; box-shadow: 0 0 100px #000; transition: transform 0.1s, opacity 1s;
@@ -31,13 +29,12 @@
             position: relative; overflow: hidden; border: 15px solid #080808;
         }
 
-        /* UI-Elemente */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
 
         .glitch-text { 
             font-size: 45px; font-weight: bold; text-shadow: 2px 0 red, -2px 0 blue;
-            animation: glitch 0.1s infinite; letter-spacing: 5px;
+            animation: glitch 0.15s infinite; letter-spacing: 5px;
         }
 
         @keyframes glitch {
@@ -53,13 +50,11 @@
         }
         .btn:hover { color: #f00; border-color: #f00; box-shadow: 0 0 15px #f00; }
 
-        /* Gameplay */
-        #timer-bar { width: 100%; height: 10px; background: var(--void-red); position: absolute; top: 0; box-shadow: 0 0 10px red; }
+        #timer-bar { width: 100%; height: 10px; background: var(--void-red); position: absolute; top: 0; box-shadow: 0 0 10px red; transition: width 0.1s linear; }
         .node { width: 50px; height: 50px; border: 1px solid #1a1a1a; margin: 10px; cursor: pointer; display: inline-block; }
         .target-zone { position: absolute; width: 40px; height: 100%; background: rgba(255,0,0,0.3); left: 130px; border-inline: 1px solid red; }
         #stab-bar { width: 3px; height: 100%; background: #fff; position: absolute; }
 
-        /* BOSS: THE VOID FAILURE ENTITY */
         #boss-layer { 
             position: fixed; width: 100%; height: 100%; top:0; left:0; 
             display: none; justify-content: center; align-items: center; z-index: 2000;
@@ -70,7 +65,6 @@
         }
         @keyframes spasm { 0% { transform: translate(2px, -2px) scale(1); } 50% { transform: translate(-3px, 3px) scale(1.02); } }
 
-        /* JUMPSCARE */
         #jumpscare { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 9999; display: none; 
@@ -79,7 +73,6 @@
         .scare-svg { width: 150%; height: 150%; filter: invert(0.1) saturate(5); animation: zoomScare 0.04s infinite; }
         @keyframes zoomScare { 0% { transform: scale(1); } 50% { transform: scale(1.2) rotate(2deg); } }
 
-        /* ENDE */
         #death-screen { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background:#000; z-index: 10001; display:none; flex-direction:column; 
@@ -159,7 +152,14 @@
         content.innerHTML = '';
         if (lvl === 5) { triggerBoss(); return; }
 
-        startTimer(10 - (lvl * 1.5));
+        // ADJUSTED TIMING: Level 3 is now much slower (12 seconds instead of ~5)
+        let timeLimit = 10;
+        if (lvl === 1) timeLimit = 12;
+        if (lvl === 2) timeLimit = 10;
+        if (lvl === 3) timeLimit = 12; // Buffed for typing
+        if (lvl === 4) timeLimit = 8;  
+
+        startTimer(timeLimit);
 
         if(lvl === 1) {
             content.innerHTML = '<p>REBOOT_NODES</p>';
@@ -174,17 +174,17 @@
             moveInterval = setInterval(() => {
                 p += (5 + lvl) * dr; if(p >= 297 || p <= 0) dr *= -1;
                 document.getElementById('stab-bar').style.left = p + "px";
-                if(Math.random() > 0.9) document.getElementById('mon-box').style.transform = `rotate(${Math.random()*2-1}deg)`;
             }, 10);
             document.getElementById('c').onclick = () => { clearInterval(moveInterval); if(p >= 130 && p <= 170) next(); else sc(); };
         } else if(lvl === 3) {
             content.innerHTML = '<p>DECRYPT_KEY</p>';
             let target = Math.floor(Math.random() * 8000) + 1000;
-            content.innerHTML += `<h2 style="color:red; letter-spacing:10px;">${target}</h2><input type="text" id="code" style="background:black; color:white; border:1px solid red; text-align:center; font-family:inherit;">`;
-            const inp = document.getElementById('code'); inp.focus();
+            content.innerHTML += `<h2 style="color:red; letter-spacing:10px; font-size:35px;">${target}</h2><input type="text" id="code" autocomplete="off" style="background:black; color:white; border:2px solid red; text-align:center; font-family:inherit; font-size:20px; outline:none; padding:5px;">`;
+            const inp = document.getElementById('code'); 
+            setTimeout(() => inp.focus(), 10);
             inp.oninput = (e) => { if(e.target.value == target) next(); };
         } else if(lvl === 4) {
-            content.innerHTML = '<p>SYNC_FREQ</p><input type="range" id="k" min="0" max="100" style="width:200px;"><p id="v">SEARCHING...</p>';
+            content.innerHTML = '<p>SYNC_FREQ</p><input type="range" id="k" min="0" max="100" style="width:200px; cursor:pointer;"><p id="v">SEARCHING...</p>';
             let t = Math.floor(Math.random() * 80) + 10;
             document.getElementById('k').oninput = (e) => { 
                 document.getElementById('v').innerText = e.target.value + " / " + t;
@@ -195,9 +195,10 @@
 
     function startTimer(s) {
         let w = 100; clearInterval(timer);
+        const bar = document.getElementById('timer-bar');
         timer = setInterval(() => {
             w -= (100 / (s * 10));
-            document.getElementById('timer-bar').style.width = w + "%";
+            bar.style.width = w + "%";
             if(w <= 0) sc();
         }, 100);
     }
@@ -219,7 +220,6 @@
             setTimeout(() => {
                 document.getElementById('mon-box').style.display = "none";
                 document.getElementById('boss-layer').style.display = 'flex';
-                // Boss attack timer
                 timer = setTimeout(sc, 10000);
             }, 1000);
         }, 2000);
