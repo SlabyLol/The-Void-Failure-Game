@@ -2,116 +2,147 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VOID_FAILURE // THE_FINAL_MANIFESTATION</title>
+    <title>THE VOID FAILURE // SYSTEM_TERMINATED</title>
     <style>
-        :root { --fnaf-red: #800000; --fnaf-green: #0f380f; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Courier New', monospace; overflow: hidden; }
+        :root { --void-red: #660000; --glitch-blue: #00ffff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Courier New', monospace; overflow: hidden; color: white; }
 
-        /* Environment & Ambiance */
-        .office { width: 110%; height: 110%; top: -5%; left: -5%; position: fixed; background: radial-gradient(circle at 50% 50%, #111 0%, #050505 70%, #000 100%); display: flex; justify-content: center; align-items: center; animation: breathe 10s infinite ease-in-out; }
-        @keyframes breathe { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(0.7); } }
-        .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%); background-size: 100% 3px; pointer-events: none; z-index: 1000; opacity: 0.4; }
+        /* Hintergrund-Atmosphäre */
+        .void-bg { 
+            position: fixed; width: 100%; height: 100%; 
+            background: radial-gradient(circle, #0a0a0a 0%, #000 100%); 
+            display: flex; justify-content: center; align-items: center; 
+        }
 
-        /* Monitor Hardware */
-        .monitor { width: 640px; height: 500px; background: #0a0a0a; border-radius: 15px; padding: 10px; position: relative; box-shadow: 0 0 100px #000; border: 3px solid #151515; z-index: 10; transition: opacity 1.5s ease-in-out; }
-        .screen { width: 100%; height: 100%; background: #010401; position: relative; overflow: hidden; border: 12px solid #050505; border-radius: 10px; }
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 1000;
+        }
 
-        /* Start Menu & UI */
+        /* Monitor-Hardware */
+        .monitor { 
+            width: 660px; height: 500px; background: #050505; border: 4px solid #111;
+            position: relative; box-shadow: 0 0 100px #000; transition: transform 0.1s, opacity 1s;
+        }
+
+        .screen { 
+            width: 100%; height: 100%; background: #010101; 
+            position: relative; overflow: hidden; border: 15px solid #080808;
+        }
+
+        /* UI-Elemente */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
-        .glitch-title { font-size: 50px; color: #fff; text-shadow: 3px 0 red, -3px 0 blue; animation: titleShake 0.1s infinite; letter-spacing: 8px; }
-        @keyframes titleShake { 0% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 1px); clip-path: inset(10% 0 15% 0); } 100% { transform: translate(0); } }
-        .btn { background: none; border: 1px solid #333; color: #555; padding: 12px 30px; margin: 10px; cursor: pointer; font-family: inherit; letter-spacing: 3px; transition: 0.2s; text-transform: uppercase; }
-        .btn:hover { color: #fff; border-color: #fff; text-shadow: 0 0 15px red; background: #100; }
 
-        /* Jumpscare: Corrupted Face */
-        #jumpscare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .scare-svg { width: 140%; height: 140%; filter: contrast(4) brightness(0.6); animation: intenseJitter 0.03s infinite; }
-        @keyframes intenseJitter { 0% { transform: translate(15px, -10px) scale(1.1); } 50% { transform: translate(-20px, 15px) scale(1.2); } 100% { transform: translate(10px, 10px); } }
+        .glitch-text { 
+            font-size: 45px; font-weight: bold; text-shadow: 2px 0 red, -2px 0 blue;
+            animation: glitch 0.1s infinite; letter-spacing: 5px;
+        }
 
-        /* THE BOSS (Level 5) */
-        #scp-void { position: absolute; width: 550px; height: 550px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; cursor: pointer; pointer-events: none; transition: opacity 2s, filter 4s; }
-        .void-mass { fill: #fff; filter: blur(4px); animation: voidPulse 3s infinite alternate; }
-        @keyframes voidPulse { 0% { transform: scale(1) rotate(0deg); } 100% { transform: scale(1.1) rotate(5deg); } }
+        @keyframes glitch {
+            0% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); clip-path: inset(10% 0 30% 0); }
+            100% { transform: translate(0); }
+        }
 
-        /* Gameplay Elements */
-        #timer-bar { width: 100%; height: 8px; background: var(--fnaf-red); position: absolute; top: 0; left: 0; box-shadow: 0 0 15px red; }
-        .node { width: 45px; height: 45px; border: 2px solid #222; margin: 10px; cursor: pointer; display: inline-block; transition: 0.1s; }
-        .target-zone { position: absolute; width: 45px; height: 100%; background: rgba(255,0,0,0.3); left: 127px; border-inline: 1px solid #f00; }
-        #stab-bar { width: 4px; height: 100%; background: #fff; position: absolute; }
+        .btn { 
+            background: none; border: 1px solid #333; color: #555; padding: 15px 40px; 
+            margin-top: 50px; cursor: pointer; font-family: inherit; letter-spacing: 3px;
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .btn:hover { color: #f00; border-color: #f00; box-shadow: 0 0 15px #f00; }
 
-        /* Endings */
-        #ending-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index: 10000; display:none; flex-direction:column; align-items:center; justify-content:center; transition: background 6s; }
+        /* Gameplay */
+        #timer-bar { width: 100%; height: 10px; background: var(--void-red); position: absolute; top: 0; box-shadow: 0 0 10px red; }
+        .node { width: 50px; height: 50px; border: 1px solid #1a1a1a; margin: 10px; cursor: pointer; display: inline-block; }
+        .target-zone { position: absolute; width: 40px; height: 100%; background: rgba(255,0,0,0.3); left: 130px; border-inline: 1px solid red; }
+        #stab-bar { width: 3px; height: 100%; background: #fff; position: absolute; }
+
+        /* BOSS: THE VOID FAILURE ENTITY */
+        #boss-layer { 
+            position: fixed; width: 100%; height: 100%; top:0; left:0; 
+            display: none; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .entity { 
+            width: 750px; height: 750px; fill: white; filter: contrast(12) blur(1px);
+            animation: spasm 0.05s infinite; cursor: crosshair;
+        }
+        @keyframes spasm { 0% { transform: translate(2px, -2px) scale(1); } 50% { transform: translate(-3px, 3px) scale(1.02); } }
+
+        /* JUMPSCARE */
+        #jumpscare { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 9999; display: none; 
+            align-items: center; justify-content: center; 
+        }
+        .scare-svg { width: 150%; height: 150%; filter: invert(0.1) saturate(5); animation: zoomScare 0.04s infinite; }
+        @keyframes zoomScare { 0% { transform: scale(1); } 50% { transform: scale(1.2) rotate(2deg); } }
+
+        /* ENDE */
+        #death-screen { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background:#000; z-index: 10001; display:none; flex-direction:column; 
+            align-items:center; justify-content:center; color: #600;
+        }
     </style>
 </head>
 <body>
 
-<audio id="jscare-sound" src="c_jscare.mp3"></audio>
+<audio id="sfx" src="c_jscare.mp3"></audio>
 <div class="scanlines"></div>
 
-<div class="office" id="bg-container">
-    <div id="scp-void" onclick="attackVoid()">
-        <svg viewBox="0 0 200 200" class="void-mass">
-            <path d="M100,10 C130,40 170,20 180,80 C195,130 145,160 150,195 C100,180 45,195 25,140 C10,95 35,65 45,25 C70,45 100,10" />
-            <circle id="eye-l" cx="70" cy="85" r="14" fill="red" opacity="0.8" />
-            <circle id="eye-r" cx="130" cy="95" r="18" fill="red" opacity="0.8" />
-            <circle id="pupil-l" cx="70" cy="85" r="5" fill="black" />
-            <circle id="pupil-r" cx="130" cy="95" r="6" fill="black" />
-        </svg>
-    </div>
-
-    <div class="monitor" id="mon-frame">
+<div class="void-bg">
+    <div class="monitor" id="mon-box">
         <div class="screen">
             <div id="v-start" class="view active">
-                <div class="glitch-title">VOID_FAILURE</div>
-                <button class="btn" onclick="startGame()">INITIATE SYSTEM</button>
+                <div class="glitch-text">THE VOID FAILURE</div>
+                <button class="btn" onclick="startGame()">INITIALIZE</button>
             </div>
             <div id="v-game" class="view">
                 <div id="timer-bar"></div>
-                <div id="game-zone"></div>
+                <div id="game-content" style="width: 100%;"></div>
             </div>
-            <div id="v-boss-pre" class="view">
-                <h1 style="color:red; animation: titleShake 0.05s infinite;">HARDWARE CRITICAL</h1>
-                <p>IT IS HERE.</p>
+            <div id="v-fail" class="view">
+                <h1 style="color: red; animation: glitch 0.1s infinite;">CRITICAL_FAILURE</h1>
+                <p>SUBJECT BREACHED REALITY</p>
             </div>
         </div>
     </div>
 </div>
 
-<div id="jumpscare-layer">
+<div id="boss-layer">
+    <svg viewBox="0 0 200 200" class="entity" id="boss-svg" onclick="hitBoss()">
+        <path d="M100,10 C140,40 180,20 190,80 C200,140 150,160 160,200 C100,180 40,200 20,140 C0,80 40,60 50,20 C80,40 100,10" />
+        <circle cx="70" cy="80" r="15" fill="red" />
+        <circle cx="130" cy="85" r="18" fill="red" />
+        <circle cx="70" cy="80" r="5" fill="black" />
+        <circle cx="130" cy="85" r="6" fill="black" />
+        <path d="M60,150 Q100,185 140,150" stroke="black" stroke-width="3" fill="none" />
+    </svg>
+    <div style="position: absolute; bottom: 40px; width: 50%; height: 6px; background: #200; border: 1px solid red;">
+        <div id="hp-bar" style="width: 100%; height: 100%; background: red; box-shadow: 0 0 10px red;"></div>
+    </div>
+</div>
+
+<div id="jumpscare">
     <svg class="scare-svg" viewBox="0 0 200 200">
-        <path d="M100,15 C40,15 10,65 15,125 C20,185 70,200 100,195 C130,200 180,185 185,125 C190,65 160,15 100,15" fill="#111" stroke="#fff" stroke-width="2"/>
-        <path d="M45,75 Q60,65 75,85 Q60,105 45,85 Z" fill="black" />
-        <path d="M125,80 Q140,70 155,90 Q140,110 125,90 Z" fill="black" />
-        <circle cx="60" cy="85" r="5" fill="red" />
-        <circle cx="140" cy="90" r="4" fill="red" />
-        <path d="M55,145 Q100,220 145,145 C120,135 80,135 55,145" fill="black" stroke="red" stroke-width="2.5"/>
+        <path d="M100,10 C40,10 10,60 15,120 C20,180 70,195 100,190 C130,195 180,180 185,120 C190,60 160,10 100,10" fill="#050505" stroke="white" stroke-width="2"/>
+        <circle cx="60" cy="80" r="10" fill="red" />
+        <circle cx="140" cy="85" r="8" fill="red" />
+        <path d="M40,140 L160,150 L100,190 Z" fill="black" stroke="red" />
     </svg>
 </div>
 
-<div id="ending-screen">
-    <h1 id="end-title" style="color:white; letter-spacing:15px;">VOID_LOG</h1>
-    <p id="end-desc" style="color:#555; width:70%; text-align:center;"></p>
-    <button class="btn" onclick="location.reload()">REBOOT</button>
+<div id="death-screen">
+    <h1 style="letter-spacing: 15px; font-size: 50px;">VOID CONSUMED YOU</h1>
+    <p>THE FAILURE IS COMPLETE.</p>
+    <button class="btn" onclick="location.reload()">RE-INITIALIZE</button>
 </div>
 
 <script>
-    let lvl = 1, timer, moveInterval, goodEndTimer;
-    const sound = document.getElementById('jscare-sound');
-
-    // Eye Tracking Logic for the Boss
-    document.addEventListener('mousemove', (e) => {
-        if (lvl === 5) {
-            const pupils = [document.getElementById('pupil-l'), document.getElementById('pupil-r')];
-            const centers = [{x: 70, y: 85}, {x: 130, y: 95}];
-            pupils.forEach((p, i) => {
-                let dx = (e.clientX - window.innerWidth/2) / 100;
-                let dy = (e.clientY - window.innerHeight/2) / 100;
-                p.setAttribute('cx', centers[i].x + dx);
-                p.setAttribute('cy', centers[i].y + dy);
-            });
-        }
-    });
+    let lvl = 1, timer, moveInterval, hp = 100;
+    const sfx = document.getElementById('sfx');
 
     function showView(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -119,48 +150,46 @@
     }
 
     function startGame() {
-        sound.play().then(() => { sound.pause(); sound.currentTime = 0; });
+        sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; });
         lvl = 1; showView('game'); runLevel();
     }
 
     function runLevel() {
-        const zone = document.getElementById('game-zone');
-        zone.innerHTML = '';
-        if (lvl === 5) { finale(); return; }
+        const content = document.getElementById('game-content');
+        content.innerHTML = '';
+        if (lvl === 5) { triggerBoss(); return; }
 
-        startTimer(13 - (lvl * 2));
+        startTimer(10 - (lvl * 1.5));
 
         if(lvl === 1) {
-            zone.innerHTML = '<p>REBOOT NODES</p>';
-            for(let i=0; i<3; i++) {
+            content.innerHTML = '<p>REBOOT_NODES</p>';
+            for(let i=0; i<4; i++) {
                 let d = document.createElement('div'); d.className = 'node';
-                d.onclick = function() { this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
-                zone.appendChild(d);
+                d.onclick = function() { this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==4) next(); };
+                content.appendChild(d);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>STABILIZE CORE</p><div style="width:300px; height:50px; border:1px solid #222; position:relative;" id="c"><div class="target-zone"></div><div id="stab-bar"></div></div>';
+            content.innerHTML = '<p>STABILIZE_CORE</p><div style="width:300px; height:40px; border:1px solid #333; position:relative; margin:auto;" id="c"><div class="target-zone"></div><div id="stab-bar"></div></div>';
             let p = 0, dr = 1;
             moveInterval = setInterval(() => {
-                p += (4 + lvl) * dr; if(p >= 296 || p <= 0) dr *= -1;
+                p += (5 + lvl) * dr; if(p >= 297 || p <= 0) dr *= -1;
                 document.getElementById('stab-bar').style.left = p + "px";
+                if(Math.random() > 0.9) document.getElementById('mon-box').style.transform = `rotate(${Math.random()*2-1}deg)`;
             }, 10);
-            document.getElementById('c').onclick = () => {
-                clearInterval(moveInterval);
-                if(p >= 127 && p <= 172) next(); else sc();
-            };
+            document.getElementById('c').onclick = () => { clearInterval(moveInterval); if(p >= 130 && p <= 170) next(); else sc(); };
         } else if(lvl === 3) {
-            zone.innerHTML = '<p>SYNC FREQUENCY</p><input type="range" id="k" min="0" max="100"><p id="v">SEARCHING...</p>';
-            let t = Math.floor(Math.random() * 70) + 15;
-            document.getElementById('k').oninput = (e) => {
-                document.getElementById('v').innerText = e.target.value + " / " + t;
-                if(Math.abs(e.target.value - t) < 3) next();
-            };
-        } else if(lvl === 4) {
-            zone.innerHTML = '<p>DECRYPTION KEY</p>';
+            content.innerHTML = '<p>DECRYPT_KEY</p>';
             let target = Math.floor(Math.random() * 8000) + 1000;
-            zone.innerHTML += `<p style="color:red; font-size:24px;">${target}</p><input type="text" id="code" style="background:#000; color:#fff; border:1px solid #333; text-align:center;">`;
+            content.innerHTML += `<h2 style="color:red; letter-spacing:10px;">${target}</h2><input type="text" id="code" style="background:black; color:white; border:1px solid red; text-align:center; font-family:inherit;">`;
             const inp = document.getElementById('code'); inp.focus();
             inp.oninput = (e) => { if(e.target.value == target) next(); };
+        } else if(lvl === 4) {
+            content.innerHTML = '<p>SYNC_FREQ</p><input type="range" id="k" min="0" max="100" style="width:200px;"><p id="v">SEARCHING...</p>';
+            let t = Math.floor(Math.random() * 80) + 10;
+            document.getElementById('k').oninput = (e) => { 
+                document.getElementById('v').innerText = e.target.value + " / " + t;
+                if(Math.abs(e.target.value - t) < 3) next(); 
+            };
         }
     }
 
@@ -173,52 +202,39 @@
         }, 100);
     }
 
-    function next() { clearInterval(timer); lvl++; setTimeout(runLevel, 500); }
+    function next() { clearInterval(timer); lvl++; setTimeout(runLevel, 300); }
 
     function sc() {
         clearInterval(timer); clearInterval(moveInterval);
-        sound.play();
-        document.getElementById('jumpscare-layer').style.display = 'flex';
-        setTimeout(() => location.reload(), 1600);
+        sfx.play();
+        document.getElementById('jumpscare').style.display = 'flex';
+        setTimeout(() => location.reload(), 1500);
     }
 
-    function finale() {
+    function triggerBoss() {
         clearInterval(timer);
-        showView('boss-pre');
+        showView('fail');
         setTimeout(() => {
-            document.getElementById('mon-frame').style.opacity = "0";
+            document.getElementById('mon-box').style.opacity = "0";
             setTimeout(() => {
-                document.getElementById('mon-frame').style.display = "none";
-                const v = document.getElementById('scp-void');
-                v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.6)"; v.style.pointerEvents = "auto";
-                goodEndTimer = setTimeout(goodEnding, 10000);
-            }, 1500);
+                document.getElementById('mon-box').style.display = "none";
+                document.getElementById('boss-layer').style.display = 'flex';
+                // Boss attack timer
+                timer = setTimeout(sc, 10000);
+            }, 1000);
         }, 2000);
     }
 
-    function attackVoid() {
-        clearTimeout(goodEndTimer);
-        const v = document.getElementById('scp-void');
-        v.style.filter = "invert(1) blur(60px)";
-        setTimeout(() => {
-            document.getElementById('end-title').innerText = "BAD ENDING: EXTERMINATION";
-            document.getElementById('end-desc').innerText = "You attacked the entity. The void is closed, but you are now truly alone in the dark.";
-            document.getElementById('ending-screen').style.display = "flex";
-        }, 4000);
-    }
-
-    function goodEnding() {
-        document.body.style.background = "#fff";
-        document.getElementById('ending-screen').style.background = "#fff";
-        const v = document.getElementById('scp-void');
-        v.style.filter = "brightness(5) blur(30px)";
-        setTimeout(() => {
-            document.getElementById('end-title').style.color = "#000";
-            document.getElementById('end-title').innerText = "GOOD ENDING: MERCY";
-            document.getElementById('end-desc').style.color = "#333";
-            document.getElementById('end-desc').innerText = "By choosing not to attack, you found peace. The entity was only a mirror of your own fear.";
-            document.getElementById('ending-screen').style.display = "flex";
-        }, 6000);
+    function hitBoss() {
+        hp -= 5;
+        document.getElementById('hp-bar').style.width = hp + "%";
+        document.body.style.background = "#200";
+        setTimeout(() => document.body.style.background = "#000", 50);
+        if(hp <= 0) {
+            clearTimeout(timer);
+            document.getElementById('boss-layer').style.display = 'none';
+            document.getElementById('death-screen').style.display = 'flex';
+        }
     }
 </script>
 </body>
