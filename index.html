@@ -17,7 +17,7 @@
             font-family: 'Courier New', monospace; overflow: hidden; user-select: none; 
         }
 
-        /* Ambient Glitch Hintergrund */
+        /* Ambient Office */
         .office { 
             width: 100%; height: 100%; 
             background: radial-gradient(circle at 50% 40%, #111 0%, #050505 60%, #000 100%); 
@@ -36,14 +36,14 @@
         .screen { 
             width: 100%; height: 100%; background: #040604; 
             position: relative; overflow: hidden; border: 10px solid #111;
-            border-radius: 10px; box-shadow: inset 0 0 50px rgba(0,0,0,1);
+            border-radius: 10px;
         }
 
         /* CRT Overlay Image */
         #crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url('crtb.png'); background-size: cover;
-            opacity: 0; z-index: 100; pointer-events: none; transition: opacity 0.5s;
+            opacity: 0; z-index: 100; pointer-events: none; transition: opacity 0.3s;
         }
 
         /* UI Views */
@@ -58,40 +58,43 @@
         }
         .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 20px var(--fnaf-green); }
 
-        /* NEUE TASK: Frequency Tuning */
-        #freq-container { width: 250px; height: 100px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; }
-        #freq-wave { width: 100%; height: 2px; background: var(--fnaf-green); position: relative; }
-        #freq-knob { width: 80%; }
+        /* Frequency Task */
+        #freq-container { width: 250px; height: 80px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; margin-top: 20px;}
+        input[type=range] { width: 80%; accent-color: var(--fnaf-green); }
 
         /* Dialog Box */
         #dialog-box { 
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
-            width: 75%; background: rgba(0,0,0,0.9); border: 1px solid #fff; 
+            width: 75%; background: rgba(0,0,0,0.95); border: 2px solid #fff; 
             padding: 25px; color: white; display: none; z-index: 2000; 
-            cursor: pointer; box-shadow: 0 0 30px rgba(255,0,0,0.2);
+            cursor: pointer;
         }
 
-        /* Final Scene Styles */
+        /* Final Entity */
         #scp-void { 
             position: absolute; width: 400px; height: 400px; top: 50%; left: 50%; 
             transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
             pointer-events: none; transition: all 0.8s;
         }
-        #knife { position: absolute; width: 80px; top: 30%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 10px red); }
+        #knife { position: absolute; width: 80px; top: 30%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 10px red); z-index: 210; }
 
+        /* Ending Screen */
         #ending-screen { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: #000; z-index: 9000; display: none; 
             flex-direction: column; align-items: center; justify-content: center; text-align: center;
         }
 
+        .fade-in { opacity: 0; animation: fadeInEffect 2s forwards; }
+
+        @keyframes fadeInEffect { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake-extreme { 0% { transform: translate(5px, 5px); } 100% { transform: translate(-5px, -5px); } }
         @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.05) translate(5px, 5px); } }
-        @keyframes shake-extreme { 0% { transform: translate(4px, 4px); } 100% { transform: translate(-4px, -4px); } }
     </style>
 </head>
 <body>
 
-<audio id="jumpscare-audio" src="DEINE_SOUND_DATEI.mp3"></audio>
+<audio id="jumpscare-audio" src="jumpscare.mp3"></audio>
 
 <div id="jumpscare-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:none; align-items:center; justify-content:center;">
     <svg style="width:140%; height:140%; fill:#600; animation: tremor 0.04s infinite;" viewBox="0 0 200 200">
@@ -111,9 +114,8 @@
             <div id="crt-overlay"></div>
             
             <div id="v-start" class="view active">
-                <h1 style="letter-spacing: 5px;">VOID_FAILURE</h1>
-                <div style="font-size: 10px; color: #444; margin-bottom: 20px;">V.4.0 - TRAGIC REALITY</div>
-                <button class="btn" onclick="showView('game'); runLevel();">INITIALIZE</button>
+                <h1>VOID_FAILURE</h1>
+                <button class="btn" onclick="showView('game'); runLevel();">REPAIR SYSTEM</button>
             </div>
 
             <div id="v-game" class="view">
@@ -122,7 +124,7 @@
             </div>
 
             <div id="v-boss" class="view">
-                <h2 id="status-text">REPAIRING SYSTEM... 99%</h2>
+                <h2 id="status-text">REPAIRING... 99%</h2>
             </div>
         </div>
     </div>
@@ -134,13 +136,13 @@
 </div>
 
 <div id="ending-screen">
-    <h1 style="color:white; font-size: 3rem; opacity:0; animation: fadeIn 2s forwards;">THE END</h1>
-    <p style="color:#666; font-style: italic; opacity:0; animation: fadeIn 2s 1s forwards;">Why....</p>
-    <p style="color:#aaa; opacity:0; animation: fadeIn 2s 2s forwards;">Void only searched for friendship and love...</p>
-    <div style="color:var(--fnaf-green); border-top: 1px solid #222; padding-top: 20px; margin-top:20px; opacity:0; animation: fadeIn 2s 3s forwards;">
+    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 20px;">THE END</h1>
+    <p class="fade-in" style="color:#666; font-style: italic; margin-bottom: 10px; animation-delay: 1s;">Why....</p>
+    <p class="fade-in" style="color:#aaa; margin-bottom: 40px; animation-delay: 2s;">Void only searched for friendship and love...</p>
+    <div class="fade-in" style="color:var(--fnaf-green); border-top: 1px solid #333; padding-top: 20px; max-width: 500px; animation-delay: 3s;">
         Lesson: Listen before you judge or destroy.
     </div>
-    <button class="btn" onclick="location.reload()" style="margin-top:40px; opacity:0; animation: fadeIn 2s 4s forwards;">REBOOT</button>
+    <button class="btn fade-in" onclick="location.reload()" style="margin-top:50px; animation-delay: 4s;">REBOOT</button>
 </div>
 
 <script>
@@ -161,7 +163,7 @@
         if(lvl < 4) startTimer(10 - (lvl * 2));
 
         if(lvl === 1) {
-            zone.innerHTML = '<p>CONNECT POWER NODES</p>';
+            zone.innerHTML = '<p>ALIGN NODES</p>';
             for(let i=0; i<3; i++) {
                 let d = document.createElement('div');
                 d.style = "width:40px; height:40px; border:1px solid var(--fnaf-green); margin:10px; cursor:pointer;";
@@ -169,23 +171,23 @@
                 zone.appendChild(d);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div id="stab-target" style="width:30px; height:100%; background:rgba(255,0,0,0.3); position:absolute; left:110px;"></div><div id="stab-bar" style="width:5px; height:100%; background:white; position:absolute; left:0;"></div></div>';
+            zone.innerHTML = '<p>STABILIZE POWER</p><div id="freq-container"><div style="width:40px; height:100%; background:rgba(255,0,0,0.3); position:absolute;"></div><div id="stab-bar" style="width:4px; height:100%; background:white; position:absolute; left:0;"></div></div>';
             let p = 0, dr = 1;
             let si = setInterval(() => {
-                p += 2 * dr; if(p >= 245 || p <= 0) dr *= -1;
+                p += 3 * dr; if(p >= 246 || p <= 0) dr *= -1;
                 document.getElementById('stab-bar').style.left = p + "px";
             }, 10);
             document.getElementById('freq-container').onclick = () => {
                 if(p > 105 && p < 145) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
             };
-        } else if(lvl === 3) { // NEUE TASK: Frequency Tuning (Slider)
-            zone.innerHTML = '<p>MATCH FREQUENCY</p><input type="range" id="freq-knob" min="0" max="100" value="0"><p id="freq-val">Current: 0Hz</p>';
-            const target = Math.floor(Math.random() * 80) + 10;
-            const knob = document.getElementById('freq-knob');
-            knob.oninput = () => {
-                document.getElementById('freq-val').innerText = `Current: ${knob.value}Hz (Target: ${target}Hz)`;
-                if(Math.abs(knob.value - target) < 3) { next(); }
-            }
+        } else if(lvl === 3) {
+            zone.innerHTML = '<p>MATCH FREQUENCY</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val">0Hz</p>';
+            let target = Math.floor(Math.random() * 80) + 10;
+            const k = document.getElementById('knob');
+            k.oninput = () => {
+                document.getElementById('f-val').innerText = k.value + "Hz (Target: " + target + "Hz)";
+                if(Math.abs(k.value - target) < 2) { next(); }
+            };
         } else finale();
     }
 
@@ -202,34 +204,30 @@
 
     function sc() {
         isTrans = true; clearInterval(timer);
-        const sound = document.getElementById('jumpscare-audio');
-        sound.play().catch(e => console.log("Sound error: Playback requires user interaction first."));
+        document.getElementById('jumpscare-audio').play().catch(()=>{});
         document.getElementById('jumpscare-layer').style.display='flex';
         setTimeout(() => location.reload(), 2000);
     }
 
     function finale() {
         clearInterval(timer); showView('boss');
-        // Void übernimmt Bildschirm
         setTimeout(() => {
             document.getElementById('crt-overlay').style.opacity = "1";
-            document.getElementById('status-text').innerText = "FATAL ERROR: VOID DETECTED";
-            document.getElementById('status-text').style.color = "red";
             document.getElementById('monitor').style.animation = "shake-extreme 0.05s infinite";
             
             setTimeout(() => {
                 const m = document.getElementById('monitor');
-                m.style.transform = "translate(1000px, 500px) rotate(90deg)"; m.style.opacity = "0";
+                m.style.transform = "translate(1200px, 400px) rotate(120deg)"; m.style.opacity = "0";
                 
                 const v = document.getElementById('scp-void');
-                v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.5)"; v.style.pointerEvents = "auto";
+                v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.6)"; v.style.pointerEvents = "auto";
                 
                 v.onclick = () => {
                     document.getElementById('knife').style.display = "block";
                     v.onclick = null;
                     setTimeout(() => { document.getElementById('dialog-box').style.display = "block"; }, 600);
                 };
-            }, 2500);
+            }, 2000);
         }, 1500);
     }
 
@@ -240,8 +238,8 @@
         } else {
             document.getElementById('dialog-box').style.display = "none";
             const v = document.getElementById('scp-void');
-            v.style.transition = "all 3s";
-            v.style.filter = "invert(1) blur(20px)";
+            v.style.transition = "all 2.5s ease-in";
+            v.style.filter = "invert(1) blur(15px) contrast(3)";
             v.style.transform = "translate(-50%, -50%) scale(0)";
             setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 3000);
         }
