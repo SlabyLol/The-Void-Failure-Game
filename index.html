@@ -5,121 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Void Failure - Final Truth</title>
     <style>
-        :root { --fnaf-green: #24ff15; --fnaf-red: #ff0000; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: var(--fnaf-green); font-family: 'Courier New', monospace; overflow: hidden; user-select: none; }
+        :root { 
+            --fnaf-green: #24ff15; 
+            --fnaf-red: #ff0000;
+            --ui-border: rgba(36, 255, 21, 0.3);
+        }
         
-        .office { width: 100%; height: 100%; background: radial-gradient(circle at 50% 40%, #1a1a1a 0%, #050505 70%, #000 100%); display: flex; justify-content: center; align-items: center; perspective: 1200px; }
-        .desk { width: 800px; height: 500px; background: #121212; position: relative; transform: rotateX(15deg); border-top: 10px solid #0a0a0a; box-shadow: 0 60px 150px #000; display: flex; justify-content: center; align-items: center; }
-        .monitor { width: 480px; height: 360px; background: #1a1a1a; border-radius: 12px; padding: 15px; position: relative; box-shadow: 0 0 50px #000; transform: translateZ(50px); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .screen { width: 100%; height: 100%; background: #040604; position: relative; overflow: hidden; border: 4px solid #000; }
-        
-        #jumpscare-layer { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .scary-face { width: 140%; height: 140%; fill: #600; animation: tremor 0.04s infinite; }
-        .crack-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: url('https://i.imgur.com/7S8zH4B.png'); background-size: cover; opacity: 0; z-index: 150; pointer-events: none; filter: invert(1); }
-        
-        #scp-void { position: absolute; width: 350px; height: 350px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 5; pointer-events: none; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #knife-in-void { position: absolute; width: 80px; top: 35%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 5px red); z-index: 10; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; color: var(--fnaf-green); 
+            font-family: 'Courier New', monospace; overflow: hidden; user-select: none; 
+        }
 
-        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        /* Ambient Glitch Hintergrund */
+        .office { 
+            width: 100%; height: 100%; 
+            background: radial-gradient(circle at 50% 40%, #111 0%, #050505 60%, #000 100%); 
+            display: flex; justify-content: center; align-items: center; perspective: 1200px; 
+        }
+
+        /* Monitor Design */
+        .monitor { 
+            width: 520px; height: 380px; background: #1a1a1a; 
+            border-radius: 20px; padding: 15px; position: relative; 
+            box-shadow: 0 0 100px #000, inset 0 0 20px #000; 
+            transform: translateZ(50px); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 4px solid #222;
+        }
+
+        .screen { 
+            width: 100%; height: 100%; background: #040604; 
+            position: relative; overflow: hidden; border: 10px solid #111;
+            border-radius: 10px; box-shadow: inset 0 0 50px rgba(0,0,0,1);
+        }
+
+        /* CRT Overlay Image */
+        #crt-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('crtb.png'); background-size: cover;
+            opacity: 0; z-index: 100; pointer-events: none; transition: opacity 0.5s;
+        }
+
+        /* UI Views */
+        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
         .active { display: flex; }
-        .btn { background: transparent; border: 1px solid var(--fnaf-green); color: var(--fnaf-green); padding: 8px 15px; margin: 10px; cursor: pointer; font-family: inherit; font-size: 12px; transition: 0.2s; }
-        .btn:hover { background: var(--fnaf-green); color: #000; }
-        
-        #stab-container { width: 200px; height: 35px; border: 2px solid var(--fnaf-green); position: relative; margin-top: 10px; cursor: pointer; background: #080808; }
-        #stab-target { width: 40px; height: 100%; background: rgba(255,0,0,0.5); position: absolute; left: 80px; }
-        #stab-bar { width: 10px; height: 100%; background: #fff; position: absolute; left: 0; pointer-events: none; }
 
-        #dialog-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70%; background: rgba(0,0,0,0.95); border: 2px solid white; padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer; text-align: left; }
-        #dialog-name { color: red; margin-bottom: 5px; font-weight: bold; }
+        .btn { 
+            background: rgba(0,0,0,0.5); border: 1px solid var(--fnaf-green); 
+            color: var(--fnaf-green); padding: 12px 25px; margin: 10px; 
+            cursor: pointer; font-family: inherit; font-size: 14px; 
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+        }
+        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 20px var(--fnaf-green); }
 
-        #ending-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .fade-in { animation: fadeIn 3s forwards; opacity: 0; }
+        /* NEUE TASK: Frequency Tuning */
+        #freq-container { width: 250px; height: 100px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; }
+        #freq-wave { width: 100%; height: 2px; background: var(--fnaf-green); position: relative; }
+        #freq-knob { width: 80%; }
+
+        /* Dialog Box */
+        #dialog-box { 
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
+            width: 75%; background: rgba(0,0,0,0.9); border: 1px solid #fff; 
+            padding: 25px; color: white; display: none; z-index: 2000; 
+            cursor: pointer; box-shadow: 0 0 30px rgba(255,0,0,0.2);
+        }
+
+        /* Final Scene Styles */
+        #scp-void { 
+            position: absolute; width: 400px; height: 400px; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
+            pointer-events: none; transition: all 0.8s;
+        }
+        #knife { position: absolute; width: 80px; top: 30%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 10px red); }
+
+        #ending-screen { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: #000; z-index: 9000; display: none; 
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
 
         @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.05) translate(5px, 5px); } }
-        @keyframes monitor-shake { 0% { transform: translateZ(50px) translate(4px,4px); } 50% { transform: translateZ(50px) translate(-4px,-4px); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes shake-extreme { 0% { transform: translate(4px, 4px); } 100% { transform: translate(-4px, -4px); } }
     </style>
 </head>
 <body>
 
-<div id="jumpscare-layer">
-    <svg class="scary-face" viewBox="0 0 200 200"><circle cx="60" cy="70" r="25" fill="red" /><circle cx="140" cy="70" r="25" fill="red" /><path d="M 30 140 Q 100 240 170 140" stroke="white" stroke-width="12" fill="none" /></svg>
+<audio id="jumpscare-audio" src="DEINE_SOUND_DATEI.mp3"></audio>
+
+<div id="jumpscare-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:none; align-items:center; justify-content:center;">
+    <svg style="width:140%; height:140%; fill:#600; animation: tremor 0.04s infinite;" viewBox="0 0 200 200">
+        <circle cx="60" cy="70" r="25" fill="red" /><circle cx="140" cy="70" r="25" fill="red" />
+        <path d="M 30 140 Q 100 240 170 140" stroke="white" stroke-width="12" fill="none" />
+    </svg>
 </div>
 
 <div class="office">
     <div id="scp-void">
         <svg viewBox="0 0 200 200"><path d="M100 0 L140 70 L200 100 L140 130 L100 200 L60 130 L0 100 L60 70 Z" fill="white" /><circle cx="75" cy="100" r="15" fill="red" /><circle cx="125" cy="100" r="15" fill="red" /></svg>
-        <svg id="knife-in-void" viewBox="0 0 50 150"><path d="M25 0 L45 80 L30 150 L20 150 L5 80 Z" fill="silver" stroke="black"/></svg>
+        <img id="knife" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'><path d='M25 0 L45 80 L30 150 L20 150 L5 80 Z' fill='silver' stroke='black'/></svg>">
     </div>
-    
-    <div class="desk">
-        <div class="monitor" id="monitor">
-            <div class="screen">
-                <div class="crack-overlay" id="crack"></div>
-                
-                <div id="v-start" class="view active">
-                    <h1>VOID_FAILURE</h1>
-                    <button class="btn" onclick="showView('game'); runLevel();">REPAIR SYSTEM</button>
-                    <button class="btn" onclick="showView('settings')">SETTINGS</button>
-                </div>
 
-                <div id="v-settings" class="view">
-                    <h3>CONFIGURATION</h3>
-                    <label>DIFFICULTY:</label>
-                    <select id="diff" class="btn"><option value="1">EASY</option><option value="2" selected>NORMAL</option><option value="3">HARD</option></select>
-                    <button class="btn" onclick="showView('start')">BACK</button>
-                </div>
+    <div class="monitor" id="monitor">
+        <div class="screen">
+            <div id="crt-overlay"></div>
+            
+            <div id="v-start" class="view active">
+                <h1 style="letter-spacing: 5px;">VOID_FAILURE</h1>
+                <div style="font-size: 10px; color: #444; margin-bottom: 20px;">V.4.0 - TRAGIC REALITY</div>
+                <button class="btn" onclick="showView('game'); runLevel();">INITIALIZE</button>
+            </div>
 
-                <div id="v-game" class="view">
-                    <div id="timer-bar" style="width:100%; height:5px; background:var(--fnaf-green); position:absolute; top:0;"></div>
-                    <div id="game-zone"></div>
-                </div>
+            <div id="v-game" class="view">
+                <div id="timer-bar" style="width:100%; height:4px; background:var(--fnaf-green); position:absolute; top:0;"></div>
+                <div id="game-zone"></div>
+            </div>
 
-                <div id="v-boss" class="view"><h3>SYSTEM REPAIR... 99%</h3></div>
+            <div id="v-boss" class="view">
+                <h2 id="status-text">REPAIRING SYSTEM... 99%</h2>
             </div>
         </div>
     </div>
 </div>
 
 <div id="dialog-box" onclick="advanceDialog()">
-    <div id="dialog-name">SCP Void</div>
+    <div style="color:red; font-weight:bold; margin-bottom:10px;">SCP Void</div>
     <div id="dialog-text">W-W-hy...</div>
 </div>
 
 <div id="ending-screen">
-    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 10px;">THE END</h1>
-    <p class="fade-in" style="color:#666; font-style: italic; margin-bottom: 10px;">Why....</p>
-    <p class="fade-in" style="color:#aaa; margin-bottom: 30px; font-size: 1.1rem;">Void only searched for friendship and love...</p>
-    <div class="fade-in" style="color:var(--fnaf-green); border-top: 1px solid #333; padding-top: 20px; max-width: 600px;">
+    <h1 style="color:white; font-size: 3rem; opacity:0; animation: fadeIn 2s forwards;">THE END</h1>
+    <p style="color:#666; font-style: italic; opacity:0; animation: fadeIn 2s 1s forwards;">Why....</p>
+    <p style="color:#aaa; opacity:0; animation: fadeIn 2s 2s forwards;">Void only searched for friendship and love...</p>
+    <div style="color:var(--fnaf-green); border-top: 1px solid #222; padding-top: 20px; margin-top:20px; opacity:0; animation: fadeIn 2s 3s forwards;">
         Lesson: Listen before you judge or destroy.
     </div>
-    <br>
-    <button class="btn fade-in" onclick="location.reload()" style="margin-top: 40px;">REBOOT</button>
+    <button class="btn" onclick="location.reload()" style="margin-top:40px; opacity:0; animation: fadeIn 2s 4s forwards;">REBOOT</button>
 </div>
 
 <script>
     let lvl = 1;
     let timer;
     let isTrans = false;
-    let stabInt;
     let dialogStep = 0;
-
-    // Jumpscare Sound Generator
-    function playScream() {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(100, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
-        osc.frequency.exponentialRampToValueAtTime(10, ctx.currentTime + 1.5);
-        gain.gain.setValueAtTime(0.5, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 1.5);
-    }
 
     function showView(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -130,44 +158,34 @@
         isTrans = false;
         const zone = document.getElementById('game-zone');
         zone.innerHTML = '';
-        const d = parseInt(document.getElementById('diff').value);
-        if (lvl < 5) startTimer(11 - (lvl * 1.5) - (d * 0.5));
+        if(lvl < 4) startTimer(10 - (lvl * 2));
 
-        if (lvl === 1) {
-            zone.innerHTML = '<p>CONNECT CONNECTORS</p>';
+        if(lvl === 1) {
+            zone.innerHTML = '<p>CONNECT POWER NODES</p>';
             for(let i=0; i<3; i++) {
-                let w = document.createElement('div');
-                w.style = "width:45px;height:45px;border:2px solid #222;margin:10px;cursor:pointer";
-                w.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
-                zone.appendChild(w);
+                let d = document.createElement('div');
+                d.style = "width:40px; height:40px; border:1px solid var(--fnaf-green); margin:10px; cursor:pointer;";
+                d.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
+                zone.appendChild(d);
             }
-        } else if (lvl === 2) {
-            zone.innerHTML = '<p>SEQUENCE 1-2-3</p>';
-            let c = 0;
-            [1,2,3].sort(()=>Math.random()-0.5).forEach(n => {
-                let b = document.createElement('button'); b.className="btn"; b.innerText=n;
-                b.onclick = function() { 
-                    if(isTrans) return;
-                    if(parseInt(this.innerText) === c + 1) { c++; this.style.opacity=0.2; if(c === 3) next(); } else sc(); 
-                };
-                zone.appendChild(b);
-            });
-        } else if (lvl === 3) {
-            zone.innerHTML = '<p>STABILIZE POWER</p><div id="stab-container"><div id="stab-target"></div><div id="stab-bar"></div></div>';
-            let p = 0; let dr = 1;
-            stabInt = setInterval(() => { 
-                p += (1.4 * d) * dr;
-                if(p >= 190 || p <= 0) dr *= -1;
-                if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = p + "px";
-            }, 15);
-            document.getElementById('stab-container').onclick = () => {
-                if(isTrans) return;
-                if(p >= 80 && p <= 120) { clearInterval(stabInt); next(); } else { clearInterval(stabInt); sc(); }
+        } else if(lvl === 2) {
+            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div id="stab-target" style="width:30px; height:100%; background:rgba(255,0,0,0.3); position:absolute; left:110px;"></div><div id="stab-bar" style="width:5px; height:100%; background:white; position:absolute; left:0;"></div></div>';
+            let p = 0, dr = 1;
+            let si = setInterval(() => {
+                p += 2 * dr; if(p >= 245 || p <= 0) dr *= -1;
+                document.getElementById('stab-bar').style.left = p + "px";
+            }, 10);
+            document.getElementById('freq-container').onclick = () => {
+                if(p > 105 && p < 145) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
             };
-        } else if (lvl === 4) {
-            let cl=0; let b = document.createElement('button'); b.className="btn"; b.innerText="SYSTEM OVERRIDE (15x)";
-            b.onclick = () => { if(isTrans) return; cl++; b.innerText="CLICKS LEFT: " + (15-cl); if(cl>=15) next(); };
-            zone.appendChild(b);
+        } else if(lvl === 3) { // NEUE TASK: Frequency Tuning (Slider)
+            zone.innerHTML = '<p>MATCH FREQUENCY</p><input type="range" id="freq-knob" min="0" max="100" value="0"><p id="freq-val">Current: 0Hz</p>';
+            const target = Math.floor(Math.random() * 80) + 10;
+            const knob = document.getElementById('freq-knob');
+            knob.oninput = () => {
+                document.getElementById('freq-val').innerText = `Current: ${knob.value}Hz (Target: ${target}Hz)`;
+                if(Math.abs(knob.value - target) < 3) { next(); }
+            }
         } else finale();
     }
 
@@ -180,36 +198,39 @@
         }, 100);
     }
 
-    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 300); }
-    
-    function sc() { 
-        isTrans = true; 
-        clearInterval(timer); 
-        clearInterval(stabInt); 
-        playScream();
-        document.getElementById('jumpscare-layer').style.display='flex'; 
-        setTimeout(()=>location.reload(), 1500); 
+    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 400); }
+
+    function sc() {
+        isTrans = true; clearInterval(timer);
+        const sound = document.getElementById('jumpscare-audio');
+        sound.play().catch(e => console.log("Sound error: Playback requires user interaction first."));
+        document.getElementById('jumpscare-layer').style.display='flex';
+        setTimeout(() => location.reload(), 2000);
     }
 
     function finale() {
         clearInterval(timer); showView('boss');
+        // Void übernimmt Bildschirm
         setTimeout(() => {
-            document.getElementById('monitor').style.animation = "monitor-shake 0.1s infinite";
+            document.getElementById('crt-overlay').style.opacity = "1";
+            document.getElementById('status-text').innerText = "FATAL ERROR: VOID DETECTED";
+            document.getElementById('status-text').style.color = "red";
+            document.getElementById('monitor').style.animation = "shake-extreme 0.05s infinite";
+            
             setTimeout(() => {
-                document.getElementById('crack').style.opacity = "1";
-                setTimeout(() => {
-                    const m = document.getElementById('monitor');
-                    m.style.transform = "translate(1200px, 400px) rotate(180deg)"; m.style.opacity = "0";
-                    const s = document.getElementById('scp-void');
-                    s.style.opacity = "1"; s.style.transform = "translate(-50%, -50%) scale(1.6)"; s.style.pointerEvents = "auto";
-                    s.onclick = () => { 
-                        document.getElementById('knife-in-void').style.display = "block";
-                        s.onclick = null;
-                        setTimeout(() => { document.getElementById('dialog-box').style.display = "block"; }, 500);
-                    };
-                }, 1500);
-            }, 1500);
-        }, 1000);
+                const m = document.getElementById('monitor');
+                m.style.transform = "translate(1000px, 500px) rotate(90deg)"; m.style.opacity = "0";
+                
+                const v = document.getElementById('scp-void');
+                v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.5)"; v.style.pointerEvents = "auto";
+                
+                v.onclick = () => {
+                    document.getElementById('knife').style.display = "block";
+                    v.onclick = null;
+                    setTimeout(() => { document.getElementById('dialog-box').style.display = "block"; }, 600);
+                };
+            }, 2500);
+        }, 1500);
     }
 
     function advanceDialog() {
@@ -218,11 +239,11 @@
             document.getElementById('dialog-text').innerText = "You always want to kill me!";
         } else {
             document.getElementById('dialog-box').style.display = "none";
-            const s = document.getElementById('scp-void');
-            s.style.transition = "all 2.5s ease-in";
-            s.style.filter = "invert(1) contrast(5) hue-rotate(180deg) blur(20px)";
-            s.style.transform = "translate(-50%, -50%) scale(0)";
-            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 2500);
+            const v = document.getElementById('scp-void');
+            v.style.transition = "all 3s";
+            v.style.filter = "invert(1) blur(20px)";
+            v.style.transform = "translate(-50%, -50%) scale(0)";
+            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 3000);
         }
     }
 </script>
