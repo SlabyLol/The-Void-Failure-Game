@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOID_FAILURE // PROJECT DARKFOX 2026</title>
+    <title>VOID_FAILURE // DARKFOX CO. 2026</title>
     <style>
         :root { 
             --fnaf-green: #24ff15; 
@@ -18,12 +18,22 @@
             font-family: 'Courier New', monospace; overflow: hidden; 
         }
 
-        /* Ambient Scene */
+        /* Ambient Scene with Flickering Light */
         .office { 
             width: 110%; height: 110%; top: -5%; left: -5%; position: fixed;
             background: radial-gradient(circle at 50% 50%, #151515 0%, #050505 75%, #000 100%); 
             display: flex; justify-content: center; align-items: center; 
             transition: transform 0.1s ease-out;
+            animation: lightFlicker 8s infinite;
+        }
+
+        @keyframes lightFlicker {
+            0%, 100% { opacity: 1; }
+            95% { opacity: 1; }
+            96% { opacity: 0.7; }
+            97% { opacity: 1; }
+            98% { opacity: 0.4; }
+            99% { opacity: 1; }
         }
 
         .scanlines {
@@ -33,7 +43,7 @@
             background-size: 100% 3px, 2px 100%; pointer-events: none; z-index: 1000;
         }
 
-        /* Hardware Monitor */
+        /* Monitor Layout */
         .monitor { 
             width: 580px; height: 440px; background: #111; 
             border-radius: 30px; padding: 18px; position: relative; 
@@ -53,7 +63,7 @@
             opacity: 0; z-index: 100; pointer-events: none; mix-blend-mode: overlay;
         }
 
-        /* UI Views */
+        /* Views */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
 
@@ -65,55 +75,51 @@
         }
         .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: var(--glow); }
 
-        /* Tasks */
-        #freq-container { width: 280px; height: 90px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; background: rgba(0,20,0,0.1); }
-        input[type=range] { width: 85%; accent-color: var(--fnaf-green); cursor: crosshair; }
+        /* Stabilize Task Fix */
+        #freq-container { 
+            width: 280px; height: 60px; border: 2px solid var(--ui-border); 
+            position: relative; margin-top: 20px; background: #050505;
+            cursor: pointer;
+        }
+        .target-zone {
+            position: absolute; width: 60px; height: 100%; 
+            background: rgba(36, 255, 21, 0.3); left: 110px; /* Mittig platziert */
+            border-left: 2px solid var(--fnaf-green); border-right: 2px solid var(--fnaf-green);
+        }
+        #stab-bar {
+            width: 6px; height: 100%; background: white; 
+            position: absolute; left: 0; box-shadow: 0 0 10px white;
+        }
 
-        /* Jumpscare System */
+        /* Jumpscare */
         #jumpscare-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             z-index: 9999; display: none; align-items: center; justify-content: center;
-            overflow: hidden;
         }
+        .blood { position: absolute; width: 100%; height: 100%; background: rgba(255, 0, 0, 0.2); pointer-events: none; }
 
-        .scare-image {
-            width: 150%; height: 150%; fill: #300; filter: contrast(2) brightness(0.8);
-            animation: jitter 0.05s infinite;
-        }
-
-        /* Void Entity (Final Scene) */
-        #scp-void { 
-            position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
-            pointer-events: none; filter: drop-shadow(0 0 25px red);
-        }
-        #knife { position: absolute; width: 100px; top: 25%; left: 58%; transform: rotate(35deg); display: none; filter: drop-shadow(0 0 15px red); }
-
-        /* Ending Screen */
+        /* Story Ending */
         #ending-screen { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: #000; z-index: 9000; display: none; 
             flex-direction: column; align-items: center; justify-content: center;
         }
-
         #story-scroll {
             height: 350px; width: 85%; overflow: hidden; position: relative; margin: 20px 0;
             mask-image: linear-gradient(transparent, white 15%, white 85%, transparent);
         }
         #story-content {
-            position: absolute; width: 100%; color: #888; font-size: 15px;
+            position: absolute; width: 100%; color: #aaa; font-size: 15px;
             line-height: 2.2; top: 100%; animation: scrollText 45s linear infinite;
             white-space: pre-wrap;
         }
 
-        /* Animations */
-        @keyframes jitter {
-            0% { transform: translate(5px, -5px) scale(1); filter: invert(0); }
-            50% { transform: translate(-8px, 8px) scale(1.1); filter: invert(0.2); }
-            100% { transform: translate(3px, -3px) scale(1); }
-        }
+        #scp-void { position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; pointer-events: none; }
+        #knife { position: absolute; width: 100px; top: 25%; left: 58%; transform: rotate(35deg); display: none; }
+        #dialog-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70%; background: #000; border: 2px solid #fff; padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer; }
+
         @keyframes scrollText { from { top: 100%; } to { top: -250%; } }
-        @keyframes shake { 0% { transform: translate(8px, 8px); } 100% { transform: translate(-8px, -8px); } }
+        @keyframes masterShake { 0% { transform: translate(10px, 10px); } 20% { transform: translate(-10px, -5px); } 40% { transform: translate(15px, 10px); } 100% { transform: translate(0, 0); } }
     </style>
 </head>
 <body id="main-body">
@@ -136,22 +142,22 @@
                 <button class="btn" onclick="startGame()">INITIALIZE REPAIR</button>
                 <button class="btn" onclick="showView('settings')">SETTINGS</button>
                 <button class="btn" onclick="showView('credits')">CREDITS</button>
-                <div style="font-size: 8px; margin-top: 25px; color:#222;">© Copyright Darkfox Co. 2026</div>
+                <div style="font-size: 8px; margin-top: 25px; color:#222;">© DARKFOX CO. 2026</div>
             </div>
 
             <div id="v-settings" class="view">
                 <h3>CONFIGURATION</h3>
                 <select id="diff-select" class="btn" style="background: #000;">
-                    <option value="1">STORY (EASY)</option>
-                    <option value="2" selected>STANDARD (NORMAL)</option>
-                    <option value="3">HARDCORE (HARD)</option>
+                    <option value="1">EASY</option>
+                    <option value="2" selected>NORMAL</option>
+                    <option value="3">HARDCORE</option>
                 </select>
                 <button class="btn" onclick="showView('start')">BACK</button>
             </div>
 
             <div id="v-credits" class="view">
                 <h3>ACCESS LOGS</h3>
-                <p style="font-size: 11px;">DIRECTOR: DARKFOX</p>
+                <p>DIRECTOR: DARKFOX</p>
                 <button class="btn" onclick="showView('start')">BACK</button>
             </div>
 
@@ -161,27 +167,17 @@
             </div>
 
             <div id="v-boss" class="view">
-                <h2 style="animation: shake 0.05s infinite; color: red;">FATAL ERROR...</h2>
+                <h2 style="color: red;">FATAL ERROR...</h2>
             </div>
         </div>
     </div>
 </div>
 
 <div id="jumpscare-layer">
-    <div style="position: absolute; width: 100%; height: 100%; background: radial-gradient(circle, transparent 20%, black 70%); z-index: 2;"></div>
-    <svg class="scare-image" viewBox="0 0 200 200">
-        <circle cx="100" cy="100" r="90" fill="#100" />
-        <path d="M 20 100 Q 100 0 180 100" fill="none" stroke="red" stroke-width="2" opacity="0.5"/>
-        <circle cx="70" cy="80" r="25" fill="white">
-            <animate attributeName="r" values="25;28;25" dur="0.1s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="130" cy="80" r="25" fill="white">
-            <animate attributeName="r" values="25;28;25" dur="0.1s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="70" cy="80" r="10" fill="black" />
-        <circle cx="130" cy="80" r="10" fill="black" />
-        <path d="M 50 140 Q 100 190 150 140" stroke="white" stroke-width="8" fill="none" />
-        <path d="M 30 40 L 170 160 M 170 40 L 30 160" stroke="red" stroke-width="1" opacity="0.3"/>
+    <div class="blood"></div>
+    <svg style="width:130%; height:130%; fill:red; filter: blur(1px);" viewBox="0 0 200 200">
+        <circle cx="60" cy="70" r="35" /><circle cx="140" cy="70" r="35" />
+        <path d="M 20 150 Q 100 280 180 150" stroke="white" stroke-width="15" fill="none" />
     </svg>
 </div>
 
@@ -191,18 +187,17 @@
 </div>
 
 <div id="ending-screen">
-    <h1 style="color:white; letter-spacing: 12px; margin-bottom: 0;">THE END</h1>
+    <h1 style="color:white; letter-spacing: 12px;">THE END</h1>
     <div id="story-scroll">
-        <div id="story-content">Loading story-void.txt...</div>
+        <div id="story-content">Loading...</div>
     </div>
-    <button class="btn" onclick="location.reload()">REBOOT TERMINAL</button>
+    <button class="btn" onclick="location.reload()">REBOOT</button>
 </div>
 
 <script>
-    let lvl = 1, timer, isTrans = false, dialogStep = 0;
+    let lvl = 1, timer, isTrans = false, dialogStep = 0, moveInterval;
     const sound = document.getElementById('jumpscare-audio');
 
-    // Mouse Parallax
     document.addEventListener('mousemove', (e) => {
         const x = (window.innerWidth / 2 - e.pageX) / 45;
         const y = (window.innerHeight / 2 - e.pageY) / 45;
@@ -212,7 +207,7 @@
     async function loadStory() {
         try {
             const r = await fetch('story-void.txt');
-            const txt = r.ok ? await r.text() : "Legend file missing.";
+            const txt = r.ok ? await r.text() : "The legend file 'story-void.txt' was not found.";
             document.getElementById('story-content').innerText = txt;
         } catch(e) { document.getElementById('story-content').innerText = "File Error."; }
     }
@@ -234,12 +229,11 @@
         zone.innerHTML = '';
         const d = parseInt(document.getElementById('diff-select').value);
         
-        // BALANCING: Mehr Zeit für Level 3
-        let timeBase = (lvl === 3) ? 14 : 11; 
+        let timeBase = (lvl === 3) ? 15 : 12; 
         startTimer(timeBase - (lvl * 2) - (d * 1.5));
 
         if(lvl === 1) {
-            zone.innerHTML = '<p>RESET NODES</p>';
+            zone.innerHTML = '<p>REBOOT NODES</p>';
             for(let i=0; i<3; i++) {
                 let div = document.createElement('div');
                 div.style = "width:50px; height:50px; border:1px solid var(--fnaf-green); margin:15px; cursor:pointer; display:inline-block;";
@@ -247,23 +241,24 @@
                 zone.appendChild(div);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>SYNC SIGNAL</p><div id="freq-container"><div id="stab-bar" style="width:4px; height:100%; background:#fff; position:absolute; left:0;"></div></div>';
+            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div class="target-zone"></div><div id="stab-bar"></div></div><p style="font-size:10px; margin-top:10px;">CLICK TO STOP IN GREEN AREA</p>';
             let p = 0, dr = 1;
-            let si = setInterval(() => {
-                p += (2.5 + d) * dr; if(p >= 276 || p <= 0) dr *= -1;
-                if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = p + "px";
+            moveInterval = setInterval(() => {
+                p += (2.4 + d) * dr; if(p >= 274 || p <= 0) dr *= -1;
+                document.getElementById('stab-bar').style.left = p + "px";
             }, 10);
             document.getElementById('freq-container').onclick = () => {
-                if(p > 110 && p < 150) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
+                clearInterval(moveInterval);
+                // Hit-Detection: Zone ist bei 110px bis 170px
+                if(p >= 110 && p <= 170) { next(); } else { sc(); }
             };
         } else if(lvl === 3) {
-            zone.innerHTML = '<p>FREQ_MATCH (0-100)</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:15px; color:white;">SEARCHING...</p>';
+            zone.innerHTML = '<p>FREQ_MATCH</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:15px; font-weight:bold;">SEARCHING...</p>';
             let target = Math.floor(Math.random() * 70) + 15;
             const k = document.getElementById('knob');
             k.oninput = () => {
-                document.getElementById('f-val').innerText = `CURRENT: ${k.value}Hz / TARGET: ${target}Hz`;
-                // Präzision angepasst für mehr Fairness
-                if(Math.abs(k.value - target) <= (4 - d)) { next(); }
+                document.getElementById('f-val').innerText = `TARGET: ${target}Hz | CURRENT: ${k.value}Hz`;
+                if(Math.abs(k.value - target) <= (5 - d)) next();
             };
         } else finale();
     }
@@ -273,7 +268,7 @@
         timer = setInterval(() => {
             w -= (100 / (s * 10));
             document.getElementById('timer-bar').style.width = w + "%";
-            if(w <= 0) sc();
+            if(w <= 0) { clearInterval(moveInterval); sc(); }
         }, 100);
     }
 
@@ -282,21 +277,16 @@
     function sc() {
         isTrans = true; clearInterval(timer);
         sound.play();
-        
-        // Hard Jumpscare Effect
-        document.getElementById('main-body').style.animation = "shake 0.05s infinite";
+        document.getElementById('main-body').style.animation = "masterShake 0.1s infinite";
         document.getElementById('jumpscare-layer').style.display = 'flex';
-        
-        setTimeout(() => {
-            location.reload();
-        }, 1500);
+        setTimeout(() => location.reload(), 1800);
     }
 
     function finale() {
         clearInterval(timer); showView('boss');
         setTimeout(() => {
             document.getElementById('crt-overlay').style.opacity = "1";
-            document.getElementById('monitor').style.animation = "shake 0.05s infinite";
+            document.getElementById('monitor').style.animation = "masterShake 0.05s infinite";
             setTimeout(() => {
                 document.getElementById('monitor').style.display = "none";
                 const v = document.getElementById('scp-void');
@@ -314,8 +304,8 @@
         dialogStep++;
         const t = document.getElementById('dialog-text');
         if(dialogStep === 1) t.innerText = "Why... do you always attack first?";
-        else if(dialogStep === 2) t.innerText = "I was just a shadow looking for a flower.";
-        else if(dialogStep === 3) t.innerText = "You judged me by my eyes, not my heart.";
+        else if(dialogStep === 2) t.innerText = "I only wanted to be more than a shadow.";
+        else if(dialogStep === 3) t.innerText = "The monster you see is just the fear in your own heart.";
         else {
             document.getElementById('dialog-box').style.display = "none";
             const v = document.getElementById('scp-void');
