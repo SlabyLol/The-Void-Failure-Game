@@ -3,267 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE VOID FAILURE // FINAL_VERSION</title>
+    <title>THE VOID FAILURE // OFFICIAL_RELEASE</title>
     <style>
-        :root { --v-red: #8b0000; --v-neon: #ff0000; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Courier New', monospace; overflow: hidden; color: white; user-select: none; }
+        :root { --v-red: #990000; --v-neon: #ff0000; --v-text: #e0e0e0; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Courier New', monospace; overflow: hidden; color: var(--v-text); }
 
-        /* CRT Filter & Visuals */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%); background-size: 100% 4px; pointer-events: none; z-index: 1000; }
-        .ambient { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at center, #111 0%, #000 100%); display: flex; justify-content: center; align-items: center; }
+        /* CRT & Atmosphäre */
+        .crt { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%); background-size: 100% 4px; pointer-events: none; z-index: 1000; }
+        .ambient-bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at center, #111 0%, #000 100%); display: flex; justify-content: center; align-items: center; }
 
         /* Monitor */
-        .monitor { width: 700px; height: 500px; background: #0a0a0a; border: 6px solid #1a1a1a; border-radius: 10px; position: relative; box-shadow: 0 0 100px rgba(0,0,0,1); transition: opacity 1s, transform 0.1s; }
-        .screen { width: calc(100% - 30px); height: calc(100% - 30px); margin: 15px; background: #020202; position: relative; overflow: hidden; border: 4px solid #050505; }
+        .monitor { width: 750px; height: 550px; background: #0d0d0d; border: 10px solid #1a1a1a; border-radius: 15px; position: relative; box-shadow: 0 0 100px #000; transition: 0.5s; }
+        .screen { width: calc(100% - 40px); height: calc(100% - 40px); margin: 20px; background: #020202; position: relative; overflow: hidden; border: 2px solid #050505; }
 
         /* Views */
-        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; text-align: center; }
+        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; text-align: center; padding: 20px; box-sizing: border-box; }
         .active { display: flex; }
 
-        /* UI Elemente */
-        .glitch-title { font-size: 50px; font-weight: bold; letter-spacing: 5px; color: #fff; text-shadow: 2px 0 var(--v-red), -2px 0 blue; animation: glitch 0.1s infinite; }
-        @keyframes glitch { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); clip-path: inset(10% 0 20% 0); } 100% { transform: translate(0); } }
-
-        .btn { background: none; border: 1px solid #444; color: #888; padding: 15px 40px; margin-top: 40px; cursor: pointer; font-family: inherit; letter-spacing: 3px; transition: 0.2s; text-transform: uppercase; font-size: 16px; }
-        .btn:hover { color: #f00; border-color: #f00; box-shadow: 0 0 15px #f00; background: rgba(50,0,0,0.2); }
-
-        /* Game Mechanics */
-        #timer-bar { position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #111; }
-        #timer-fill { height: 100%; width: 100%; background: var(--v-neon); box-shadow: 0 0 10px var(--v-neon); }
-
-        .node { width: 60px; height: 60px; border: 1px solid #333; margin: 10px; cursor: pointer; display: inline-block; background: #050505; transition: background 0.1s; }
+        /* UI Styles */
+        h1.glitch { font-size: 45px; text-transform: uppercase; letter-spacing: 5px; text-shadow: 2px 0 red, -2px 0 blue; animation: glitch 0.2s infinite; }
+        @keyframes glitch { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(0); } }
         
-        /* Nadel (Level 2) */
-        .gauge { width: 350px; height: 50px; border: 2px solid #333; position: relative; background: #000; margin-bottom: 10px; }
-        .safe-zone { position: absolute; width: 60px; height: 100%; background: rgba(255, 0, 0, 0.3); left: 145px; border-left: 2px solid var(--v-neon); border-right: 2px solid var(--v-neon); }
-        #needle { width: 4px; height: 100%; background: #fff; position: absolute; box-shadow: 0 0 8px #fff; left: 0; }
+        .story-text { font-size: 14px; line-height: 1.6; color: #888; max-width: 80%; margin-bottom: 20px; }
+        .btn { background: transparent; border: 1px solid #444; color: #888; padding: 12px 30px; margin: 10px; cursor: pointer; font-family: inherit; transition: 0.3s; text-transform: uppercase; }
+        .btn:hover { color: #fff; border-color: #f00; box-shadow: 0 0 10px #f00; }
 
-        /* Boss Fight */
-        #boss-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: none; justify-content: center; align-items: center; background: #000; flex-direction: column; }
-        .entity { width: 700px; height: 700px; fill: #fff; filter: contrast(15) blur(1px); animation: pulse 0.05s infinite; cursor: crosshair; }
-        @keyframes pulse { 0% { transform: scale(1) translate(2px, -2px); } 50% { transform: scale(1.02) translate(-2px, 2px); } }
+        /* Gameplay Elemente */
+        #timer-container { position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: #111; }
+        #timer-fill { height: 100%; width: 100%; background: var(--v-neon); transition: width 0.1s linear; }
 
-        /* Jumpscare */
+        .node { width: 55px; height: 55px; border: 1px solid #333; margin: 10px; cursor: pointer; display: inline-block; background: #050505; }
+        .gauge { width: 300px; height: 40px; border: 1px solid #333; position: relative; background: #000; }
+        .safe-zone { position: absolute; width: 60px; height: 100%; background: rgba(255,0,0,0.2); left: 120px; border-left: 1px solid red; border-right: 1px solid red; }
+        #needle { width: 3px; height: 100%; background: #fff; position: absolute; left: 0; box-shadow: 0 0 5px #fff; }
+
+        /* Finale & Horror */
+        #boss-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: none; justify-content: center; align-items: center; background: #000; }
+        .entity { width: 600px; height: 600px; fill: #fff; filter: contrast(12) blur(1px); animation: shake 0.1s infinite; cursor: crosshair; }
+        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } }
+
         #jumpscare { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .face { width: 150%; height: 150%; fill: #050505; animation: jitter 0.04s infinite; }
-        @keyframes jitter { 0% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.1) rotate(2deg); filter: invert(0.2) saturate(5); } }
-
-        /* End Screen */
-        #death-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .face-svg { width: 130%; height: 130%; animation: zoom-in 0.05s infinite; }
+        @keyframes zoom-in { 0% { transform: scale(1); } 50% { transform: scale(1.1) rotate(1deg); } }
     </style>
 </head>
 <body>
 
-<audio id="sfx-scare" src="c_jscare.mp3" preload="auto"></audio>
+<audio id="sfx-scare" src="c_jscare.mp3"></audio>
 
-<div class="overlay"></div>
-
-<div class="ambient">
-    <div class="monitor" id="main-mon">
+<div class="crt"></div>
+<div class="ambient-bg">
+    <div class="monitor" id="main-monitor">
         <div class="screen">
             
-            <div id="view-start" class="view active">
-                <div class="glitch-title">THE VOID FAILURE</div>
-                <button class="btn" onclick="startGame()">INITIALIZE</button>
+            <div id="v-menu" class="view active">
+                <h1 class="glitch">THE VOID FAILURE</h1>
+                <p class="story-text">SYSTEM_OS v.0.9.9 // STATUS: CORRUPTED<br>Warnung: Realitätsfilter instabil.</p>
+                <button class="btn" onclick="show('v-story')">Starten</button>
+                <button class="btn" onclick="show('v-settings')">Optionen</button>
+                <button class="btn" onclick="show('v-credits')">Credits</button>
             </div>
 
-            <div id="view-game" class="view">
-                <div id="timer-bar"><div id="timer-fill"></div></div>
-                <div id="task-area" style="width: 100%;"></div>
+            <div id="v-story" class="view">
+                <p class="story-text">
+                    Du hast das Terminal aktiviert. <br><br>
+                    Etwas ist im System gefangen. Wenn die Stabilisierung fehlschlägt, wird die Grenze zwischen dem Code und deiner Welt brechen.<br><br>
+                    Lass die Zeit nicht ablaufen.
+                </p>
+                <button class="btn" onclick="startGame()">Initialisieren</button>
             </div>
 
-            <div id="view-breach" class="view">
-                <h1 style="color: var(--v-neon); animation: glitch 0.1s infinite;">SYSTEM BREACHED</h1>
-                <p>HARDWARE DISSOLVING...</p>
+            <div id="v-settings" class="view">
+                <h2>SYSTEM SETTINGS</h2>
+                <button class="btn" onclick="testSound()">Sound Test</button>
+                <p style="font-size: 10px;">VOLUME: MAX (Empfohlen)</p>
+                <button class="btn" onclick="show('v-menu')">Zurück</button>
+            </div>
+
+            <div id="v-game" class="view">
+                <div id="timer-container"><div id="timer-fill"></div></div>
+                <div id="level-display" style="position: absolute; top: 20px; right: 20px; font-size: 10px; color: #444;"></div>
+                <div id="game-content" style="width: 100%;"></div>
+            </div>
+
+            <div id="v-breach" class="view">
+                <h1 style="color: red;">KRITISCHER FEHLER</h1>
+                <p>HARDWARE-BARRIERE ZERSTÖRT. <br> ES IST HIER.</p>
+            </div>
+
+            <div id="v-credits" class="view">
+                <h2>CREDITS</h2>
+                <p class="story-text">Design & Code: Gemini<br>Audio: User (c_jscare.mp3)<br><br>Danke fürs Überleben.</p>
+                <button class="btn" onclick="show('v-menu')">Menü</button>
             </div>
 
         </div>
     </div>
 </div>
 
+<div id="jumpscare">
+    <svg class="face-svg" viewBox="0 0 200 200">
+        <path d="M100,10 C40,10 10,60 15,120 C20,180 70,195 100,190 C130,195 180,180 185,120 C190,60 160,10 100,10" fill="white" />
+        <circle cx="60" cy="80" r="15" fill="red" />
+        <circle cx="140" cy="85" r="18" fill="red" />
+        <path d="M40,150 L160,160 L100,195 Z" fill="black" />
+    </svg>
+</div>
+
 <div id="boss-layer">
     <svg viewBox="0 0 200 200" class="entity" onclick="hitBoss()">
-        <path d="M100,10 C140,40 180,20 190,80 C200,140 150,160 160,200 C100,180 40,200 20,140 C0,80 40,60 50,20 C80,40 100,10" />
-        <circle cx="70" cy="80" r="14" fill="red" />
-        <circle cx="130" cy="85" r="16" fill="red" />
-        <circle cx="70" cy="80" r="4" fill="black" />
-        <circle cx="130" cy="85" r="5" fill="black" />
-        <path d="M60,150 Q100,190 140,150" stroke="black" stroke-width="3" fill="none" />
+        <path d="M100,10 C140,40 180,20 190,80 C200,140 150,160 160,200 C100,180 40,200 20,140 C0,80 40,60 50,20 Z" />
+        <circle cx="75" cy="80" r="10" fill="red" />
+        <circle cx="125" cy="85" r="12" fill="red" />
     </svg>
-    <div style="width: 60%; height: 8px; background: #222; border: 1px solid #444; margin-top: 20px;">
-        <div id="boss-hp" style="width: 100%; height: 100%; background: red; box-shadow: 0 0 15px red;"></div>
+    <div style="position: absolute; bottom: 50px; width: 300px; height: 5px; background: #222; border: 1px solid red;">
+        <div id="hp-bar" style="width: 100%; height: 100%; background: red; box-shadow: 0 0 10px red;"></div>
     </div>
 </div>
 
-<div id="jumpscare">
-    <svg class="face" viewBox="0 0 200 200">
-        <path d="M100,10 C40,10 10,60 15,120 C20,180 70,195 100,190 C130,195 180,180 185,120 C190,60 160,10 100,10" stroke="white" stroke-width="2"/>
-        <circle cx="65" cy="80" r="12" fill="red" />
-        <circle cx="135" cy="85" r="10" fill="red" />
-        <path d="M40,140 L160,150 L100,195 Z" fill="black" stroke="red" />
-    </svg>
-</div>
-
-<div id="death-screen">
-    <h1 style="color: #600; font-size: 50px; letter-spacing: 15px;">VOID CONSUMED</h1>
-    <p style="color: #333;">NOTHING REMAINS.</p>
-    <button class="btn" onclick="location.reload()">RESTART</button>
-</div>
-
 <script>
-    let currentLvl = 1;
-    let mainTimer, actionInterval;
-    let bossHealth = 100;
-    const scareSound = document.getElementById('sfx-scare');
+    let lvl = 1;
+    let mainTimer, loopInterval;
+    let bossHP = 100;
+    const sfx = document.getElementById('sfx-scare');
 
-    function switchView(id) {
+    function show(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + id).classList.add('active');
+        document.getElementById(id).classList.add('active');
+    }
+
+    function testSound() {
+        sfx.volume = 0.2;
+        sfx.play().then(() => { setTimeout(() => { sfx.pause(); sfx.currentTime = 0; sfx.volume = 1; }, 500); });
     }
 
     function startGame() {
-        // Initiiere Audio (Browser Policy)
-        scareSound.volume = 0;
-        scareSound.play().then(() => { scareSound.pause(); scareSound.currentTime = 0; scareSound.volume = 1; }).catch(e => console.log(e));
-        
-        currentLvl = 1;
-        switchView('game');
-        runLevel();
+        lvl = 1;
+        show('v-game');
+        loadLevel();
     }
 
-    function runLevel() {
-        const area = document.getElementById('task-area');
-        area.innerHTML = '';
-        clearInterval(actionInterval);
+    function loadLevel() {
+        const content = document.getElementById('game-content');
+        document.getElementById('level-display').innerText = `STABILISIERUNG: ${lvl}/5`;
+        content.innerHTML = '';
+        clearInterval(loopInterval);
 
-        if (currentLvl === 5) {
-            initBossPhase();
-            return;
-        }
+        if (lvl > 4) { startBreach(); return; }
 
-        // Timer Logik: Level 3 (Tippen) bekommt 14 Sekunden, der Rest 10 Sekunden.
-        let timeAllowed = (currentLvl === 3) ? 14 : 10;
-        startTimer(timeAllowed);
+        let time = (lvl === 3) ? 12 : 8; // Level 3 (Tippen) kriegt mehr Zeit
+        startTimer(time);
 
-        // LEVEL 1: NODES
-        if (currentLvl === 1) {
-            area.innerHTML = '<p style="color:red; margin-bottom:20px;">REBOOT NODES</p>';
+        if (lvl === 1) {
+            content.innerHTML = '<p>NODES REAKTIVIEREN</p>';
             for(let i=0; i<4; i++) {
-                let node = document.createElement('div');
-                node.className = 'node';
-                node.onclick = function() { 
-                    this.style.background = 'red'; 
-                    this.classList.add('active-node'); 
-                    if(document.querySelectorAll('.active-node').length === 4) advance();
-                };
-                area.appendChild(node);
+                let d = document.createElement('div'); d.className = 'node';
+                d.onclick = function() { this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length === 4) next(); };
+                content.appendChild(d);
             }
         } 
-        // LEVEL 2: DIE NADEL (Fair & Langsamer)
-        else if (currentLvl === 2) {
-            area.innerHTML = '<p style="color:red;">STABILIZE CORE</p><div class="gauge" id="gauge-box"><div class="safe-zone"></div><div id="needle"></div></div><p style="font-size:12px; color:#555;">CLICK GAUGE TO STOP</p>';
-            let pos = 0; 
-            let direction = 1;
-            // Konstante, faire Geschwindigkeit (3.5 Pixel pro Tick)
-            actionInterval = setInterval(() => {
-                pos += 3.5 * direction;
-                if(pos >= 346 || pos <= 0) direction *= -1;
-                document.getElementById('needle').style.left = pos + 'px';
-            }, 15);
-
-            document.getElementById('gauge-box').onclick = () => {
-                clearInterval(actionInterval);
-                // Safe Zone ist zwischen 145px und 205px
-                if(pos >= 135 && pos <= 215) advance(); 
-                else killPlayer();
+        else if (lvl === 2) {
+            content.innerHTML = '<p>KERN STABILISIEREN</p><div class="gauge" id="gb"><div class="safe-zone"></div><div id="needle"></div></div>';
+            let p = 0, d = 1;
+            loopInterval = setInterval(() => {
+                p += 3.5 * d; // Konsistente Geschwindigkeit
+                if(p >= 297 || p <= 0) d *= -1;
+                document.getElementById('needle').style.left = p + "px";
+            }, 16);
+            document.getElementById('gb').onclick = () => {
+                if(p >= 120 && p <= 180) next(); else fail();
             };
         }
-        // LEVEL 3: DECRYPT (Tippen)
-        else if (currentLvl === 3) {
-            let code = Math.floor(Math.random() * 8999) + 1000;
-            area.innerHTML = `<p style="color:red;">DECRYPT KEY</p><h1 style="color:white; font-size:40px; letter-spacing:10px;">${code}</h1><input type="text" id="codeInput" autocomplete="off" style="background:black; color:red; border:2px solid red; text-align:center; font-family:inherit; font-size:24px; outline:none; padding:5px; width:150px;">`;
-            const inputField = document.getElementById('codeInput');
-            setTimeout(() => inputField.focus(), 50);
-            inputField.oninput = () => { if(inputField.value == code) advance(); };
+        else if (lvl === 3) {
+            let code = Math.floor(Math.random() * 8000) + 1000;
+            content.innerHTML = `<p>CODE EINGEBEN</p><h2 style="letter-spacing:10px;">${code}</h2><input type="text" id="ci" autocomplete="off" style="background:black; color:white; border:1px solid red; text-align:center; font-family:inherit; font-size:20px; outline:none; width:120px;">`;
+            const inp = document.getElementById('ci');
+            setTimeout(() => inp.focus(), 10);
+            inp.oninput = () => { if(inp.value == code) next(); };
         }
-        // LEVEL 4: SYNC
-        else if (currentLvl === 4) {
-            area.innerHTML = '<p style="color:red;">SYNC FREQUENCY</p><input type="range" id="freqSlider" min="0" max="100" style="width:250px; cursor:pointer; margin: 20px 0;"><h2 id="freqVal" style="color:white;">SCANNING...</h2>';
-            let targetNum = Math.floor(Math.random() * 80) + 10;
-            const slider = document.getElementById('freqSlider');
-            slider.oninput = () => {
-                document.getElementById('freqVal').innerText = slider.value + " / " + targetNum;
-                if(Math.abs(slider.value - targetNum) <= 2) advance();
+        else if (lvl === 4) {
+            content.innerHTML = '<p>FREQUENZ SYNCHRONISIEREN</p><input type="range" id="sl" min="0" max="100" style="width:200px;"><p id="sv">---</p>';
+            let target = Math.floor(Math.random() * 80) + 10;
+            const sl = document.getElementById('sl');
+            sl.oninput = () => {
+                document.getElementById('sv').innerText = sl.value + " / " + target;
+                if(Math.abs(sl.value - target) < 3) next();
             };
         }
     }
 
-    function startTimer(seconds) {
-        let width = 100;
+    function startTimer(s) {
+        let w = 100;
         clearInterval(mainTimer);
         const fill = document.getElementById('timer-fill');
         mainTimer = setInterval(() => {
-            width -= (100 / (seconds * 10));
-            fill.style.width = width + "%";
-            if(width <= 0) killPlayer();
+            w -= (100 / (s * 10));
+            fill.style.width = w + "%";
+            if(w <= 0) fail();
         }, 100);
     }
 
-    function advance() {
+    function next() {
         clearInterval(mainTimer);
-        clearInterval(actionInterval);
-        currentLvl++;
-        setTimeout(runLevel, 300);
+        clearInterval(loopInterval);
+        lvl++;
+        setTimeout(loadLevel, 400);
     }
 
-    function killPlayer() {
+    function fail() {
         clearInterval(mainTimer);
-        clearInterval(actionInterval);
-        
-        // Jumpscare auslösen
-        scareSound.currentTime = 0;
-        scareSound.play().catch(e => console.log("Audio play failed:", e));
-        
+        clearInterval(loopInterval);
+        sfx.play();
         document.getElementById('jumpscare').style.display = 'flex';
-        document.getElementById('main-mon').style.transform = 'scale(1.2) rotate(3deg)';
-        
-        // Reload nach 1.5 Sekunden
-        setTimeout(() => location.reload(), 1500);
+        setTimeout(() => location.reload(), 2000);
     }
 
-    function initBossPhase() {
+    function startBreach() {
         clearInterval(mainTimer);
-        switchView('breach');
-        
+        show('v-breach');
         setTimeout(() => {
-            // Monitor verschwindet
-            document.getElementById('main-mon').style.opacity = "0";
-            
+            document.getElementById('main-monitor').style.opacity = "0";
             setTimeout(() => {
-                document.getElementById('main-mon').style.display = "none";
-                document.getElementById('boss-layer').style.display = 'flex';
-                
-                // Du hast 12 Sekunden Zeit, den Boss zu besiegen, sonst Jumpscare
-                mainTimer = setTimeout(killPlayer, 12000);
+                document.getElementById('boss-layer').style.display = "flex";
+                // 12 Sekunden zum Töten des Bosses
+                mainTimer = setTimeout(fail, 12000);
             }, 1000);
-        }, 2000);
+        }, 2500);
     }
 
     function hitBoss() {
-        bossHealth -= 5;
-        document.getElementById('boss-hp').style.width = bossHealth + "%";
-        
-        // Visuelles Feedback beim Klicken
-        document.body.style.background = "#300";
+        bossHP -= 4;
+        document.getElementById('hp-bar').style.width = bossHP + "%";
+        document.body.style.background = "#200";
         setTimeout(() => document.body.style.background = "#000", 50);
-
-        if(bossHealth <= 0) {
+        if(bossHP <= 0) {
             clearTimeout(mainTimer);
-            document.getElementById('boss-layer').style.display = 'none';
-            document.getElementById('death-screen').style.display = 'flex';
+            document.getElementById('boss-layer').innerHTML = '<h1 style="color:white; letter-spacing:10px;">SUCCESS</h1><p>The Void is sealed.</p><button class="btn" onclick="location.reload()">Reboot</button>';
         }
     }
 </script>
-
 </body>
 </html>
