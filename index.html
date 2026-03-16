@@ -8,6 +8,7 @@
         :root { 
             --fnaf-green: #24ff15; 
             --fnaf-red: #ff0000;
+            --fnaf-crimson: #800000;
             --ui-border: rgba(36, 255, 21, 0.4);
             --glow: 0 0 15px rgba(36, 255, 21, 0.5);
         }
@@ -25,15 +26,11 @@
             display: flex; justify-content: center; align-items: center; 
             transition: transform 0.1s ease-out;
             animation: lightFlicker 8s infinite;
+            z-index: 1;
         }
 
         @keyframes lightFlicker {
-            0%, 100% { opacity: 1; }
-            95% { opacity: 1; }
-            96% { opacity: 0.7; }
-            97% { opacity: 1; }
-            98% { opacity: 0.4; }
-            99% { opacity: 1; }
+            0%, 100% { opacity: 1; } 95% { opacity: 1; } 96% { opacity: 0.7; } 97% { opacity: 1; } 98% { opacity: 0.4; } 99% { opacity: 1; }
         }
 
         .scanlines {
@@ -49,6 +46,7 @@
             border-radius: 30px; padding: 18px; position: relative; 
             box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 30px #000; 
             border: 5px solid #222; transform-style: preserve-3d;
+            z-index: 10;
         }
 
         .screen { 
@@ -75,7 +73,7 @@
         }
         .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: var(--glow); }
 
-        /* Stabilize Task Fix */
+        /* Stabilize Task */
         #freq-container { 
             width: 280px; height: 60px; border: 2px solid var(--ui-border); 
             position: relative; margin-top: 20px; background: #050505;
@@ -83,7 +81,7 @@
         }
         .target-zone {
             position: absolute; width: 60px; height: 100%; 
-            background: rgba(36, 255, 21, 0.3); left: 110px; /* Mittig platziert */
+            background: rgba(36, 255, 21, 0.2); left: 110px;
             border-left: 2px solid var(--fnaf-green); border-right: 2px solid var(--fnaf-green);
         }
         #stab-bar {
@@ -91,12 +89,27 @@
             position: absolute; left: 0; box-shadow: 0 0 10px white;
         }
 
-        /* Jumpscare */
+        /* JUMPSCARE SYSTEM (NEW & SCARY) */
         #jumpscare-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             z-index: 9999; display: none; align-items: center; justify-content: center;
+            overflow: hidden;
         }
-        .blood { position: absolute; width: 100%; height: 100%; background: rgba(255, 0, 0, 0.2); pointer-events: none; }
+        .scare-fratze {
+            width: 130%; height: 130%; fill: var(--fnaf-crimson);
+            filter: blur(1px) contrast(3) brightness(0.7);
+            animation: jitterFratze 0.04s infinite;
+        }
+        .strobe { position: absolute; width: 100%; height: 100%; background: white; z-index: 10000; opacity: 0; pointer-events: none; }
+
+        /* VOID ENTITY (NEW & SCARY Shape) */
+        #scp-void { 
+            position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
+            pointer-events: none; filter: drop-shadow(0 0 30px red);
+        }
+        #knife { position: absolute; width: 100px; top: 25%; left: 58%; transform: rotate(35deg); display: none; filter: drop-shadow(0 0 15px white); }
+        #dialog-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70%; background: #000; border: 2px solid #fff; padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer; }
 
         /* Story Ending */
         #ending-screen { 
@@ -114,12 +127,15 @@
             white-space: pre-wrap;
         }
 
-        #scp-void { position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; pointer-events: none; }
-        #knife { position: absolute; width: 100px; top: 25%; left: 58%; transform: rotate(35deg); display: none; }
-        #dialog-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70%; background: #000; border: 2px solid #fff; padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer; }
-
+        /* Animations */
         @keyframes scrollText { from { top: 100%; } to { top: -250%; } }
-        @keyframes masterShake { 0% { transform: translate(10px, 10px); } 20% { transform: translate(-10px, -5px); } 40% { transform: translate(15px, 10px); } 100% { transform: translate(0, 0); } }
+        @keyframes masterShake { 0% { transform: translate(15px, 15px); } 20% { transform: translate(-15px, -10px); } 40% { transform: translate(20px, 15px); } 100% { transform: translate(0, 0); } }
+        @keyframes jitterFratze {
+            0% { transform: translate(8px, -8px) scale(1); filter: invert(0) blur(1px); }
+            50% { transform: translate(-10px, 10px) scale(1.05); filter: invert(0.1) blur(2px); }
+            100% { transform: translate(5px, -5px) scale(1); }
+        }
+        @keyframes strobeFlash { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
     </style>
 </head>
 <body id="main-body">
@@ -129,7 +145,13 @@
 
 <div class="office" id="parallax-bg">
     <div id="scp-void">
-        <svg viewBox="0 0 200 200"><path d="M100 0 L140 70 L200 100 L140 130 L100 200 L60 130 L0 100 L60 70 Z" fill="white" /><circle cx="75" cy="100" r="15" fill="red" /><circle cx="125" cy="100" r="15" fill="red" /></svg>
+        <svg viewBox="0 0 200 200">
+            <path d="M100 0 L130 50 L200 60 L150 110 L170 180 L100 140 L30 180 L50 110 L0 60 L70 50 Z" fill="white" />
+            <ellipse cx="70" cy="90" rx="18" ry="22" fill="red" />
+            <ellipse cx="125" cy="85" rx="14" ry="18" fill="red" />
+            <circle cx="70" cy="90" r="5" fill="black" />
+            <circle cx="125" cy="85" r="4" fill="black" />
+        </svg>
         <img id="knife" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'><path d='M25 0 L45 80 L30 150 L20 150 L5 80 Z' fill='silver' stroke='black'/></svg>">
     </div>
 
@@ -174,10 +196,15 @@
 </div>
 
 <div id="jumpscare-layer">
-    <div class="blood"></div>
-    <svg style="width:130%; height:130%; fill:red; filter: blur(1px);" viewBox="0 0 200 200">
-        <circle cx="60" cy="70" r="35" /><circle cx="140" cy="70" r="35" />
-        <path d="M 20 150 Q 100 280 180 150" stroke="white" stroke-width="15" fill="none" />
+    <div class="strobe" id="strobe-effect"></div>
+    <svg class="scare-fratze" viewBox="0 0 200 200">
+        <path d="M 100 10 C 30 10, 10 70, 20 120 C 30 170, 70 190, 100 190 C 130 190, 170 170, 180 120 C 190 70, 170 10, 100 10 Z" fill="#200" stroke="red" stroke-width="2"/>
+        <ellipse cx="65" cy="80" rx="25" ry="35" fill="black" stroke="white" stroke-width="1"/>
+        <ellipse cx="135" cy="75" rx="20" ry="30" fill="black" stroke="white" stroke-width="1"/>
+        <circle cx="65" cy="80" r="8" fill="red" />
+        <circle cx="135" cy="75" r="6" fill="red" />
+        <path d="M 60 140 Q 100 200 140 140 Q 100 130 60 140 Z" fill="black" stroke="red" stroke-width="2"/>
+        <path d="M 40 30 L 160 170 M 160 30 L 40 170" stroke="red" stroke-width="0.5" opacity="0.3"/>
     </svg>
 </div>
 
@@ -207,7 +234,7 @@
     async function loadStory() {
         try {
             const r = await fetch('story-void.txt');
-            const txt = r.ok ? await r.text() : "The legend file 'story-void.txt' was not found.";
+            const txt = r.ok ? await r.text() : "Legend file missing.";
             document.getElementById('story-content').innerText = txt;
         } catch(e) { document.getElementById('story-content').innerText = "File Error."; }
     }
@@ -241,7 +268,7 @@
                 zone.appendChild(div);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div class="target-zone"></div><div id="stab-bar"></div></div><p style="font-size:10px; margin-top:10px;">CLICK TO STOP IN GREEN AREA</p>';
+            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div class="target-zone"></div><div id="stab-bar"></div></div><p style="font-size:10px; margin-top:10px;">CLICK IN GREEN AREA</p>';
             let p = 0, dr = 1;
             moveInterval = setInterval(() => {
                 p += (2.4 + d) * dr; if(p >= 274 || p <= 0) dr *= -1;
@@ -249,7 +276,6 @@
             }, 10);
             document.getElementById('freq-container').onclick = () => {
                 clearInterval(moveInterval);
-                // Hit-Detection: Zone ist bei 110px bis 170px
                 if(p >= 110 && p <= 170) { next(); } else { sc(); }
             };
         } else if(lvl === 3) {
@@ -277,9 +303,15 @@
     function sc() {
         isTrans = true; clearInterval(timer);
         sound.play();
+        
+        // Trigger Effects
         document.getElementById('main-body').style.animation = "masterShake 0.1s infinite";
+        document.getElementById('strobe-effect').style.animation = "strobeFlash 0.1s 5"; // 5 flashes
         document.getElementById('jumpscare-layer').style.display = 'flex';
-        setTimeout(() => location.reload(), 1800);
+        
+        setTimeout(() => {
+            location.reload();
+        }, 1800);
     }
 
     function finale() {
@@ -309,7 +341,7 @@
         else {
             document.getElementById('dialog-box').style.display = "none";
             const v = document.getElementById('scp-void');
-            v.style.transition = "all 4s";
+            v.style.transition = "all 4s cubic-bezier(0.1, 0, 0.9, 1)";
             v.style.filter = "invert(1) blur(30px)";
             v.style.transform = "translate(-50%, -50%) scale(0)";
             setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 4000);
