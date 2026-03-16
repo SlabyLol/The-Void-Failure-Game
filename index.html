@@ -3,105 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Void Failure - Darkfox Co. 2026</title>
+    <title>VOID_FAILURE // DARKFOX CO. 2026</title>
     <style>
         :root { 
             --fnaf-green: #24ff15; 
             --fnaf-red: #ff0000;
-            --ui-border: rgba(36, 255, 21, 0.3);
+            --ui-border: rgba(36, 255, 21, 0.4);
+            --glow: 0 0 15px rgba(36, 255, 21, 0.5);
         }
         
         body, html { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             background: #000; color: var(--fnaf-green); 
-            font-family: 'Courier New', monospace; overflow: hidden; user-select: none; 
+            font-family: 'Courier New', monospace; overflow: hidden; 
         }
 
+        /* Ambient Background & Vignette */
         .office { 
-            width: 100%; height: 100%; 
-            background: radial-gradient(circle at 50% 40%, #111 0%, #050505 60%, #000 100%); 
-            display: flex; justify-content: center; align-items: center; perspective: 1200px; 
+            width: 110%; height: 110%; top: -5%; left: -5%; position: fixed;
+            background: radial-gradient(circle at 50% 50%, #151515 0%, #050505 70%, #000 100%); 
+            display: flex; justify-content: center; align-items: center; 
+            transition: transform 0.1s ease-out; /* Für Maus-Parallax */
         }
 
+        /* Scanline Effect Overlay */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%; pointer-events: none; z-index: 1000;
+        }
+
+        /* Monitor Stylings */
         .monitor { 
-            width: 520px; height: 420px; background: #1a1a1a; 
-            border-radius: 20px; padding: 15px; position: relative; 
-            box-shadow: 0 0 100px #000, inset 0 0 20px #000; 
-            transform: translateZ(50px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 4px solid #222;
+            width: 580px; height: 440px; background: #111; 
+            border-radius: 30px; padding: 20px; position: relative; 
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 30px #000; 
+            border: 4px solid #222; transform-style: preserve-3d;
         }
 
         .screen { 
-            width: 100%; height: 100%; background: #040604; 
-            position: relative; overflow: hidden; border: 10px solid #111;
-            border-radius: 10px;
+            width: 100%; height: 100%; background: #020402; 
+            position: relative; overflow: hidden; border: 12px solid #0a0a0a;
+            border-radius: 15px; box-shadow: inset 0 0 60px rgba(0,0,0,1);
         }
 
         #crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url('crtb.png'); background-size: cover;
-            opacity: 0; z-index: 100; pointer-events: none; transition: opacity 0.3s;
+            opacity: 0; z-index: 100; pointer-events: none; mix-blend-mode: overlay;
         }
 
-        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 10; text-align: center; padding: 20px; box-sizing: border-box;}
+        /* UI Elements */
+        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
 
         .btn { 
-            background: rgba(0,0,0,0.5); border: 1px solid var(--fnaf-green); 
-            color: var(--fnaf-green); padding: 10px 20px; margin: 5px; 
-            cursor: pointer; font-family: inherit; font-size: 13px; 
-            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+            background: transparent; border: 1px solid var(--fnaf-green); 
+            color: var(--fnaf-green); padding: 12px 30px; margin: 8px; 
+            cursor: pointer; font-family: inherit; font-size: 14px; 
+            text-transform: uppercase; letter-spacing: 3px; transition: 0.2s;
+            position: relative; overflow: hidden;
         }
-        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: 0 0 15px var(--fnaf-green); }
+        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: var(--glow); }
 
-        #freq-container { width: 250px; height: 80px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; margin-top: 20px;}
-        input[type=range] { width: 80%; accent-color: var(--fnaf-green); cursor: pointer; }
+        /* Task Designs */
+        #freq-container { width: 280px; height: 90px; border: 1px solid var(--ui-border); position: relative; display: flex; align-items: center; justify-content: center; background: rgba(0,20,0,0.2); }
+        input[type=range] { width: 80%; accent-color: var(--fnaf-green); cursor: crosshair; }
 
-        #dialog-box { 
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
-            width: 75%; background: rgba(0,0,0,0.95); border: 2px solid #fff; 
-            padding: 25px; color: white; display: none; z-index: 2000; cursor: pointer;
-        }
-
+        /* Void Entity */
         #scp-void { 
-            position: absolute; width: 400px; height: 400px; top: 50%; left: 50%; 
+            position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; 
             transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
-            pointer-events: none; transition: all 0.8s;
+            pointer-events: none; filter: drop-shadow(0 0 20px red);
         }
-        #knife { position: absolute; width: 80px; top: 30%; left: 55%; transform: rotate(45deg); display: none; filter: drop-shadow(0 0 10px red); z-index: 210; }
+        
+        #knife { 
+            position: absolute; width: 100px; top: 25%; left: 58%; 
+            transform: rotate(35deg); display: none; filter: drop-shadow(0 0 15px red); 
+        }
 
+        /* Cinematic Ending */
         #ending-screen { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: #000; z-index: 9000; display: none; 
-            flex-direction: column; align-items: center; justify-content: flex-start; text-align: center;
-            overflow-y: auto; padding: 60px 20px; box-sizing: border-box;
+            flex-direction: column; align-items: center; justify-content: center;
         }
 
-        .story-text { 
-            color: #ccc; max-width: 750px; font-size: 15px; line-height: 1.8; 
-            margin: 20px 0; text-align: center; padding: 0 30px; white-space: pre-wrap;
+        #story-scroll {
+            height: 300px; width: 80%; overflow: hidden; position: relative;
+            mask-image: linear-gradient(transparent, white 20%, white 80%, transparent);
+        }
+        #story-content {
+            position: absolute; width: 100%; color: #aaa; font-size: 16px;
+            line-height: 2; top: 100%; animation: scrollText 40s linear infinite;
         }
 
-        .copyright-text { font-size: 10px; color: #444; margin-top: 20px; letter-spacing: 1px; }
-        .fade-in { opacity: 0; animation: fadeInEffect 2.5s forwards; }
-
-        @keyframes fadeInEffect { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shake-extreme { 0% { transform: translate(6px, 6px); } 100% { transform: translate(-6px, -6px); } }
-        @keyframes tremor { 0% { transform: scale(1); } 50% { transform: scale(1.06) translate(5px, 5px); } }
+        @keyframes scrollText { from { top: 100%; } to { top: -200%; } }
+        @keyframes glitch-shake { 
+            0% { clip-path: inset(10% 0 30% 0); transform: translate(-5px, 5px); }
+            50% { clip-path: inset(50% 0 10% 0); transform: translate(5px, -5px); }
+            100% { clip-path: inset(10% 0 30% 0); transform: translate(0); }
+        }
     </style>
 </head>
 <body>
 
-<audio id="jumpscare-audio" src="c_jscare.mp3" preload="auto"></audio>
+<audio id="jumpscare-audio" src="c_jscare.mp3"></audio>
+<div class="scanlines"></div>
 
-<div id="jumpscare-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:none; align-items:center; justify-content:center;">
-    <svg style="width:140%; height:140%; fill:#600; animation: tremor 0.04s infinite;" viewBox="0 0 200 200">
-        <circle cx="60" cy="70" r="25" fill="red" /><circle cx="140" cy="70" r="25" fill="red" />
-        <path d="M 30 140 Q 100 240 170 140" stroke="white" stroke-width="12" fill="none" />
-    </svg>
-</div>
-
-<div class="office">
+<div class="office" id="bg-parallax">
     <div id="scp-void">
         <svg viewBox="0 0 200 200"><path d="M100 0 L140 70 L200 100 L140 130 L100 200 L60 130 L0 100 L60 70 Z" fill="white" /><circle cx="75" cy="100" r="15" fill="red" /><circle cx="125" cy="100" r="15" fill="red" /></svg>
         <img id="knife" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'><path d='M25 0 L45 80 L30 150 L20 150 L5 80 Z' fill='silver' stroke='black'/></svg>">
@@ -112,67 +123,64 @@
             <div id="crt-overlay"></div>
             
             <div id="v-start" class="view active">
-                <h1 style="letter-spacing: 5px; margin-bottom: 5px;">VOID_FAILURE</h1>
-                <p style="font-size: 9px; margin-bottom: 25px; color: #444;">DARKFOX CO. SYSTEMS</p>
-                <button class="btn" onclick="startGame()">REPAIR SYSTEM</button>
-                <button class="btn" onclick="showView('settings')">SETTINGS</button>
-                <button class="btn" onclick="showView('credits')">CREDITS</button>
-                <div class="copyright-text">Copyright Darkfox Co. 2026</div>
+                <h1 style="letter-spacing: 8px; text-shadow: var(--glow);">VOID_FAILURE</h1>
+                <p style="font-size: 10px; color: #333; margin-bottom: 30px;">// SECURE. CONTAIN. PROTECT.</p>
+                <button class="btn" onclick="startGame()">ENTER TERMINAL</button>
+                <button class="btn" onclick="showView('settings')">CONFIG</button>
+                <button class="btn" onclick="showView('credits')">ACCESS LOGS</button>
+                <div style="font-size: 9px; color: #222; margin-top: 20px;">© DARKFOX CO. 2026</div>
             </div>
 
             <div id="v-settings" class="view">
-                <h3>SETTINGS</h3>
-                <label style="font-size: 11px;">MOD_DIFFICULTY</label>
-                <select id="diff-select" class="btn" style="background: black; width: 150px;">
-                    <option value="1">EASY</option>
-                    <option value="2" selected>NORMAL</option>
-                    <option value="3">HARD</option>
+                <h3 style="letter-spacing: 5px;">SYSTEM CONFIG</h3>
+                <label style="font-size: 11px; margin-top: 20px;">DIFFICULTY_LEVEL</label>
+                <select id="diff-select" class="btn" style="background: #000;">
+                    <option value="1">EASY_MODE</option>
+                    <option value="2" selected>NORMAL_MODE</option>
+                    <option value="3">VETERAN_MODE</option>
                 </select>
-                <button class="btn" onclick="showView('start')" style="margin-top: 20px;">BACK</button>
+                <button class="btn" onclick="showView('start')">RETURN</button>
             </div>
 
             <div id="v-credits" class="view">
-                <h3>CREDITS</h3>
-                <p style="font-size: 12px;">Directed by: <span style="color:white">Darkfox</span></p>
-                <p style="font-size: 12px;">Engine: Darkfox Co. v4.0</p>
-                <p style="font-size: 12px;">Audio: c_jscare.mp3</p>
-                <button class="btn" onclick="showView('start')" style="margin-top: 20px;">BACK</button>
+                <h3>ACCESS LOGS</h3>
+                <p style="font-size: 11px;">AUTH: <span style="color:white">DARKFOX</span></p>
+                <p style="font-size: 11px;">ENGINE: DF_CORE_V4</p>
+                <p style="font-size: 11px;">ASSET_01: C_JSCARE.MP3</p>
+                <p style="font-size: 11px;">ASSET_02: CRTB.PNG</p>
+                <button class="btn" onclick="showView('start')">RETURN</button>
             </div>
 
             <div id="v-game" class="view">
-                <div id="timer-bar" style="width:100%; height:4px; background:var(--fnaf-green); position:absolute; top:0;"></div>
+                <div id="timer-bar" style="width:100%; height:6px; background:var(--fnaf-green); position:absolute; top:0; box-shadow: var(--glow);"></div>
                 <div id="game-zone"></div>
             </div>
 
             <div id="v-boss" class="view">
-                <h2 id="status-text">OVERRIDING... 99%</h2>
+                <h2 id="status-text" style="animation: glitch-shake 0.2s infinite;">FATAL ERROR: 99%</h2>
             </div>
         </div>
     </div>
 </div>
 
+<div id="jumpscare-layer" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:9999; display:none; align-items:center; justify-content:center;">
+    <svg style="width:130%; height:130%; fill:red; filter: blur(2px);" viewBox="0 0 200 200">
+        <circle cx="60" cy="70" r="30" /><circle cx="140" cy="70" r="30" />
+        <path d="M 20 150 Q 100 250 180 150" stroke="white" stroke-width="15" fill="none" />
+    </svg>
+</div>
+
 <div id="dialog-box" onclick="advanceDialog()">
-    <div style="color:red; font-weight:bold; margin-bottom:10px;">SCP Void</div>
-    <div id="dialog-text">W-W-hy...</div>
+    <div style="color:red; font-weight:bold; letter-spacing: 2px;">ENTITY_ID: VOID</div>
+    <div id="dialog-text" style="margin-top:10px;">...</div>
 </div>
 
 <div id="ending-screen">
-    <h1 class="fade-in" style="color:white; font-size: 3rem; margin-bottom: 10px;">THE END</h1>
-    <h3 class="fade-in" style="color:var(--fnaf-red); letter-spacing: 3px; animation-delay: 0.5s;">THE LEGEND OF THE MISUNDERSTOOD</h3>
-    
-    <div id="story-content" class="story-text fade-in" style="animation-delay: 1.5s;">
-        Loading legend...
+    <h1 style="color:white; letter-spacing: 10px;">THE END</h1>
+    <div id="story-scroll">
+        <div id="story-content"></div>
     </div>
-
-    <div class="fade-in" style="color:var(--fnaf-green); font-weight: bold; margin: 20px 0; animation-delay: 4s;">
-        "Everyone is different. Listen before you destroy."
-    </div>
-
-    <div class="fade-in" style="color:#444; font-size: 11px; animation-delay: 5s;">
-        Copyright Darkfox Co. 2026
-    </div>
-
-    <button class="btn fade-in" onclick="location.reload()" style="margin-top:40px; animation-delay: 6s; padding: 15px 40px;">REBOOT SYSTEM</button>
+    <button class="btn" onclick="location.reload()" style="margin-top:30px;">SYSTEM RESET</button>
 </div>
 
 <script>
@@ -182,27 +190,20 @@
     let dialogStep = 0;
     const jumpscareSound = document.getElementById('jumpscare-audio');
 
-    // STORY LOADING LOGIC
-    async function loadStory() {
-        try {
-            const response = await fetch('story-void.txt');
-            if (response.ok) {
-                const text = await response.text();
-                document.getElementById('story-content').innerText = text;
-            } else {
-                document.getElementById('story-content').innerText = "The legend was lost in the void (story-void.txt not found).";
-            }
-        } catch (error) {
-            console.error("Story failed to load:", error);
-        }
-    }
+    // Cool Parallax Effect
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth / 2 - e.pageX) / 50;
+        const y = (window.innerHeight / 2 - e.pageY) / 50;
+        document.getElementById('bg-parallax').style.transform = `translate(${x}px, ${y}px)`;
+    });
 
-    function startGame() {
-        loadStory(); // Start loading story when game starts
-        jumpscareSound.play().then(() => { jumpscareSound.pause(); jumpscareSound.currentTime = 0; }).catch(e => {});
-        lvl = 1;
-        showView('game');
-        runLevel();
+    // Load external story file
+    async function fetchStory() {
+        try {
+            const r = await fetch('story-void.txt');
+            const text = r.ok ? await r.text() : "The legend is missing (story-void.txt).";
+            document.getElementById('story-content').innerText = text;
+        } catch(e) { document.getElementById('story-content').innerText = "Error loading legend."; }
     }
 
     function showView(id) {
@@ -210,38 +211,46 @@
         document.getElementById('v-' + id).classList.add('active');
     }
 
+    function startGame() {
+        fetchStory();
+        jumpscareSound.play().then(() => { jumpscareSound.pause(); jumpscareSound.currentTime=0; });
+        lvl = 1;
+        showView('game');
+        runLevel();
+    }
+
     function runLevel() {
         isTrans = false;
         const zone = document.getElementById('game-zone');
         zone.innerHTML = '';
         const d = parseInt(document.getElementById('diff-select').value);
-        if(lvl < 4) startTimer(12 - (lvl * 2.5) - (d * 1.2));
+        if(lvl < 4) startTimer(11 - (lvl * 2.5) - (d * 1.5));
 
         if(lvl === 1) {
-            zone.innerHTML = '<p>RECALIBRATE NODES</p>';
+            zone.innerHTML = '<p style="letter-spacing:3px">RECALIBRATE_SYSTEM</p>';
             for(let i=0; i<3; i++) {
                 let div = document.createElement('div');
-                div.style = "width:45px; height:45px; border:1px solid var(--fnaf-green); margin:12px; cursor:pointer;";
+                div.style = "width:50px; height:50px; border:1px solid var(--fnaf-green); margin:15px; cursor:pointer; display:inline-block;";
                 div.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
                 zone.appendChild(div);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div style="width:40px; height:100%; background:rgba(255,0,0,0.3); position:absolute;"></div><div id="stab-bar" style="width:4px; height:100%; background:white; position:absolute; left:0;"></div></div>';
+            zone.innerHTML = '<p>SIGNAL_STABILITY</p><div id="freq-container"><div style="width:40px; height:100%; background:rgba(255,0,0,0.4); position:absolute;"></div><div id="stab-bar" style="width:4px; height:100%; background:#fff; position:absolute; left:0; box-shadow:0 0 10px #fff;"></div></div>';
             let p = 0, dr = 1;
             let si = setInterval(() => {
-                p += (2.6 + d) * dr; if(p >= 246 || p <= 0) dr *= -1;
+                p += (2.8 + d) * dr; if(p >= 276 || p <= 0) dr *= -1;
                 if(document.getElementById('stab-bar')) document.getElementById('stab-bar').style.left = p + "px";
             }, 10);
             document.getElementById('freq-container').onclick = () => {
-                if(p > 105 && p < 145) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
+                if(p > 110 && p < 150) { clearInterval(si); next(); } else { clearInterval(si); sc(); }
             };
         } else if(lvl === 3) {
-            zone.innerHTML = '<p>MATCH FREQUENCY</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:10px;">0Hz</p>';
+            zone.innerHTML = '<p>FREQ_MATCH</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:10px; font-size:12px;">SEARCHING...</p>';
             let target = Math.floor(Math.random() * 80) + 10;
             const k = document.getElementById('knob');
             k.oninput = () => {
-                document.getElementById('f-val').innerText = k.value + "Hz (Target: " + target + "Hz)";
-                if(Math.abs(k.value - target) < (4 - d)) { next(); }
+                document.getElementById('f-val').innerText = `${k.value}Hz / TARGET: ${target}Hz`;
+                if(Math.abs(k.value - target) < (4 - d)) next();
             };
         } else finale();
     }
@@ -255,11 +264,11 @@
         }, 100);
     }
 
-    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 450); }
+    function next() { isTrans = true; clearInterval(timer); lvl++; setTimeout(runLevel, 500); }
 
     function sc() {
         isTrans = true; clearInterval(timer);
-        jumpscareSound.play().catch(e => {});
+        jumpscareSound.play();
         document.getElementById('jumpscare-layer').style.display='flex';
         setTimeout(() => location.reload(), 2000);
     }
@@ -270,30 +279,31 @@
             document.getElementById('crt-overlay').style.opacity = "1";
             document.getElementById('monitor').style.animation = "shake-extreme 0.05s infinite";
             setTimeout(() => {
-                const m = document.getElementById('monitor');
-                m.style.transform = "translate(1500px, 600px) rotate(180deg)"; m.style.opacity = "0";
+                document.getElementById('monitor').style.display = "none";
                 const v = document.getElementById('scp-void');
-                v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.6)"; v.style.pointerEvents = "auto";
+                v.style.opacity = "1"; v.style.transform = "translate(-50%, -50%) scale(1.5)"; v.style.pointerEvents = "auto";
                 v.onclick = () => {
                     document.getElementById('knife').style.display = "block";
                     v.onclick = null;
-                    setTimeout(() => { document.getElementById('dialog-box').style.display = "block"; }, 600);
+                    setTimeout(() => { document.getElementById('dialog-box').style.display = "block"; advanceDialog(); }, 600);
                 };
-            }, 2000);
+            }, 2500);
         }, 1500);
     }
 
     function advanceDialog() {
         dialogStep++;
-        if(dialogStep === 1) {
-            document.getElementById('dialog-text').innerText = "You always want to kill me!";
-        } else {
+        const t = document.getElementById('dialog-text');
+        if(dialogStep === 1) t.innerText = "W-why... why do you hunt me?";
+        else if(dialogStep === 2) t.innerText = "I only wanted to see the light...";
+        else if(dialogStep === 3) t.innerText = "You always reach for the blade first.";
+        else {
             document.getElementById('dialog-box').style.display = "none";
             const v = document.getElementById('scp-void');
-            v.style.transition = "all 3s cubic-bezier(0.1, 0, 0.9, 1)";
-            v.style.filter = "invert(1) blur(20px) contrast(4)";
+            v.style.transition = "all 4s";
+            v.style.filter = "invert(1) blur(30px)";
             v.style.transform = "translate(-50%, -50%) scale(0)";
-            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 3500);
+            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 4000);
         }
     }
 </script>
