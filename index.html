@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VOID_FAILURE // DARKFOX CO. 2026</title>
+    <title>VOID_FAILURE // ERROR_SYSTEM_CRITICAL</title>
     <style>
         :root { 
-            --fnaf-green: #24ff15; 
+            --fnaf-green: #15ff24; 
             --fnaf-red: #ff0000;
-            --fnaf-crimson: #800000;
-            --ui-border: rgba(36, 255, 21, 0.4);
-            --glow: 0 0 15px rgba(36, 255, 21, 0.5);
+            --fnaf-crimson: #4a0000;
+            --ui-border: rgba(36, 255, 21, 0.2);
+            --glow: 0 0 20px rgba(255, 0, 0, 0.6);
         }
         
         body, html { 
@@ -19,123 +19,104 @@
             font-family: 'Courier New', monospace; overflow: hidden; 
         }
 
-        /* Ambient Scene with Flickering Light */
+        /* Ambient Scene with Shadow Movement */
         .office { 
             width: 110%; height: 110%; top: -5%; left: -5%; position: fixed;
-            background: radial-gradient(circle at 50% 50%, #151515 0%, #050505 75%, #000 100%); 
+            background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #080808 60%, #000 100%); 
             display: flex; justify-content: center; align-items: center; 
             transition: transform 0.1s ease-out;
-            animation: lightFlicker 8s infinite;
-            z-index: 1;
+            animation: darknessBreaks 15s infinite;
         }
 
-        @keyframes lightFlicker {
-            0%, 100% { opacity: 1; } 95% { opacity: 1; } 96% { opacity: 0.7; } 97% { opacity: 1; } 98% { opacity: 0.4; } 99% { opacity: 1; }
+        @keyframes darknessBreaks {
+            0%, 100% { filter: brightness(1); }
+            45% { filter: brightness(0.8) contrast(1.2); }
+            47% { filter: brightness(0.2); }
+            48% { filter: brightness(1.1); }
         }
 
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 3px, 2px 100%; pointer-events: none; z-index: 1000;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+            background-size: 100% 2px, 3px 100%; pointer-events: none; z-index: 1000; opacity: 0.6;
         }
 
-        /* Monitor Layout */
+        /* Hardware Monitor */
         .monitor { 
-            width: 580px; height: 440px; background: #111; 
-            border-radius: 30px; padding: 18px; position: relative; 
-            box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 0 30px #000; 
-            border: 5px solid #222; transform-style: preserve-3d;
+            width: 600px; height: 460px; background: #0a0a0a; 
+            border-radius: 20px; padding: 15px; position: relative; 
+            box-shadow: 0 0 100px #000, inset 0 0 50px #000; 
+            border: 6px solid #1a1a1a; transform-style: preserve-3d;
             z-index: 10;
         }
 
         .screen { 
-            width: 100%; height: 100%; background: #020402; 
-            position: relative; overflow: hidden; border: 12px solid #0a0a0a;
-            border-radius: 15px;
+            width: 100%; height: 100%; background: #010501; 
+            position: relative; overflow: hidden; border: 10px solid #050505;
+            border-radius: 10px; box-shadow: inset 0 0 40px rgba(0,0,0,1);
         }
 
         #crt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url('crtb.png'); background-size: cover;
-            opacity: 0; z-index: 100; pointer-events: none; mix-blend-mode: overlay;
+            opacity: 0.4; z-index: 100; pointer-events: none; mix-blend-mode: overlay;
         }
 
-        /* Views */
+        /* Menu Glitch Effects */
         .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .active { display: flex; }
 
+        .glitch-text {
+            font-size: 42px; letter-spacing: 15px; color: #fff;
+            text-shadow: 2px 0 red, -2px 0 blue;
+            animation: textGlitch 3s infinite;
+        }
+
+        @keyframes textGlitch {
+            0% { transform: translate(0); }
+            1% { transform: translate(-5px, 2px); }
+            2% { transform: translate(5px, -2px); }
+            3% { transform: translate(0); }
+        }
+
         .btn { 
-            background: transparent; border: 1px solid var(--fnaf-green); 
-            color: var(--fnaf-green); padding: 10px 25px; margin: 8px; 
-            cursor: pointer; font-family: inherit; font-size: 13px; 
-            text-transform: uppercase; letter-spacing: 3px; transition: 0.2s;
+            background: rgba(0, 30, 0, 0.3); border: 1px solid var(--fnaf-green); 
+            color: var(--fnaf-green); padding: 12px 35px; margin: 10px; 
+            cursor: pointer; font-family: inherit; font-size: 14px; 
+            text-transform: uppercase; letter-spacing: 5px; transition: 0.1s;
         }
-        .btn:hover { background: var(--fnaf-green); color: #000; box-shadow: var(--glow); }
+        .btn:hover { background: var(--fnaf-red); color: #fff; border-color: #fff; box-shadow: var(--glow); }
 
-        /* Stabilize Task */
-        #freq-container { 
-            width: 280px; height: 60px; border: 2px solid var(--ui-border); 
-            position: relative; margin-top: 20px; background: #050505;
-            cursor: pointer;
-        }
-        .target-zone {
-            position: absolute; width: 60px; height: 100%; 
-            background: rgba(36, 255, 21, 0.2); left: 110px;
-            border-left: 2px solid var(--fnaf-green); border-right: 2px solid var(--fnaf-green);
-        }
-        #stab-bar {
-            width: 6px; height: 100%; background: white; 
-            position: absolute; left: 0; box-shadow: 0 0 10px white;
-        }
+        /* Gameplay Elements */
+        #freq-container { width: 300px; height: 70px; border: 2px solid #333; position: relative; background: #000; cursor: crosshair; }
+        .target-zone { position: absolute; width: 50px; height: 100%; background: rgba(255, 0, 0, 0.3); left: 125px; border-inline: 2px solid red; }
+        #stab-bar { width: 4px; height: 100%; background: #fff; position: absolute; left: 0; box-shadow: 0 0 15px #fff; }
 
-        /* JUMPSCARE SYSTEM (NEW & SCARY) */
+        /* THE JUMPSCARE (REWORKED) */
         #jumpscare-layer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
             z-index: 9999; display: none; align-items: center; justify-content: center;
-            overflow: hidden;
         }
-        .scare-fratze {
-            width: 130%; height: 130%; fill: var(--fnaf-crimson);
-            filter: blur(1px) contrast(3) brightness(0.7);
-            animation: jitterFratze 0.04s infinite;
-        }
-        .strobe { position: absolute; width: 100%; height: 100%; background: white; z-index: 10000; opacity: 0; pointer-events: none; }
-
-        /* VOID ENTITY (NEW & SCARY Shape) */
-        #scp-void { 
-            position: absolute; width: 450px; height: 450px; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; 
-            pointer-events: none; filter: drop-shadow(0 0 30px red);
-        }
-        #knife { position: absolute; width: 100px; top: 25%; left: 58%; transform: rotate(35deg); display: none; filter: drop-shadow(0 0 15px white); }
-        #dialog-box { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70%; background: #000; border: 2px solid #fff; padding: 20px; color: white; display: none; z-index: 2000; cursor: pointer; }
-
-        /* Story Ending */
-        #ending-screen { 
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: #000; z-index: 9000; display: none; 
-            flex-direction: column; align-items: center; justify-content: center;
-        }
-        #story-scroll {
-            height: 350px; width: 85%; overflow: hidden; position: relative; margin: 20px 0;
-            mask-image: linear-gradient(transparent, white 15%, white 85%, transparent);
-        }
-        #story-content {
-            position: absolute; width: 100%; color: #aaa; font-size: 15px;
-            line-height: 2.2; top: 100%; animation: scrollText 45s linear infinite;
-            white-space: pre-wrap;
+        .scare-face {
+            width: 140%; height: 140%; fill: #fff;
+            filter: contrast(5) brightness(0.6) blur(0.5px);
+            animation: intenseJitter 0.03s infinite;
         }
 
-        /* Animations */
-        @keyframes scrollText { from { top: 100%; } to { top: -250%; } }
-        @keyframes masterShake { 0% { transform: translate(15px, 15px); } 20% { transform: translate(-15px, -10px); } 40% { transform: translate(20px, 15px); } 100% { transform: translate(0, 0); } }
-        @keyframes jitterFratze {
-            0% { transform: translate(8px, -8px) scale(1); filter: invert(0) blur(1px); }
-            50% { transform: translate(-10px, 10px) scale(1.05); filter: invert(0.1) blur(2px); }
-            100% { transform: translate(5px, -5px) scale(1); }
+        @keyframes intenseJitter {
+            0% { transform: translate(10px, 10px) scale(1.1); filter: invert(0); }
+            50% { transform: translate(-15px, 5px) scale(1.2); filter: invert(0.2); }
+            100% { transform: translate(5px, -15px) scale(1.1); }
         }
-        @keyframes strobeFlash { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* Ending Elements */
+        #scp-void { position: absolute; width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; z-index: 200; }
+        #ending-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: #000; z-index: 9000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #story-scroll { height: 400px; width: 80%; overflow: hidden; position: relative; mask-image: linear-gradient(transparent, #000 20%, #000 80%, transparent); }
+        #story-content { position: absolute; width: 100%; color: #555; font-size: 16px; line-height: 2.5; top: 100%; animation: scrollText 50s linear infinite; white-space: pre-wrap; }
+        
+        @keyframes scrollText { from { top: 100%; } to { top: -300%; } }
     </style>
 </head>
 <body id="main-body">
@@ -144,15 +125,16 @@
 <div class="scanlines"></div>
 
 <div class="office" id="parallax-bg">
+    
     <div id="scp-void">
         <svg viewBox="0 0 200 200">
-            <path d="M100 0 L130 50 L200 60 L150 110 L170 180 L100 140 L30 180 L50 110 L0 60 L70 50 Z" fill="white" />
-            <ellipse cx="70" cy="90" rx="18" ry="22" fill="red" />
-            <ellipse cx="125" cy="85" rx="14" ry="18" fill="red" />
-            <circle cx="70" cy="90" r="5" fill="black" />
+            <path d="M100 0 L135 60 L200 40 L160 110 L190 190 L100 150 L10 190 L40 110 L0 40 L65 60 Z" fill="#fff" />
+            <circle cx="75" cy="95" r="18" fill="red" />
+            <circle cx="125" cy="85" r="12" fill="red" />
+            <circle cx="75" cy="95" r="6" fill="black" />
             <circle cx="125" cy="85" r="4" fill="black" />
         </svg>
-        <img id="knife" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'><path d='M25 0 L45 80 L30 150 L20 150 L5 80 Z' fill='silver' stroke='black'/></svg>">
+        <img id="knife" style="display:none; position:absolute; top:30%; left:60%; width:80px;" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 150'><path d='M25 0 L45 80 L30 150 L20 150 L5 80 Z' fill='silver' stroke='black'/></svg>">
     </div>
 
     <div class="monitor" id="monitor">
@@ -160,83 +142,84 @@
             <div id="crt-overlay"></div>
             
             <div id="v-start" class="view active">
-                <h1 style="letter-spacing: 10px; text-shadow: var(--glow);">VOID_FAILURE</h1>
-                <button class="btn" onclick="startGame()">INITIALIZE REPAIR</button>
-                <button class="btn" onclick="showView('settings')">SETTINGS</button>
-                <button class="btn" onclick="showView('credits')">CREDITS</button>
-                <div style="font-size: 8px; margin-top: 25px; color:#222;">© DARKFOX CO. 2026</div>
+                <div class="glitch-text">VOID_FAILURE</div>
+                <p style="color: #300; font-size: 10px; margin-top: -10px;">[CORE_UNSTABLE_REPAIR_REQUIRED]</p>
+                <div style="margin-top: 40px;">
+                    <button class="btn" onclick="startGame()">INITIALIZE</button><br>
+                    <button class="btn" onclick="showView('settings')">CONFIG</button><br>
+                    <button class="btn" onclick="showView('credits')">LOGS</button>
+                </div>
             </div>
 
             <div id="v-settings" class="view">
-                <h3>CONFIGURATION</h3>
-                <select id="diff-select" class="btn" style="background: #000;">
-                    <option value="1">EASY</option>
-                    <option value="2" selected>NORMAL</option>
-                    <option value="3">HARDCORE</option>
+                <h3>LEVEL_MODIFIER</h3>
+                <select id="diff-select" class="btn">
+                    <option value="1">SURVIVOR</option>
+                    <option value="2" selected>VICTIM</option>
+                    <option value="3">SLAUGHTER</option>
                 </select>
                 <button class="btn" onclick="showView('start')">BACK</button>
             </div>
 
             <div id="v-credits" class="view">
-                <h3>ACCESS LOGS</h3>
-                <p>DIRECTOR: DARKFOX</p>
+                <h3>SYSTEM_AUTHORS</h3>
+                <p style="font-size: 12px;">ENTRY_01: DARKFOX</p>
+                <p style="font-size: 12px; color:red;">ENTRY_02: IT_IS_WATCHING</p>
                 <button class="btn" onclick="showView('start')">BACK</button>
             </div>
 
             <div id="v-game" class="view">
-                <div id="timer-bar" style="width:100%; height:5px; background:var(--fnaf-green); position:absolute; top:0;"></div>
+                <div id="timer-bar" style="width:100%; height:8px; background:var(--fnaf-red); position:absolute; top:0;"></div>
                 <div id="game-zone"></div>
             </div>
 
             <div id="v-boss" class="view">
-                <h2 style="color: red;">FATAL ERROR...</h2>
+                <h1 style="color:red; animation: intenseJitter 0.1s infinite;">SYSTEM FAILURE</h1>
             </div>
         </div>
     </div>
 </div>
 
 <div id="jumpscare-layer">
-    <div class="strobe" id="strobe-effect"></div>
-    <svg class="scare-fratze" viewBox="0 0 200 200">
-        <path d="M 100 10 C 30 10, 10 70, 20 120 C 30 170, 70 190, 100 190 C 130 190, 170 170, 180 120 C 190 70, 170 10, 100 10 Z" fill="#200" stroke="red" stroke-width="2"/>
-        <ellipse cx="65" cy="80" rx="25" ry="35" fill="black" stroke="white" stroke-width="1"/>
-        <ellipse cx="135" cy="75" rx="20" ry="30" fill="black" stroke="white" stroke-width="1"/>
-        <circle cx="65" cy="80" r="8" fill="red" />
-        <circle cx="135" cy="75" r="6" fill="red" />
-        <path d="M 60 140 Q 100 200 140 140 Q 100 130 60 140 Z" fill="black" stroke="red" stroke-width="2"/>
-        <path d="M 40 30 L 160 170 M 160 30 L 40 170" stroke="red" stroke-width="0.5" opacity="0.3"/>
+    <svg class="scare-face" viewBox="0 0 200 200">
+        <path d="M 100 20 C 40 20, 20 80, 25 130 C 35 180, 80 195, 100 195 C 120 195, 165 180, 175 130 C 180 80, 160 20, 100 20 Z" fill="#050505" stroke="#fff" stroke-width="0.5"/>
+        <circle cx="65" cy="85" r="28" fill="#000" />
+        <circle cx="135" cy="80" r="22" fill="#000" />
+        <circle cx="68" cy="88" r="4" fill="#fff" opacity="0.8" />
+        <circle cx="132" cy="82" r="3" fill="#fff" opacity="0.8" />
+        <path d="M 55 145 Q 100 210 145 145 Q 100 135 55 145 Z" fill="#000" stroke="#400" stroke-width="3"/>
+        <path d="M 60 115 L 55 135 M 140 110 L 145 130" stroke="red" stroke-width="1" />
     </svg>
 </div>
 
-<div id="dialog-box" onclick="advanceDialog()">
-    <div style="color:red; font-weight:bold; font-size: 12px;">[!] UNKNOWN_ENTITY</div>
-    <div id="dialog-text" style="margin-top:8px;">...</div>
+<div id="dialog-box" style="display:none; position:fixed; bottom:40px; left:50%; transform:translateX(-50%); width:60%; border:1px solid red; background:#000; padding:20px; z-index:2000; cursor:pointer;" onclick="advanceDialog()">
+    <div style="color:red; font-size:12px; margin-bottom:10px;">ENTITY_000:</div>
+    <div id="dialog-text" style="color:#fff;">...</div>
 </div>
 
 <div id="ending-screen">
-    <h1 style="color:white; letter-spacing: 12px;">THE END</h1>
-    <div id="story-scroll">
-        <div id="story-content">Loading...</div>
-    </div>
-    <button class="btn" onclick="location.reload()">REBOOT</button>
+    <h1 style="letter-spacing: 20px; color:#fff;">THE END</h1>
+    <div id="story-scroll"><div id="story-content">Loading legend...</div></div>
+    <button class="btn" onclick="location.reload()">RESET SYSTEM</button>
 </div>
 
 <script>
     let lvl = 1, timer, isTrans = false, dialogStep = 0, moveInterval;
     const sound = document.getElementById('jumpscare-audio');
 
+    // Parallax
     document.addEventListener('mousemove', (e) => {
-        const x = (window.innerWidth / 2 - e.pageX) / 45;
-        const y = (window.innerHeight / 2 - e.pageY) / 45;
+        const x = (window.innerWidth / 2 - e.pageX) / 40;
+        const y = (window.innerHeight / 2 - e.pageY) / 40;
         document.getElementById('parallax-bg').style.transform = `translate(${x}px, ${y}px)`;
     });
 
     async function loadStory() {
         try {
             const r = await fetch('story-void.txt');
-            const txt = r.ok ? await r.text() : "Legend file missing.";
+            const txt = r.ok ? await r.text() : "The file story-void.txt is missing. The void remains silent.";
             document.getElementById('story-content').innerText = txt;
-        } catch(e) { document.getElementById('story-content').innerText = "File Error."; }
+        } catch(e) { document.getElementById('story-content').innerText = "ERROR_DATA_CORRUPT."; }
     }
 
     function showView(id) {
@@ -247,7 +230,11 @@
     function startGame() {
         loadStory();
         sound.play().then(() => { sound.pause(); sound.currentTime = 0; });
-        lvl = 1; showView('game'); runLevel();
+        // Start-Glitch
+        document.getElementById('monitor').style.animation = "intenseJitter 0.05s 10";
+        setTimeout(() => {
+            lvl = 1; showView('game'); runLevel();
+        }, 500);
     }
 
     function runLevel() {
@@ -256,34 +243,34 @@
         zone.innerHTML = '';
         const d = parseInt(document.getElementById('diff-select').value);
         
-        let timeBase = (lvl === 3) ? 15 : 12; 
-        startTimer(timeBase - (lvl * 2) - (d * 1.5));
+        let timeBase = (lvl === 3) ? 14 : 11; 
+        startTimer(timeBase - (lvl * 1.5) - (d * 2));
 
         if(lvl === 1) {
-            zone.innerHTML = '<p>REBOOT NODES</p>';
+            zone.innerHTML = '<p style="font-size:12px;">REBOOT_NODES</p>';
             for(let i=0; i<3; i++) {
                 let div = document.createElement('div');
-                div.style = "width:50px; height:50px; border:1px solid var(--fnaf-green); margin:15px; cursor:pointer; display:inline-block;";
+                div.style = "width:55px; height:55px; border:2px solid var(--fnaf-green); margin:15px; cursor:pointer; display:inline-block; transition: 0.1s;";
                 div.onclick = function() { if(isTrans) return; this.style.background="red"; this.classList.add('ok'); if(document.querySelectorAll('.ok').length==3) next(); };
                 zone.appendChild(div);
             }
         } else if(lvl === 2) {
-            zone.innerHTML = '<p>STABILIZE SIGNAL</p><div id="freq-container"><div class="target-zone"></div><div id="stab-bar"></div></div><p style="font-size:10px; margin-top:10px;">CLICK IN GREEN AREA</p>';
+            zone.innerHTML = '<p style="font-size:12px;">STABILIZE_CORE</p><div id="freq-container"><div class="target-zone"></div><div id="stab-bar"></div></div>';
             let p = 0, dr = 1;
             moveInterval = setInterval(() => {
-                p += (2.4 + d) * dr; if(p >= 274 || p <= 0) dr *= -1;
+                p += (2.6 + (d * 0.8)) * dr; if(p >= 296 || p <= 0) dr *= -1;
                 document.getElementById('stab-bar').style.left = p + "px";
             }, 10);
             document.getElementById('freq-container').onclick = () => {
                 clearInterval(moveInterval);
-                if(p >= 110 && p <= 170) { next(); } else { sc(); }
+                if(p >= 125 && p <= 175) next(); else sc();
             };
         } else if(lvl === 3) {
-            zone.innerHTML = '<p>FREQ_MATCH</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:15px; font-weight:bold;">SEARCHING...</p>';
-            let target = Math.floor(Math.random() * 70) + 15;
+            zone.innerHTML = '<p style="font-size:12px;">MATCH_FREQUENCY</p><input type="range" id="knob" min="0" max="100" value="0"><p id="f-val" style="margin-top:15px; font-weight:bold; color:red;">??? Hz</p>';
+            let target = Math.floor(Math.random() * 60) + 20;
             const k = document.getElementById('knob');
             k.oninput = () => {
-                document.getElementById('f-val').innerText = `TARGET: ${target}Hz | CURRENT: ${k.value}Hz`;
+                document.getElementById('f-val').innerText = `${k.value}Hz / ${target}Hz`;
                 if(Math.abs(k.value - target) <= (5 - d)) next();
             };
         } else finale();
@@ -303,22 +290,15 @@
     function sc() {
         isTrans = true; clearInterval(timer);
         sound.play();
-        
-        // Trigger Effects
-        document.getElementById('main-body').style.animation = "masterShake 0.1s infinite";
-        document.getElementById('strobe-effect').style.animation = "strobeFlash 0.1s 5"; // 5 flashes
+        document.getElementById('main-body').style.animation = "intenseJitter 0.05s infinite";
         document.getElementById('jumpscare-layer').style.display = 'flex';
-        
-        setTimeout(() => {
-            location.reload();
-        }, 1800);
+        setTimeout(() => location.reload(), 1800);
     }
 
     function finale() {
         clearInterval(timer); showView('boss');
         setTimeout(() => {
-            document.getElementById('crt-overlay').style.opacity = "1";
-            document.getElementById('monitor').style.animation = "masterShake 0.05s infinite";
+            document.getElementById('monitor').style.animation = "intenseJitter 0.05s infinite";
             setTimeout(() => {
                 document.getElementById('monitor').style.display = "none";
                 const v = document.getElementById('scp-void');
@@ -326,25 +306,33 @@
                 v.onclick = () => {
                     document.getElementById('knife').style.display = "block";
                     v.onclick = null;
-                    setTimeout(() => { document.getElementById('dialog-box').style.display = "block"; advanceDialog(); }, 600);
+                    setTimeout(() => { 
+                        document.getElementById('dialog-box').style.display = "block"; 
+                        advanceDialog(); 
+                    }, 800);
                 };
-            }, 2500);
+            }, 2000);
         }, 1500);
     }
 
     function advanceDialog() {
         dialogStep++;
         const t = document.getElementById('dialog-text');
-        if(dialogStep === 1) t.innerText = "Why... do you always attack first?";
-        else if(dialogStep === 2) t.innerText = "I only wanted to be more than a shadow.";
-        else if(dialogStep === 3) t.innerText = "The monster you see is just the fear in your own heart.";
-        else {
+        const lines = [
+            "You found me... in the dark.",
+            "I was never the error. You were.",
+            "But now... we are both just code.",
+            "Goodnight, User."
+        ];
+        if(dialogStep <= lines.length) {
+            t.innerText = lines[dialogStep-1];
+        } else {
             document.getElementById('dialog-box').style.display = "none";
             const v = document.getElementById('scp-void');
-            v.style.transition = "all 4s cubic-bezier(0.1, 0, 0.9, 1)";
-            v.style.filter = "invert(1) blur(30px)";
+            v.style.transition = "all 5s cubic-bezier(0.9, 0, 0.1, 1)";
+            v.style.filter = "invert(1) blur(50px)";
             v.style.transform = "translate(-50%, -50%) scale(0)";
-            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 4000);
+            setTimeout(() => { document.getElementById('ending-screen').style.display = "flex"; }, 5000);
         }
     }
 </script>
