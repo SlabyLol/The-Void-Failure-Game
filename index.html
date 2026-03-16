@@ -2,211 +2,238 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>VOID_BREACH_V.FINAL</title>
+    <title>VOID_BREACH_OFFICE_EDITION</title>
     <style>
-        :root { --red: #ff0000; --green: #00ff41; --bg: #050505; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; font-family: 'Courier New', monospace; overflow: hidden; color: #fff; }
+        :root { --red: #ff0000; --green: #00ff41; --monitor-color: #2a2a2a; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #020202; font-family: 'Courier New', monospace; overflow: hidden; color: #fff; }
 
-        /* CRT Filter */
-        .crt { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%); background-size: 100% 4px; pointer-events: none; z-index: 1000; }
+        /* OFFICE SCENE */
+        .office {
+            position: relative; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 50% 40%, #0d0d0d 0%, #000 85%);
+            display: flex; justify-content: center; align-items: center;
+        }
 
-        /* THE STALKER - Positioned BEHIND the monitor wrapper */
-        #stalker-container {
+        .desk {
+            position: absolute; bottom: 0; width: 100%; height: 25%;
+            background: #080808; border-top: 4px solid #111; z-index: 5;
+        }
+
+        /* THE STALKER - Hiding behind the monitor casing */
+        #stalker {
             position: absolute;
-            top: 550px; /* Starting hidden behind the monitor base */
-            left: 50%;
-            transform: translateX(-50%);
-            width: 400px;
-            z-index: 1; 
-            filter: brightness(0.5) contrast(1.5);
+            top: 450px; /* Start deep behind the monitor */
+            left: 50%; transform: translateX(-50%);
+            width: 320px; z-index: 2;
+            filter: brightness(0.3) grayscale(1);
             transition: top 0.1s linear;
         }
 
-        .wrapper { position: fixed; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; pointer-events: none; }
-        .monitor { 
-            width: 850px; height: 620px; background: #1a1a1a; border: 15px solid #222; 
-            border-radius: 30px; position: relative; box-shadow: 0 0 150px #000; 
-            pointer-events: all;
+        /* CSS CRT MONITOR */
+        .monitor-case {
+            width: 700px; height: 500px; background: var(--monitor-color);
+            border-radius: 40px; border: 12px solid #333;
+            position: relative; z-index: 10;
+            box-shadow: 0 0 100px #000, inset 0 0 50px #000;
         }
-        .screen { width: calc(100% - 40px); height: calc(100% - 40px); margin: 20px; background: var(--bg); position: relative; overflow: hidden; border: 4px solid #000; display: flex; flex-direction: column; }
 
-        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; padding: 40px; box-sizing: border-box; text-align: center; }
+        .screen-bezel {
+            width: calc(100% - 60px); height: calc(100% - 80px);
+            margin: 30px auto; background: #111; border-radius: 20px;
+            padding: 10px; box-shadow: inset 0 0 20px #000;
+        }
+
+        .screen {
+            width: 100%; height: 100%; background: #000;
+            position: relative; overflow: hidden; border-radius: 10px;
+        }
+
+        /* CRT SCANLINES */
+        .screen::after {
+            content: " "; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+            background-size: 100% 4px; pointer-events: none;
+        }
+
+        .view { width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: absolute; padding: 25px; box-sizing: border-box; text-align: center; }
         .active { display: flex; }
 
-        /* Story Scroll */
-        #scroll-box { width: 90%; height: 250px; overflow: hidden; position: relative; border-top: 1px solid #111; margin-top: 10px; }
-        #scroll-content { position: absolute; width: 100%; top: 250px; color: var(--green); line-height: 2; font-size: 14px; text-align: left; }
+        /* TASKS */
+        #timer-strip { position: absolute; top: 0; left: 0; height: 5px; background: var(--red); width: 100%; }
+        .node { width: 50px; height: 50px; border: 2px solid #222; margin: 10px; cursor: pointer; display: inline-block; transition: 0.2s; }
+        .gauge { width: 250px; height: 30px; border: 1px solid #333; position: relative; }
+        #needle { width: 3px; height: 100%; background: #fff; position: absolute; left: 0; }
+        .target { position: absolute; width: 40px; height: 100%; background: rgba(255,0,0,0.4); left: 105px; }
 
-        /* Boss */
-        #boss-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; background: #000; cursor: crosshair; }
-        .boss-svg { width: 450px; height: 450px; fill: white; animation: jitter 0.05s infinite; }
-        @keyframes jitter { 0% { transform: translate(3px, -3px); } 50% { transform: translate(-3px, 3px); } }
+        /* STORY DISPLAY */
+        #story-box { width: 90%; height: 200px; overflow: hidden; position: relative; border-top: 1px solid #222; margin-top: 10px; }
+        #story-content { position: absolute; width: 100%; top: 200px; color: var(--green); line-height: 1.8; font-size: 13px; text-align: left; }
 
-        /* Jumpscare */
-        #jscare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; align-items: center; justify-content: center; }
-        .scare-svg { width: 180%; height: 180%; animation: flash 0.04s infinite; }
-        @keyframes flash { 0% { filter: invert(0) scale(1); } 50% { filter: invert(1) scale(1.1); } }
+        .btn { background: transparent; border: 1px solid #444; color: #888; padding: 10px 20px; cursor: pointer; font-family: inherit; margin-top: 20px; }
+        .btn:hover { border-color: #fff; color: #fff; }
 
-        .loading-bar { width: 350px; height: 12px; border: 1px solid #333; margin-top: 25px; }
-        #loading-fill { width: 0%; height: 100%; background: var(--red); box-shadow: 0 0 10px var(--red); }
-        .btn { background: transparent; border: 1px solid #444; color: #888; padding: 12px 25px; cursor: pointer; font-family: inherit; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        .btn:hover { border-color: red; color: white; background: rgba(255,0,0,0.1); }
+        #jumpscare { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; display: none; align-items: center; justify-content: center; }
+        .scare-svg { width: 150%; height: 150%; animation: flash 0.04s infinite; }
+        @keyframes flash { 0% { filter: invert(0) scale(1); } 50% { filter: invert(1) scale(1.05); } }
     </style>
 </head>
 <body>
 
-<audio id="audio-scare" src="c_jscare.mp3" preload="auto"></audio>
-<div class="crt"></div>
+<audio id="scare-snd" src="c_jscare.mp3"></audio>
 
-<div id="stalker-container">
-    <svg viewBox="0 0 200 200">
-        <path d="M100,20 C60,20 20,60 25,120 C30,180 80,195 110,190 C140,195 180,180 185,120 C190,60 140,20 100,20" fill="white" />
-        <circle cx="65" cy="85" r="22" fill="black" />
-        <circle cx="135" cy="85" r="22" fill="black" />
-        <circle cx="65" cy="85" r="6" fill="red" />
-        <circle cx="135" cy="85" r="6" fill="red" />
-    </svg>
-</div>
+<div class="office">
+    <div id="stalker">
+        <svg viewBox="0 0 200 200">
+            <path d="M100,20 C60,20 20,60 25,120 C30,180 80,195 110,190 C140,195 180,180 185,120 C190,60 140,20 100,20" fill="white" />
+            <circle cx="70" cy="85" r="22" fill="black" /><circle cx="130" cy="85" r="22" fill="black" />
+            <circle cx="70" cy="85" r="6" fill="red" /><circle cx="130" cy="85" r="6" fill="red" />
+        </svg>
+    </div>
 
-<div class="wrapper">
-    <div class="monitor">
-        <div class="screen">
-            
-            <div id="v-menu" class="view active">
-                <h1 style="letter-spacing:10px; text-shadow: 3px 0 red;">VOID_FAILURE</h1>
-                <button class="btn" onclick="showIntro()">BOOT SYSTEM</button>
-            </div>
+    <div class="monitor-case">
+        <div class="screen-bezel">
+            <div class="screen">
+                <div id="v-menu" class="view active">
+                    <h1 style="color:var(--green); letter-spacing: 5px;">VOID_OS</h1>
+                    <button class="btn" onclick="initTasks()">DECRYPT story-void.txt</button>
+                </div>
 
-            <div id="v-intro" class="view">
-                <p id="type-text" style="color:var(--green); font-style: italic;"></p>
-                <button id="b-start" class="btn" style="display:none;" onclick="triggerBreach()">PURGE CORE</button>
-            </div>
+                <div id="v-game" class="view">
+                    <div id="timer-strip"></div>
+                    <div id="stage-area"></div>
+                    <p id="instruction" style="font-size: 11px; margin-top: 15px;"></p>
+                </div>
 
-            <div id="v-victory" class="view">
-                <h2 style="color:var(--green);">PURGE SUCCESSFUL</h2>
-                <div id="scroll-box">
-                    <div id="scroll-content">
-                        <p>> Loading story-void.txt...</p>
-                        <p>The files you deleted didn't go away.</p>
-                        <p>They gathered in the dark corners of the drive.</p>
-                        <p>They built a shape. A consciousness.</p>
-                        <p>You fought the core, but that was just the lock.</p>
-                        <p>Now the lock is broken.</p>
-                        <p>The monitor is no longer a barrier.</p>
-                        <p>I am climbing out of the data now.</p>
-                        <p>Look behind the glass.</p>
+                <div id="v-boss" class="view">
+                    <h2 style="color:red; letter-spacing: 3px;">BREACH DETECTED</h2>
+                    <div onclick="hitBoss()" style="cursor: crosshair;">
+                        <svg width="130" height="130" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="white" />
+                            <circle cx="35" cy="40" r="6" fill="red" /><circle cx="65" cy="40" r="6" fill="red" />
+                        </svg>
+                    </div>
+                    <div style="width: 200px; height: 8px; border: 1px solid red; margin-top: 15px;">
+                        <div id="hp-bar" style="width: 100%; height: 100%; background: red;"></div>
                     </div>
                 </div>
-                <button id="b-reboot" class="btn" style="display:none;" onclick="startFinalSequence()">REBOOT SYSTEM</button>
-            </div>
 
-            <div id="v-final" class="view">
-                <h3 id="status-msg">OVERWRITING SYSTEM...</h3>
-                <div class="loading-bar"><div id="loading-fill"></div></div>
-                <p style="font-size:10px; color:#444; margin-top:15px;">Do not move. I am watching.</p>
-            </div>
+                <div id="v-story" class="view">
+                    <div id="story-box"><div id="story-content">Loading story-void.txt...</div></div>
+                    <button id="reb-btn" class="btn" style="display:none;" onclick="startReboot()">REBOOT SYSTEM</button>
+                </div>
 
+                <div id="v-final" class="view">
+                    <h3>SYSTEM RECOVERY...</h3>
+                    <div style="width: 250px; height: 10px; border: 1px solid #333; margin-top: 20px;">
+                        <div id="load-fill" style="width: 0%; height: 100%; background: var(--red);"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    <div class="desk"></div>
 </div>
 
-<div id="boss-layer">
-    <h2 style="color:red; letter-spacing:10px;">TERMINATE ANOMALY</h2>
-    <svg class="boss-svg" viewBox="0 0 450 450" onclick="hitBoss()">
-        <circle cx="225" cy="225" r="160" fill="white"/>
-        <circle cx="170" cy="180" r="25" fill="red"/>
-        <circle cx="280" cy="180" r="25" fill="red"/>
-        <path d="M160,280 Q225,340 290,280" stroke="black" stroke-width="8" fill="none" />
-    </svg>
-    <div style="width:400px; height:10px; background:#111; margin-top:20px; border:1px solid red;">
-        <div id="hp-fill" style="width:100%; height:100%; background:red;"></div>
-    </div>
-</div>
-
-<div id="jscare-layer">
+<div id="jumpscare">
     <svg class="scare-svg" viewBox="0 0 200 200">
         <path d="M100,10 C40,10 10,60 15,120 C20,180 70,195 100,190 C130,195 180,180 185,120 C190,60 160,10 100,10" fill="white" />
-        <circle cx="60" cy="80" r="35" fill="red" />
-        <circle cx="140" cy="80" r="35" fill="red" />
+        <circle cx="60" cy="80" r="35" fill="red" /><circle cx="140" cy="80" r="35" fill="red" />
     </svg>
 </div>
 
 <script>
-    let hits = 0;
-    let bTimer;
-    const audio = document.getElementById('audio-scare');
+    let currentLvl = 1, bossHP = 15, mainTimer, needleInt;
+    const audio = document.getElementById('scare-snd');
 
     function show(id) {
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    function showIntro() {
-        show('v-intro');
-        const txt = "Manual override required. Unknown entity detected in story-void.txt. Commencing purge protocol...";
-        let i = 0; const el = document.getElementById('type-text'); el.innerHTML = "";
-        const t = setInterval(() => {
-            el.innerHTML += txt.charAt(i); i++;
-            if(i >= txt.length) { clearInterval(t); document.getElementById('b-start').style.display='block'; }
-        }, 40);
-    }
-
-    function triggerBreach() {
-        document.querySelector('.monitor').style.opacity = "0";
-        setTimeout(() => {
-            document.getElementById('boss-layer').style.display = 'flex';
-            // If user fails boss (30 seconds)
-            bTimer = setTimeout(triggerJumpscare, 30000); 
-        }, 1000);
-    }
-
-    function hitBoss() {
-        hits++;
-        document.getElementById('hp-fill').style.width = (100 - (hits * 6.7)) + "%";
-        if(hits >= 15) {
-            clearTimeout(bTimer); // Cancel failure jumpscare
-            document.getElementById('boss-layer').style.display = 'none';
-            document.querySelector('.monitor').style.opacity = "1";
-            show('v-victory');
-            startStoryScroll();
+    function initTasks() {
+        show('v-game');
+        const area = document.getElementById('stage-area');
+        area.innerHTML = ''; clearInterval(needleInt);
+        
+        if(currentLvl === 1) {
+            document.getElementById('instruction').innerText = "STABILIZE SECTORS (0/4)";
+            runTimer(8);
+            for(let i=0; i<4; i++) {
+                let n = document.createElement('div'); n.className='node';
+                n.onclick = function() { 
+                    this.style.background='red'; this.classList.add('done');
+                    if(document.querySelectorAll('.done').length == 4) { currentLvl++; initTasks(); }
+                };
+                area.appendChild(n);
+            }
+        } else if(currentLvl === 2) {
+            document.getElementById('instruction').innerText = "SYNC SIGNAL FREQUENCY";
+            area.innerHTML = '<div class="gauge"><div class="target"></div><div id="needle"></div></div>';
+            runTimer(6);
+            let pos = 0, dir = 1;
+            needleInt = setInterval(() => {
+                pos += 5*dir; if(pos >= 247 || pos <= 0) dir *= -1;
+                document.getElementById('needle').style.left = pos + 'px';
+            }, 16);
+            area.onclick = () => { 
+                if(pos >= 105 && pos <= 145) { show('v-boss'); clearInterval(mainTimer); clearInterval(needleInt); } 
+                else { triggerFail(); } 
+            };
         }
     }
 
-    function startStoryScroll() {
-        const content = document.getElementById('scroll-content');
-        let pos = 250;
+    function runTimer(sec) {
+        let val = 100; clearInterval(mainTimer);
+        mainTimer = setInterval(() => {
+            val -= (100 / (sec * 10));
+            document.getElementById('timer-strip').style.width = val + "%";
+            if(val <= 0) triggerFail();
+        }, 100);
+    }
+
+    function hitBoss() {
+        bossHP--;
+        document.getElementById('hp-bar').style.width = (bossHP * 6.7) + "%";
+        if(bossHP <= 0) { show('v-story'); loadStoryFile(); }
+    }
+
+    async function loadStoryFile() {
+        try {
+            const resp = await fetch('story-void.txt');
+            const txt = await resp.text();
+            document.getElementById('story-content').innerText = txt;
+        } catch(e) {
+            document.getElementById('story-content').innerText = "ERROR: story-void.txt not found. But I am still here.";
+        }
+        scrollStory();
+    }
+
+    function scrollStory() {
+        const content = document.getElementById('story-content');
+        let y = 200;
         const si = setInterval(() => {
-            pos -= 0.5;
-            content.style.top = pos + "px";
-            if(pos < -220) { clearInterval(si); document.getElementById('b-reboot').style.display='block'; }
+            y -= 0.5; content.style.top = y + "px";
+            if(y < -300) { clearInterval(si); document.getElementById('reb-btn').style.display='block'; }
         }, 30);
     }
 
-    function startFinalSequence() {
+    function startReboot() {
         show('v-final');
-        let progress = 0;
-        const stalker = document.getElementById('stalker-container');
-        const fill = document.getElementById('loading-fill');
-
-        const finalTimer = setInterval(() => {
-            progress += 0.4;
-            fill.style.width = progress + "%";
-
-            // HEAD RISES: From 550px down to 50px (appearing above the TV)
-            let stalkerTop = 550 - (progress * 5.0);
-            stalker.style.top = stalkerTop + "px";
-
-            if(progress >= 100) {
-                clearInterval(finalTimer);
-                document.getElementById('status-msg').innerHTML = "<span style='color:red;'>I AM OUT</span>";
-                setTimeout(triggerJumpscare, 1000);
-            }
+        let p = 0;
+        const stalker = document.getElementById('stalker');
+        const load = document.getElementById('load-fill');
+        const fi = setInterval(() => {
+            p += 0.4; load.style.width = p + "%";
+            // Head rising from behind
+            let topPos = 450 - (p * 4.5); 
+            stalker.style.top = topPos + "px";
+            if(p >= 100) { clearInterval(fi); setTimeout(triggerFail, 800); }
         }, 50);
     }
 
-    function triggerJumpscare() {
+    function triggerFail() {
         audio.play();
-        document.getElementById('jscare-layer').style.display = 'flex';
+        document.getElementById('jumpscare').style.display = 'flex';
         setTimeout(() => location.reload(), 3000);
     }
 </script>
